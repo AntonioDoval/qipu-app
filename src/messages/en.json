@@ -1,0 +1,76 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "close": "Close",
+    "open": "Open",
+    "back": "Back",
+    "confirm": "Confirm",
+    "noResults": "No results"
+  },
+  "nav": {
+    "library": "Library",
+    "projects": "Projects",
+    "tags": "Tags",
+    "settings": "Settings",
+    "allItems": "All items"
+  },
+  "families": {
+    "bibliography": "Bibliography",
+    "fieldwork": "Fieldwork",
+    "multimedia": "Multimedia",
+    "data": "Data",
+    "other": "Other",
+    "quotes": "Quotes"
+  },
+  "types": {
+    "book": "Book",
+    "book_chapter": "Book chapter",
+    "journal_article": "Journal article",
+    "thesis": "Thesis",
+    "working_paper": "Working paper",
+    "conference_paper": "Conference paper",
+    "interview": "Interview",
+    "fieldnote": "Field note",
+    "document": "Document",
+    "webpage": "Webpage",
+    "image": "Image",
+    "video": "Video",
+    "audio": "Audio",
+    "social_media_post": "Social media post",
+    "dataset": "Dataset",
+    "statistic": "Statistic",
+    "custom": "Custom"
+  },
+  "items": {
+    "addItem": "Add item",
+    "dropzone": "Drop a file here or click to browse",
+    "pasteLink": "Paste a link",
+    "createNote": "Create note",
+    "addManually": "Add manually",
+    "title": "Title",
+    "type": "Type",
+    "year": "Year",
+    "creators": "Authors / Creators",
+    "tags": "Tags",
+    "projects": "Projects",
+    "metadata": "Metadata",
+    "openViewer": "Open viewer",
+    "noItems": "No items yet"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "signInWithGoogle": "Continue with Google",
+    "email": "Email",
+    "password": "Password",
+    "driveReconnect": "Reconnect your Google Drive",
+    "driveReconnectDesc": "Access to Google Drive was revoked. Reconnect to continue viewing and uploading files."
+  }
+}

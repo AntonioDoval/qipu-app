@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design tokens as CSS custom properties ──────────────────────────── */
+:root {
+  --paper:   #faf8f4;
+  --cream:   #f0ebdd;
+  --sand:    #e8e2d5;
+  --dust:    #d8cfba;
+  --stone:   #a89b85;
+  --sage:    #7a7060;
+  --ink:     #1a1a1a;
+  --accent:  #4a5b78;
+  --accent2: #6b7d99;
+  --soft:    #e6ebf3;
+  --softer:  #eef2f8;
+}
+
+/* ─── Base ────────────────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: 'Lora', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Typography ──────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+code, kbd, samp, pre {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+/* ─── Animations ──────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Scrollbars ──────────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--dust); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--stone); }
+
+/* ─── Focus rings ─────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ─── Selection ───────────────────────────────────────────────────────── */
+::selection {
+  background-color: var(--soft);
+  color: var(--ink);
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+}

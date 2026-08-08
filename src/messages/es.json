@@ -1,0 +1,76 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Ocurrió un error",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "search": "Buscar",
+    "close": "Cerrar",
+    "open": "Abrir",
+    "back": "Volver",
+    "confirm": "Confirmar",
+    "noResults": "Sin resultados"
+  },
+  "nav": {
+    "library": "Biblioteca",
+    "projects": "Proyectos",
+    "tags": "Etiquetas",
+    "settings": "Configuración",
+    "allItems": "Todos los ítems"
+  },
+  "families": {
+    "bibliography": "Bibliografía",
+    "fieldwork": "Trabajo de campo",
+    "multimedia": "Multimedia",
+    "data": "Datos",
+    "other": "Otros",
+    "quotes": "Citas"
+  },
+  "types": {
+    "book": "Libro",
+    "book_chapter": "Capítulo de libro",
+    "journal_article": "Artículo de revista",
+    "thesis": "Tesis",
+    "working_paper": "Documento de trabajo",
+    "conference_paper": "Ponencia",
+    "interview": "Entrevista",
+    "fieldnote": "Nota de campo",
+    "document": "Documento",
+    "webpage": "Página web",
+    "image": "Imagen",
+    "video": "Video",
+    "audio": "Audio",
+    "social_media_post": "Publicación en redes",
+    "dataset": "Dataset",
+    "statistic": "Estadística",
+    "custom": "Personalizado"
+  },
+  "items": {
+    "addItem": "Agregar ítem",
+    "dropzone": "Soltá un archivo aquí o hacé clic para explorar",
+    "pasteLink": "Pegar enlace",
+    "createNote": "Crear nota",
+    "addManually": "Agregar manualmente",
+    "title": "Título",
+    "type": "Tipo",
+    "year": "Año",
+    "creators": "Autores / Creadores",
+    "tags": "Etiquetas",
+    "projects": "Proyectos",
+    "metadata": "Metadatos",
+    "openViewer": "Abrir visor",
+    "noItems": "No hay ítems todavía"
+  },
+  "auth": {
+    "signIn": "Iniciar sesión",
+    "signOut": "Cerrar sesión",
+    "signInWithGoogle": "Continuar con Google",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "driveReconnect": "Reconectá tu Google Drive",
+    "driveReconnectDesc": "El acceso a Google Drive fue revocado. Reconectá para seguir viendo y subiendo archivos."
+  }
+}
