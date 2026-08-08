@@ -7,7 +7,7 @@ export const defaultLocale: Locale = 'es';
 
 export default getRequestConfig(async () => {
   // Read locale from cookie, fallback to default
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const localeCookie = cookieStore.get('qipu-locale')?.value;
   const locale = locales.includes(localeCookie as Locale)
     ? (localeCookie as Locale)

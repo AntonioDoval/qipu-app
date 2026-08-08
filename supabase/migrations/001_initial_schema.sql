@@ -76,13 +76,23 @@ create table public.items (
 );
 
 -- Full-text search vector (title + creators + content_text)
-alter table public.items
-  add column search_vector tsvector
-  generated always as (
-    setweight(to_tsvector('spanish', coalesce(title, '')), 'A') ||
-    setweight(to_tsvector('spanish', coalesce(array_to_string(creators, ' '), '')), 'B') ||
-    setweight(to_tsvector('spanish', coalesce(content_text, '')), 'C')
-  ) stored;
+-- Populated via trigger (generated columns don't support language-specific tsvector)
+alter table public.items add column search_vector tsvector;
+
+create or replace function public.items_search_vector_update()
+returns trigger language plpgsql as $$
+begin
+  new.search_vector :=
+    setweight(to_tsvector('spanish', coalesce(new.title, '')), 'A') ||
+    setweight(to_tsvector('spanish', coalesce(array_to_string(new.creators, ' '), '')), 'B') ||
+    setweight(to_tsvector('spanish', coalesce(new.content_text, '')), 'C');
+  return new;
+end;
+$$;
+
+create trigger items_search_vector_trigger
+  before insert or update on public.items
+  for each row execute procedure public.items_search_vector_update();
 
 -- Indexes
 create index items_user_id_idx        on public.items(user_id);
