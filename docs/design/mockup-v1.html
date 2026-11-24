@@ -1,0 +1,656 @@
+<title>Qipu Workspace Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: three-pane research workspace (sidebar · content · context panel); the reader drops the sidebar to give the page room. */
+:root {
+  /* Qipu tokens (src/lib/tokens.ts) */
+  --paper: #faf8f4; --cream: #f0ebdd; --sand: #e8e2d5; --dust: #d8cfba;
+  --stone: #a89b85; --sage: #7a7060; --ink: #1a1a1a;
+  --accent: #4a5b78; --accent2: #6b7d99; --soft: #e6ebf3; --softer: #eef2f8;
+  /* proposed additions: reading highlights */
+  --quote-hl: #dfe6f1; --note-hl: #f1e6c8; --note-mark: #a8803a;
+  --page: #ffffff; --shadow: rgba(60, 50, 30, .08);
+  --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --body: 'Lora', Georgia, 'Times New Roman', serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #191816; --cream: #222019; --sand: #2a2823; --dust: #3a372f;
+  --stone: #8e8371; --sage: #b2a78f; --ink: #ece6da;
+  --accent: #9fb1d0; --accent2: #8194b4; --soft: #263044; --softer: #1f2533;
+  --quote-hl: #2c3850; --note-hl: #43391f; --note-mark: #d4ae62;
+  --page: #211f1b; --shadow: rgba(0,0,0,.35); color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --paper: #191816; --cream: #222019; --sand: #2a2823; --dust: #3a372f;
+  --stone: #8e8371; --sage: #b2a78f; --ink: #ece6da;
+  --accent: #9fb1d0; --accent2: #8194b4; --soft: #263044; --softer: #1f2533;
+  --quote-hl: #2c3850; --note-hl: #43391f; --note-mark: #d4ae62;
+  --page: #211f1b; --shadow: rgba(0,0,0,.35); color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.55; overflow: hidden; }
+* { box-sizing: border-box; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+::selection { background: var(--soft); }
+.mono { font-family: var(--mono); font-size: 11px; letter-spacing: .02em; font-variant-numeric: tabular-nums; }
+.label { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--sage); }
+
+/* Mockup strip */
+.strip { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; height: 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--dust); background: var(--cream); }
+.strip .label { color: var(--sage); }
+.strip nav { display: flex; gap: 4px; }
+.strip nav button { padding: 3px 10px; border-radius: 999px; font-size: 12.5px; color: var(--sage); }
+.strip nav button[aria-current="true"] { background: var(--ink); color: var(--paper); }
+.strip .hint { margin-left: auto; font-size: 12px; color: var(--sage); font-style: italic; }
+
+.app { display: grid; grid-template-columns: 236px minmax(0, 1fr); height: calc(100% - 40px); }
+.app[data-view="reader"] { grid-template-columns: minmax(0, 1fr); }
+.app[data-view="reader"] .side { display: none; }
+
+/* Sidebar */
+.side { border-right: 1px solid var(--dust); background: var(--cream); overflow-y: auto; padding: 18px 12px 24px; display: flex; flex-direction: column; gap: 20px; }
+.brand { font-family: var(--display); font-size: 24px; font-weight: 600; letter-spacing: -.02em; padding: 0 8px; display: flex; align-items: baseline; gap: 8px; }
+.brand small { font-family: var(--mono); font-size: 10px; color: var(--stone); font-weight: 400; letter-spacing: .05em; }
+.side section { display: flex; flex-direction: column; gap: 1px; }
+.side .label { padding: 0 8px 6px; display: flex; justify-content: space-between; }
+.side .label button { color: var(--stone); font-size: 13px; line-height: 1; }
+.nav { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 4px 8px; border-radius: 5px; font-size: 13.5px; color: var(--ink); }
+.nav:hover { background: var(--sand); }
+.nav[aria-current="true"] { background: var(--soft); color: var(--accent); }
+.nav .count { margin-left: auto; font-family: var(--mono); font-size: 10.5px; color: var(--stone); }
+.nav .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.nav.child { padding-left: 24px; }
+.nav.grandchild { padding-left: 40px; }
+.nav .caret { width: 10px; color: var(--stone); font-size: 9px; flex: none; }
+.side .foot { margin-top: auto; display: flex; flex-direction: column; gap: 1px; border-top: 1px solid var(--dust); padding-top: 12px; }
+
+/* Shared topbar */
+.top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding-block: 14px; padding-inline: 24px; border-bottom: 1px solid var(--dust); }
+.top h1 { font-family: var(--display); font-size: 22px; font-weight: 500; letter-spacing: -.01em; margin: 0; }
+.top .sub { color: var(--sage); font-size: 13px; }
+.btn.menu-btn { display: none; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--dust); background: var(--page); font-size: 13px; }
+.btn:hover { border-color: var(--stone); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.btn.ghost { border-color: transparent; background: none; color: var(--sage); }
+.btn.ghost:hover { color: var(--ink); background: var(--sand); }
+
+/* Library */
+.lib { display: grid; grid-template-columns: minmax(0, 1fr) 320px; height: 100%; min-height: 0; }
+.lib-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.searchrow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding-block: 12px; padding-inline: 24px; border-bottom: 1px solid var(--sand); }
+.search { flex: 1 1 220px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--dust); border-radius: 6px; padding: 5px 10px; background: var(--page); min-width: 0; }
+.search input { border: 0; outline: 0; background: none; width: 100%; font-size: 13.5px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px; border-radius: 999px; background: var(--sand); font-size: 12px; white-space: nowrap; }
+.chip .dot { width: 6px; height: 6px; border-radius: 50%; }
+.chip button { color: var(--stone); font-size: 12px; line-height: 1; }
+.list { overflow: auto; flex: 1; }
+table { width: 100%; border-collapse: collapse; }
+th { position: sticky; top: 0; background: var(--paper); text-align: left; font-weight: 400; padding: 8px 10px; border-bottom: 1px solid var(--dust); z-index: 1; }
+th:first-child, td:first-child { padding-left: 24px; }
+th button { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--sage); }
+td { padding: 9px 10px; border-bottom: 1px solid var(--sand); vertical-align: top; }
+tr.row { cursor: pointer; }
+tr.row:hover td { background: var(--softer); }
+tr.row[aria-selected="true"] td { background: var(--soft); }
+.t-title { font-weight: 500; line-height: 1.35; }
+.t-creators { color: var(--sage); font-size: 12.5px; }
+.type { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--sage); white-space: nowrap; }
+.type.note { color: var(--note-mark); }
+.yr { font-family: var(--mono); font-size: 12px; color: var(--sage); }
+.badges { display: flex; gap: 8px; color: var(--stone); font-family: var(--mono); font-size: 11px; white-space: nowrap; }
+.tagdots { display: flex; gap: 4px; flex-wrap: wrap; }
+.empty { padding: 40px 24px; color: var(--sage); font-style: italic; }
+
+/* Context panel (inspector / reader panel / note links) */
+.panel { border-left: 1px solid var(--dust); background: var(--paper); overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.panel h2 { font-family: var(--display); font-size: 19px; font-weight: 500; line-height: 1.25; margin: 4px 0 2px; text-wrap: balance; }
+.panel section { display: flex; flex-direction: column; gap: 6px; }
+.meta { display: grid; grid-template-columns: 82px 1fr; gap: 4px 10px; font-size: 13px; }
+.meta dt { color: var(--sage); font-family: var(--mono); font-size: 11px; padding-top: 2px; }
+.meta dd { margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.addchip { border: 1px dashed var(--dust); background: none; color: var(--stone); }
+.linkrow { display: flex; gap: 8px; align-items: baseline; padding: 4px 0; text-align: left; width: 100%; }
+.linkrow:hover .lt { color: var(--accent); text-decoration: underline; }
+.linkrow .lt { font-size: 13px; }
+.muted { color: var(--sage); font-size: 12.5px; }
+.anchored { border-left: 2px solid var(--note-mark); padding: 2px 0 2px 10px; text-align: left; width: 100%; }
+.anchored .lt { font-size: 13px; font-weight: 500; }
+.anchored:hover .lt { color: var(--accent); }
+
+/* Reader */
+.reader { display: grid; grid-template-columns: minmax(0, 1fr) 360px; height: 100%; min-height: 0; }
+.reader-main { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.reader .top h1 { font-size: 17px; }
+.pagewrap { flex: 1; overflow: auto; background: var(--sand); padding: 28px 20px 60px; }
+.page { position: relative; max-width: 640px; margin: 0 auto; background: var(--page); box-shadow: 0 1px 3px var(--shadow), 0 8px 24px var(--shadow); padding: 56px 64px 64px; font-family: 'Times New Roman', Georgia, serif; font-size: 15.5px; line-height: 1.62; }
+.page .runhead { display: flex; justify-content: space-between; font-size: 12px; color: var(--sage); letter-spacing: .06em; margin-bottom: 36px; font-variant: small-caps; }
+.page h3 { text-align: center; font-weight: 400; font-size: 14px; letter-spacing: .18em; margin: 0 0 4px; }
+.page h4 { text-align: center; font-weight: 400; font-size: 17px; letter-spacing: .08em; margin: 0 0 28px; }
+.page p { margin: 0 0 14px; text-indent: 1.6em; text-align: justify; hyphens: auto; position: relative; }
+.page .bar { height: 10px; background: var(--sand); border-radius: 2px; margin: 0 0 11px; }
+mark { color: inherit; border-radius: 2px; padding: 1px 0; cursor: pointer; }
+mark.q { background: var(--quote-hl); }
+mark.n { background: var(--note-hl); }
+mark.flash { outline: 2px solid var(--accent); }
+.margin-note { position: absolute; right: -46px; width: 22px; height: 22px; border-radius: 50%; background: var(--note-mark); color: var(--page); font-family: var(--mono); font-size: 11px; display: grid; place-items: center; }
+.pop { position: fixed; z-index: 30; display: flex; gap: 2px; padding: 3px; background: var(--ink); border-radius: 8px; box-shadow: 0 6px 18px var(--shadow); }
+.pop button { color: var(--paper); padding: 5px 10px; border-radius: 5px; font-size: 12.5px; }
+.pop button:hover { background: rgba(127,127,127,.3); }
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--dust); margin: -20px -20px 0; padding: 0 12px; position: sticky; top: -20px; background: var(--paper); z-index: 2; }
+.tabs button { padding: 12px 10px 10px; font-size: 13px; color: var(--sage); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tabs .count { font-family: var(--mono); font-size: 10.5px; color: var(--stone); margin-left: 3px; }
+.card { border: 1px solid var(--dust); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: var(--page); }
+.card.is-new { border-color: var(--accent2); }
+.card blockquote { margin: 0; font-size: 13.5px; line-height: 1.5; padding-left: 10px; border-left: 2px solid var(--accent2); }
+.card.notecard blockquote { border-left-color: var(--note-mark); color: var(--sage); font-size: 12.5px; font-style: italic; }
+.card .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.loc { width: 90px; border: 1px solid transparent; border-radius: 4px; padding: 1px 5px; background: var(--softer); font-family: var(--mono); font-size: 11px; }
+.loc:hover, .loc:focus { border-color: var(--dust); }
+.tagin { width: 80px; border: 1px dashed var(--dust); border-radius: 999px; padding: 0 8px; background: none; font-size: 12px; outline: 0; }
+.card textarea { width: 100%; min-height: 84px; resize: vertical; border: 1px solid var(--dust); border-radius: 6px; padding: 8px; background: var(--paper); font-size: 13.5px; line-height: 1.5; }
+.card .ntitle { font-weight: 500; font-size: 13.5px; }
+.textlink { color: var(--accent); font-size: 12.5px; }
+.textlink:hover { text-decoration: underline; }
+
+/* Note editor */
+.notev { display: grid; grid-template-columns: minmax(0, 1fr) 300px; height: 100%; min-height: 0; }
+.note-main { overflow-y: auto; min-width: 0; }
+.note-inner { max-width: 700px; margin: 0 auto; padding: 32px 32px 80px; display: flex; flex-direction: column; gap: 16px; }
+.note-title { font-family: var(--display); font-size: 30px; font-weight: 500; letter-spacing: -.015em; border: 0; outline: 0; background: none; width: 100%; padding: 0; }
+.anchor-card { display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 10px 14px; border-radius: 8px; background: var(--note-hl); width: 100%; }
+.anchor-card .q { font-style: italic; font-size: 13.5px; line-height: 1.5; }
+.anchor-card .src { font-size: 12.5px; color: var(--sage); }
+.anchor-card:hover .src { color: var(--accent); }
+.modebar { display: flex; gap: 2px; align-self: flex-start; background: var(--sand); border-radius: 6px; padding: 2px; }
+.modebar button { padding: 2px 10px; border-radius: 4px; font-size: 12px; color: var(--sage); }
+.modebar button[aria-pressed="true"] { background: var(--page); color: var(--ink); box-shadow: 0 1px 2px var(--shadow); }
+.editor { width: 100%; min-height: 340px; border: 0; outline: 0; background: none; resize: none; font-size: 15px; line-height: 1.7; font-family: var(--mono); font-size: 13.5px; }
+.rendered { font-size: 15.5px; line-height: 1.75; max-width: 65ch; }
+.rendered p { margin: 0 0 14px; }
+.wikilink { color: var(--accent); border-bottom: 1px solid var(--accent2); cursor: pointer; }
+.wikilink.missing { color: var(--stone); border-bottom-style: dashed; }
+.hashtag { font-family: var(--mono); font-size: 12px; background: var(--sand); padding: 1px 6px; border-radius: 999px; cursor: pointer; }
+
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 8px; font-size: 13px; z-index: 40; max-width: calc(100% - 32px); }
+.addmenu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; background: var(--page); border: 1px solid var(--dust); border-radius: 8px; box-shadow: 0 8px 24px var(--shadow); padding: 4px; min-width: 210px; display: flex; flex-direction: column; }
+.addmenu button { text-align: left; padding: 7px 10px; border-radius: 5px; font-size: 13px; display: flex; justify-content: space-between; gap: 12px; }
+.addmenu button:hover { background: var(--softer); }
+.addmenu button span { color: var(--stone); font-family: var(--mono); font-size: 10.5px; }
+.rel { position: relative; }
+
+@media (max-width: 860px) {
+  body { overflow: auto; }
+  .app, .app[data-view="reader"] { display: block; height: auto; }
+  .side { display: none; position: fixed; z-index: 25; inset: 40px auto 0 0; width: 260px; box-shadow: 0 0 40px var(--shadow); padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+  .app.menu-open .side { display: flex; }
+  .btn.menu-btn { display: inline-flex; }
+  .lib, .reader, .notev { display: block; height: auto; }
+  .panel { border-left: 0; border-top: 1px solid var(--dust); }
+  .list { overflow: visible; }
+  .top, .searchrow { padding-inline: max(16px, env(safe-area-inset-left, 0px)); }
+  th:first-child, td:first-child { padding-left: 16px; }
+  .hide-sm { display: none; }
+  .page { padding: 32px 26px 40px; }
+  .margin-note { right: -20px; }
+  .pagewrap { padding: 16px 10px 30px; }
+  .note-inner { padding: 24px 16px 40px; }
+  .strip .hint { display: none; }
+  .tabs { position: static; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .toast, .pop, .addmenu { animation: fadeIn .15s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translate(var(--tx, 0), 4px); } to { opacity: 1; transform: translate(var(--tx, 0), 0); } }
+  .toast { --tx: -50%; }
+}
+</style>
+
+<div class="strip">
+  <span class="label">Mockup · example data</span>
+  <nav aria-label="Mockup views">
+    <button data-go="library">Library</button>
+    <button data-go="reader">Reader</button>
+    <button data-go="note">Note</button>
+  </nav>
+  <span class="hint">In the Reader, select any text to quote it or add a note.</span>
+</div>
+<div class="app" id="app" data-view="library">
+  <aside class="side" id="side" aria-label="Sidebar"></aside>
+  <main id="main" style="min-height:0;min-width:0;height:100%"></main>
+</div>
+
+<script>
+// ─── Example data ─────────────────────────────────────────────────────────
+const TYPES = {
+  book: ['Book', 'bibliography'], journal_article: ['Article', 'bibliography'], book_chapter: ['Chapter', 'bibliography'],
+  fieldnote: ['Fieldnote', 'fieldwork'], interview: ['Interview', 'fieldwork'], document: ['Document', 'fieldwork'],
+  note: ['Note', 'notes'],
+};
+const FAMILIES = [['all', 'All items'], ['bibliography', 'Bibliography'], ['fieldwork', 'Fieldwork'], ['notes', 'Notes']];
+const TAGS = [
+  { n: 'exchange', c: '#a89b85' }, { n: 'gift', p: 'exchange' }, { n: 'reciprocity', p: 'exchange' }, { n: 'kula', p: 'exchange' }, { n: 'circulation', p: 'exchange' },
+  { n: 'andes', c: '#7f9168' }, { n: 'ayni', p: 'andes' }, { n: 'minga', p: 'andes' }, { n: 'feria', p: 'andes' },
+  { n: 'method', c: '#8c7aa0' }, { n: 'to-revisit', c: '#b8743c' },
+];
+const PROJECTS = [
+  { id: 'thesis', n: 'Thesis', c: '#4a5b78' }, { id: 'ch1', n: 'Ch. 1 — Theories of exchange', p: 'thesis' }, { id: 'ch2', n: 'Ch. 2 — The Huancayo feria', p: 'thesis' },
+  { id: 'sem', n: 'Seminar: Economic anthropology', c: '#a8803a' },
+];
+let ITEMS = [
+  { id: 'malinowski', type: 'book', title: 'Argonauts of the Western Pacific', creators: ['Bronisław Malinowski'], year: 1922, tags: ['kula', 'reciprocity'], projects: ['ch1', 'sem'], pdf: true, pages: 527, publisher: 'Routledge & Kegan Paul', place: 'London', links: ['mauss'] },
+  { id: 'mauss', type: 'journal_article', title: 'Essai sur le don', creators: ['Marcel Mauss'], year: 1925, tags: ['gift', 'reciprocity'], projects: ['ch1'], pdf: true, pages: 186, journal: "L'Année sociologique", links: [] },
+  { id: 'alberti', type: 'book', title: 'Reciprocidad e intercambio en los Andes peruanos', creators: ['Giorgio Alberti', 'Enrique Mayer'], year: 1974, tags: ['ayni', 'reciprocity', 'andes'], projects: ['ch2'], pdf: true, pages: 360, publisher: 'IEP', place: 'Lima', links: [] },
+  { id: 'mayer', type: 'book', title: 'The Articulated Peasant', creators: ['Enrique Mayer'], year: 2002, tags: ['andes', 'feria'], projects: ['ch2'], pdf: true, pages: 382, publisher: 'Westview', links: [] },
+  { id: 'strathern', type: 'book', title: 'The Gender of the Gift', creators: ['Marilyn Strathern'], year: 1988, tags: ['gift', 'to-revisit'], projects: ['ch1'], pdf: false, publisher: 'University of California Press', links: [] },
+  { id: 'graeber', type: 'book', title: 'Toward an Anthropological Theory of Value', creators: ['David Graeber'], year: 2001, tags: ['exchange'], projects: ['sem'], pdf: true, pages: 320, publisher: 'Palgrave', links: [] },
+  { id: 'tsing', type: 'book', title: 'The Mushroom at the End of the World', creators: ['Anna Lowenhaupt Tsing'], year: 2015, tags: ['circulation'], projects: ['sem'], pdf: true, pages: 352, publisher: 'Princeton University Press', links: [] },
+  { id: 'fn-feria', type: 'fieldnote', title: 'Feria de Huancayo — 14 mar 2026', creators: [], year: 2026, tags: ['feria', 'minga'], projects: ['ch2'],
+    body: 'Domingo. Llegué 6:40, los puestos de papa ya armados. Doña Rosa dice que "acá nadie fía, pero todos deben". Le pregunto por la minga del jueves: va a ir porque su comadre fue a la suya en enero.\n\nOjo: el fiado circula entre puesteras igual que la ayuda en la chacra. Volver sobre esto en [[Ayni vs. the Maussian gift]]. #feria #minga' },
+  { id: 'int-rosa', type: 'interview', title: 'Entrevista a Doña Rosa, comerciante', creators: [], year: 2026, tags: ['feria', 'method'], projects: ['ch2'],
+    body: 'Transcripción parcial (audio 00:00–14:20).\n\nR: Mi mamá vendía acá mismo, en la misma esquina. Las caseras son de toda la vida...\n\nPendiente: completar desde el minuto 14. #method' },
+  { id: 'doc-ordenanza', type: 'document', title: 'Ordenanza municipal sobre ferias, 2019', creators: ['Municipalidad Provincial de Huancayo'], year: 2019, tags: ['feria'], projects: ['ch2'], pdf: true, pages: 12, links: [] },
+  { id: 'n-kula', type: 'note', title: 'Kula as circulation, not exchange', creators: [], year: 2026, tags: ['kula', 'circulation'], projects: ['ch1'],
+    anchor: { item: 'malinowski', page: 81, para: 1, text: 'Each of these articles, as it travels in its own direction on the closed circuit, meets on its way articles of the other class, and is constantly being exchanged for them.' },
+    body: 'Malinowski insists the armshells and necklaces never stop moving. Nobody keeps them; holding one is a stage, not an end.\n\nCompare with [[Ayni vs. the Maussian gift]]: in Huancayo the open debt is also what keeps the relation going. See [[Feria de Huancayo — 14 mar 2026]].\n\nQuestion for ch. 2: is the feria a ring or a hub? #kula #circulation' },
+  { id: 'n-ayni', type: 'note', title: 'Ayni vs. the Maussian gift', creators: [], year: 2026, tags: ['ayni', 'gift'], projects: ['ch1', 'ch2'],
+    body: 'Ayni returns labour in kind and in time: you help on my field, I help on yours. Mauss reads the obligation to return as a force in the thing itself; in ayni the obligation sits in the calendar and the kin network.\n\nSources: [[Reciprocidad e intercambio en los Andes peruanos]], [[Essai sur le don]], [[The Gender of the Gift]].\n\nStill missing: [[Harris on ayllu economies]] #ayni #gift #to-revisit' },
+];
+let QUOTES = [
+  { id: 'q1', item: 'malinowski', text: 'The Kula is a form of exchange, of extensive, inter-tribal character', loc: 'p. 81, ¶1', tags: ['kula'] },
+  { id: 'q2', item: 'malinowski', text: 'Every movement of the Kula articles, every detail of the transactions is fixed and regulated by a set of traditional rules and conventions', loc: 'p. 81, ¶2', tags: ['reciprocity'] },
+  { id: 'q3', item: 'malinowski', text: 'articles of two kinds, and these two kinds only, are constantly travelling in opposite directions', loc: 'p. 81, ¶1', tags: [] },
+  { id: 'q4', item: 'mauss', text: 'la chose donnée n’est pas inerte', loc: 'p. 46', tags: ['gift'] },
+];
+// Sample page (Malinowski 1922, ch. III, public domain). Segments: plain text, or [kind, id, text].
+const PAGE81 = [
+  ['Having thus described the scene, and the actors, let us now proceed to the performance. ', ['q', 'q1', 'The Kula is a form of exchange, of extensive, inter-tribal character'], '; it is carried on by communities inhabiting a wide ring of islands, which form a closed circuit. This circuit can be seen on Map V, where it is represented by the lines joining a number of islands to the North and East of the East end of New Guinea. Along this route, ', ['q', 'q3', 'articles of two kinds, and these two kinds only, are constantly travelling in opposite directions'], '. In the direction of the hands of a clock, moves constantly one of these kinds—long necklaces of red shell, called soulava. In the opposite direction moves the other kind—bracelets of white shell called mwali. ', ['n', 'n-kula', 'Each of these articles, as it travels in its own direction on the closed circuit, meets on its way articles of the other class, and is constantly being exchanged for them.']],
+  [['q', 'q2', 'Every movement of the Kula articles, every detail of the transactions is fixed and regulated by a set of traditional rules and conventions'], ', and some acts of the Kula are accompanied by an elaborate magical ritual and public ceremonies.'],
+];
+
+// ─── State ────────────────────────────────────────────────────────────────
+const S = { view: 'library', filter: { kind: 'family', id: 'all' }, q: '', sort: 'title', selected: 'malinowski', readerItem: 'malinowski', tab: 'quotes', noteId: 'n-kula', noteMode: 'read', newCard: null };
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fold = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const item = id => ITEMS.find(i => i.id === id);
+const byTitle = t => ITEMS.find(i => fold(i.title) === fold(t));
+const tagColor = n => { const t = TAGS.find(x => x.n === n); if (!t) return '#a89b85'; return t.c || tagColor(t.p); };
+const proj = id => PROJECTS.find(p => p.id === id);
+const isText = i => ['note', 'fieldnote', 'interview'].includes(i.type);
+const anchoredNotes = id => ITEMS.filter(i => i.anchor && i.anchor.item === id);
+const quotesOf = id => QUOTES.filter(q => q.item === id);
+const outLinks = i => {
+  const fromBody = [...(i.body || '').matchAll(/\[\[([^\]]+)\]\]/g)].map(m => m[1]);
+  return [...new Set(fromBody)].map(t => ({ t, it: byTitle(t) })).concat((i.links || []).map(id => ({ t: item(id).title, it: item(id) })));
+};
+const backLinks = i => ITEMS.filter(o => o.id !== i.id && (outLinks(o).some(l => l.it && l.it.id === i.id)));
+const chipHTML = (n, removable) => `<span class="chip"><span class="dot" style="background:${tagColor(n)}"></span>${esc(n)}${removable ? `<button aria-label="Remove ${esc(n)}" data-untag="${esc(n)}">×</button>` : ''}</span>`;
+
+function toast(msg) {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.append(t);
+  setTimeout(() => t.remove(), 2600);
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────
+function countFor(kind, id) {
+  return ITEMS.filter(i => matches(i, { kind, id })).length;
+}
+function matches(i, f) {
+  if (f.kind === 'family') return f.id === 'all' || TYPES[i.type][1] === f.id;
+  if (f.kind === 'project') return i.projects.includes(f.id) || PROJECTS.some(p => p.p === f.id && i.projects.includes(p.id));
+  if (f.kind === 'tag') return i.tags.includes(f.id) || TAGS.some(t => t.p === f.id && i.tags.includes(t.n));
+  return true;
+}
+function renderSide() {
+  const cur = (k, id) => S.view === 'library' && S.filter.kind === k && S.filter.id === id;
+  const fam = FAMILIES.map(([id, n]) => `<button class="nav" data-filter="family:${id}" aria-current="${cur('family', id)}">${n}<span class="count">${countFor('family', id)}</span></button>`).join('');
+  const projs = PROJECTS.map(p => `<button class="nav ${p.p ? 'child' : ''}" data-filter="project:${p.id}" aria-current="${cur('project', p.id)}">${p.p ? '' : `<span class="dot" style="background:${p.c}"></span>`}${esc(p.n)}<span class="count">${countFor('project', p.id)}</span></button>`).join('');
+  const tags = TAGS.map(t => `<button class="nav ${t.p ? 'child' : ''}" data-filter="tag:${t.n}" aria-current="${cur('tag', t.n)}"><span class="dot" style="background:${tagColor(t.n)}"></span>${esc(t.n)}<span class="count">${countFor('tag', t.n)}</span></button>`).join('');
+  $('#side').innerHTML = `
+    <div class="brand">Qipu <small>v0.1</small></div>
+    <section><div class="label">Library</div>${fam}</section>
+    <section><div class="label">Projects <button aria-label="New project" data-soon="New project">+</button></div>${projs}</section>
+    <section><div class="label">Tags <button aria-label="New tag" data-soon="New tag">+</button></div>${tags}</section>
+    <div class="foot">
+      <button class="nav" data-soon="Trash">Trash<span class="count">2</span></button>
+      <button class="nav" data-soon="Settings: Google Drive, language (ES/EN), citation style">Settings</button>
+    </div>`;
+}
+
+// ─── Library ──────────────────────────────────────────────────────────────
+function filterLabel() {
+  const f = S.filter;
+  if (f.kind === 'family') return FAMILIES.find(x => x[0] === f.id)[1];
+  if (f.kind === 'project') return proj(f.id).n;
+  return '#' + f.id;
+}
+function visibleItems() {
+  let list = ITEMS.filter(i => matches(i, S.filter));
+  if (S.q.trim()) {
+    const q = fold(S.q.trim());
+    list = list.filter(i => fold([i.title, i.creators.join(' '), i.body || ''].join(' ')).includes(q));
+  }
+  const k = S.sort;
+  return list.sort((a, b) => k === 'year' ? b.year - a.year : k === 'type' ? a.type.localeCompare(b.type) : a.title.localeCompare(b.title));
+}
+function renderLibrary() {
+  const list = visibleItems();
+  const rows = list.map(i => {
+    const nq = quotesOf(i.id).length, nn = anchoredNotes(i.id).length;
+    return `<tr class="row" data-select="${i.id}" aria-selected="${S.selected === i.id}" tabindex="0">
+      <td><div class="t-title">${esc(i.title)}</div><div class="t-creators">${esc(i.creators.join(', ') || (i.anchor ? 'on ' + item(i.anchor.item).title : ''))}</div></td>
+      <td><span class="type ${i.type === 'note' ? 'note' : ''}">${TYPES[i.type][0]}</span></td>
+      <td class="hide-sm"><span class="yr">${i.year}</span></td>
+      <td class="hide-sm"><div class="tagdots">${i.tags.slice(0, 3).map(t => chipHTML(t)).join('')}</div></td>
+      <td class="hide-sm"><div class="badges">${nq ? `<span title="Quotes">❝ ${nq}</span>` : ''}${nn ? `<span title="Notes on this item">✎ ${nn}</span>` : ''}${i.pdf ? '<span title="PDF in Drive">PDF</span>' : ''}</div></td>
+    </tr>`;
+  }).join('');
+  const f = S.filter;
+  $('#main').innerHTML = `
+  <div class="lib">
+    <div class="lib-main">
+      <div class="top">
+        <button class="btn menu-btn" data-menu>☰</button>
+        <h1>${esc(filterLabel())}</h1><span class="sub">${list.length} item${list.length === 1 ? '' : 's'}</span>
+        <div style="margin-left:auto" class="rel">
+          <button class="btn primary" data-addmenu aria-expanded="false">+ Add</button>
+        </div>
+      </div>
+      <div class="searchrow">
+        <form class="search" id="searchform" role="search">
+          <input id="q" placeholder="Search titles, authors and full text of PDFs" value="${esc(S.q)}" aria-label="Search">
+          <button class="btn" type="submit" style="padding:2px 10px">Search</button>
+        </form>
+        ${!(f.kind === 'family' && f.id === 'all') ? `<span class="chip">${esc(filterLabel())}<button aria-label="Clear filter" data-filter="family:all">×</button></span>` : ''}
+        ${S.q ? `<span class="chip">“${esc(S.q)}”<button aria-label="Clear search" data-clearq>×</button></span>` : ''}
+      </div>
+      <div class="list">
+        ${list.length ? `<table>
+          <thead><tr>
+            <th><button data-sort="title">Title${S.sort === 'title' ? ' ↓' : ''}</button></th>
+            <th><button data-sort="type">Type${S.sort === 'type' ? ' ↓' : ''}</button></th>
+            <th class="hide-sm"><button data-sort="year">Year${S.sort === 'year' ? ' ↓' : ''}</button></th>
+            <th class="hide-sm"><span class="label">Tags</span></th>
+            <th class="hide-sm"><span class="label">Has</span></th>
+          </tr></thead><tbody>${rows}</tbody></table>` : `<div class="empty">Nothing matches. Clear the filter or try other words.</div>`}
+      </div>
+    </div>
+    <aside class="panel" aria-label="Item details">${inspector(item(S.selected))}</aside>
+  </div>`;
+}
+function inspector(i) {
+  if (!i) return `<p class="muted">Select an item to see its details.</p>`;
+  const meta = [['Type', TYPES[i.type][0]], ['Creators', i.creators.join('; ')], ['Year', i.year], ['Journal', i.journal], ['Publisher', i.publisher], ['Place', i.place], ['Pages', i.pages]]
+    .filter(([, v]) => v).map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('');
+  const notes = anchoredNotes(i.id), qs = quotesOf(i.id), out = outLinks(i), back = backLinks(i);
+  return `
+    <section>
+      <span class="label">${TYPES[i.type][0]}${i.pdf ? ' · PDF' : ''}</span>
+      <h2>${esc(i.title)}</h2>
+      <div><button class="btn primary" data-open="${i.id}">${isText(i) ? 'Open' : 'Open in reader'} ↗</button></div>
+    </section>
+    ${i.anchor ? `<button class="anchor-card" data-jump="${i.anchor.item}"><span class="label">Comment on</span><span class="q">“${esc(i.anchor.text.slice(0, 120))}…”</span><span class="src">${esc(item(i.anchor.item).title)} · p. ${i.anchor.page}</span></button>` : ''}
+    ${i.type !== 'note' ? `<section><span class="label">Info</span><dl class="meta">${meta}</dl></section>` : ''}
+    <section><span class="label">Tags</span><div class="chips">${i.tags.map(t => chipHTML(t, true)).join('')}<input class="tagin" placeholder="+ tag" data-addtag="${i.id}" aria-label="Add tag"></div></section>
+    <section><span class="label">Projects</span><div class="chips">${i.projects.map(p => `<span class="chip">${esc(proj(p).n)}</span>`).join('')}<button class="chip addchip" data-soon="Add to project">+ project</button></div></section>
+    ${!isText(i) ? `<section><span class="label">Notes on this ${TYPES[i.type][0].toLowerCase()} · ${notes.length}</span>${notes.length ? notes.map(n => `<button class="anchored" data-opennote="${n.id}"><div class="lt">${esc(n.title)}</div><div class="muted">p. ${n.anchor.page}</div></button>`).join('') : '<p class="muted">Select text in the reader and choose “Note”.</p>'}</section>
+    <section><span class="label">Quotes · ${qs.length}</span>${qs.slice(0, 3).map(q => `<div class="muted" style="border-left:2px solid var(--accent2);padding-left:8px">“${esc(q.text)}” <span class="mono">${esc(q.loc)}</span></div>`).join('') || '<p class="muted">No quotes yet.</p>'}</section>` : ''}
+    <section><span class="label">Links · ${out.length}</span>${out.map(l => linkRow(l.it, l.t)).join('') || '<p class="muted">None.</p>'}<button class="chip addchip" style="align-self:flex-start" data-soon="Link to another item">+ link</button></section>
+    <section><span class="label">Backlinks · ${back.length}</span>${back.map(b => linkRow(b)).join('') || '<p class="muted">Nothing links here yet.</p>'}</section>`;
+}
+function linkRow(it, t) {
+  if (!it) return `<div class="linkrow"><span class="type">new</span><span class="lt muted">${esc(t)} (no note yet)</span></div>`;
+  return `<button class="linkrow" data-open="${it.id}"><span class="type ${it.type === 'note' ? 'note' : ''}">${TYPES[it.type][0]}</span><span class="lt">${esc(it.title)}</span></button>`;
+}
+
+// ─── Reader ───────────────────────────────────────────────────────────────
+function pageHTML(i) {
+  if (i.id !== 'malinowski') {
+    const w = [96, 100, 92, 100, 88, 97, 100, 64, 0, 100, 95, 100, 90, 98, 72, 0, 100, 94, 99, 81];
+    return `<div class="runhead"><span>${esc(i.creators[0] || '')}</span><span>1</span></div>
+      <p class="muted" style="text-indent:0;text-align:center;margin-bottom:24px">PDF preview placeholder. Open <button class="textlink" data-open="malinowski">Argonauts</button> for a page with text.</p>
+      ${w.map(x => x ? `<div class="bar" style="width:${x}%"></div>` : '<div style="height:14px"></div>').join('')}`;
+  }
+  const paras = PAGE81.map((segs, pi) => {
+    let marker = '';
+    const html = segs.map(s => {
+      if (typeof s === 'string') return esc(s);
+      const [k, id, t] = s;
+      if (k === 'n') marker = `<button class="margin-note" data-opennote="${id}" title="Note: ${esc(item(id)?.title || '')}" style="top:${pi ? 0 : 150}px">✎</button>`;
+      return `<mark class="${k}" data-${k === 'q' ? 'quote' : 'opennote'}="${id}">${esc(t)}</mark>`;
+    }).join('');
+    return `<p data-para="${pi + 1}">${html}${marker}</p>`;
+  }).join('');
+  return `<div class="runhead"><span>Argonauts of the Western Pacific</span><span>81</span></div>
+    <h3>CHAPTER III</h3><h4>THE ESSENTIALS OF THE KULA</h4>${paras}
+    <p style="text-indent:0;text-align:center;color:var(--stone);margin-top:28px;font-size:12px">— example page · Malinowski 1922, public domain —</p>`;
+}
+function renderReader() {
+  const i = item(S.readerItem);
+  const qs = quotesOf(i.id), ns = anchoredNotes(i.id);
+  $('#main').innerHTML = `
+  <div class="reader">
+    <div class="reader-main">
+      <div class="top">
+        <button class="btn ghost" data-go="library">← Library</button>
+        <h1>${esc(i.title)}</h1><span class="type">${TYPES[i.type][0]}</span>
+        <span class="mono hide-sm" style="margin-left:auto;color:var(--sage)">p. ${i.id === 'malinowski' ? 81 : 1} / ${i.pages || '—'}</span>
+        <button class="btn ghost hide-sm" data-soon="Zoom">−</button><button class="btn ghost hide-sm" data-soon="Zoom">+</button>
+      </div>
+      <div class="pagewrap" id="pagewrap"><article class="page" id="page">${pageHTML(i)}</article></div>
+    </div>
+    <aside class="panel" id="rpanel" aria-label="Quotes and notes">${readerPanel(i)}</aside>
+  </div>`;
+}
+function readerPanel(i) {
+  const qs = quotesOf(i.id), ns = anchoredNotes(i.id);
+  const tab = (id, n, c) => `<button role="tab" aria-selected="${S.tab === id}" data-tab="${id}">${n}<span class="count">${c ?? ''}</span></button>`;
+  let body = '';
+  if (S.tab === 'quotes') body = qs.length ? qs.slice().reverse().map(q => `
+    <div class="card ${S.newCard === q.id ? 'is-new' : ''}">
+      <blockquote>${esc(q.text)}</blockquote>
+      <div class="row"><input class="loc" value="${esc(q.loc)}" aria-label="Locator" title="Locator (auto, editable)">
+        ${q.tags.map(t => chipHTML(t)).join('')}<input class="tagin" placeholder="+ tag" data-qtag="${q.id}" aria-label="Add tag to quote"></div>
+    </div>`).join('') : '<p class="muted">Select text on the page and choose “Quote”.</p>';
+  if (S.tab === 'notes') body = ns.length ? ns.slice().reverse().map(n => `
+    <div class="card notecard ${S.newCard === n.id ? 'is-new' : ''}">
+      <blockquote>“${esc(n.anchor.text)}”</blockquote>
+      ${S.newCard === n.id
+        ? `<input class="loc" style="width:100%;font-family:var(--body);font-size:13.5px;background:none;border-color:var(--dust);padding:4px 8px" value="${esc(n.title)}" data-ntitle="${n.id}" aria-label="Note title">
+           <textarea data-nbody="${n.id}" placeholder="Write your note. Use [[Title]] to link and #tag to tag.">${esc(n.body)}</textarea>`
+        : `<div class="ntitle">${esc(n.title)}</div><div class="muted">${esc(n.body.slice(0, 140))}${n.body.length > 140 ? '…' : ''}</div>`}
+      <div class="row"><span class="mono" style="color:var(--sage)">p. ${n.anchor.page}</span><button class="textlink" style="margin-left:auto" data-opennote="${n.id}">Open as note →</button></div>
+    </div>`).join('') : '<p class="muted">Select text on the page and choose “Note”. The note is saved on its own and also stays pinned to this passage.</p>';
+  if (S.tab === 'info') body = inspector(i);
+  return `<div class="tabs" role="tablist">${tab('quotes', 'Quotes', qs.length)}${tab('notes', 'Notes', ns.length)}${tab('info', 'Info')}</div>${body}`;
+}
+function rerenderPanel() { const p = $('#rpanel'); if (p) p.innerHTML = readerPanel(item(S.readerItem)); }
+
+let pendingRange = null;
+function showPop(range) {
+  closePop();
+  const r = range.getBoundingClientRect();
+  const pop = document.createElement('div'); pop.className = 'pop'; pop.id = 'pop';
+  pop.innerHTML = `<button data-make="quote">❝ Quote</button><button data-make="note">✎ Note</button>`;
+  document.body.append(pop);
+  const w = pop.offsetWidth;
+  pop.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + 'px';
+  pop.style.top = Math.max(48, r.top - 44) + 'px';
+}
+function closePop() { $('#pop')?.remove(); }
+function makeFromSelection(kind) {
+  const range = pendingRange; closePop();
+  if (!range) return;
+  const text = range.toString().trim().replace(/\s+/g, ' ');
+  const para = range.startContainer.parentElement?.closest('p')?.dataset.para || 1;
+  const i = item(S.readerItem);
+  const page = i.id === 'malinowski' ? 81 : 1;
+  const id = kind + Date.now();
+  const mark = document.createElement('mark');
+  mark.className = kind === 'quote' ? 'q' : 'n';
+  try { range.surroundContents(mark); } catch (e) { /* selection crosses another highlight: keep the text, skip the inline mark */ }
+  getSelection().removeAllRanges();
+  if (kind === 'quote') {
+    QUOTES.push({ id, item: i.id, text, loc: `p. ${page}, ¶${para}`, tags: [] });
+    S.tab = 'quotes';
+    toast('Quote saved with locator p. ' + page + ', ¶' + para);
+  } else {
+    ITEMS.push({ id, type: 'note', title: `Note on ${i.title}, p. ${page}`, creators: [], year: 2026, tags: [], projects: [...i.projects], anchor: { item: i.id, page, para, text }, body: '' });
+    mark.dataset.opennote = id;
+    S.tab = 'notes';
+    toast('New note created. It also appears under Notes in the library.');
+  }
+  S.newCard = id;
+  rerenderPanel();
+  setTimeout(() => $(`[data-nbody="${id}"]`)?.focus(), 30);
+}
+
+// ─── Note editor ──────────────────────────────────────────────────────────
+function renderMd(s) {
+  return s.split(/\n{2,}/).map(p => '<p>' + esc(p)
+    .replace(/\[\[([^\]]+)\]\]/g, (_, t) => { const it = byTitle(t); return `<span class="wikilink ${it ? '' : 'missing'}" ${it ? `data-open="${it.id}"` : `data-newnote="${esc(t)}"`} role="link" tabindex="0">${t}</span>`; })
+    .replace(/(^|\s)#([\w-]+)/g, (_, sp, t) => `${sp}<span class="hashtag" data-filter="tag:${t}">#${t}</span>`)
+    .replace(/\n/g, '<br>') + '</p>').join('');
+}
+function renderNote() {
+  const n = item(S.noteId);
+  const a = n.anchor;
+  $('#main').innerHTML = `
+  <div class="notev">
+    <div class="note-main">
+      <div class="top">
+        <button class="btn menu-btn" data-menu>☰</button>
+        <span class="type ${n.type === 'note' ? 'note' : ''}">${TYPES[n.type][0]}</span>
+        <span class="mono" style="color:var(--stone)">edited just now · saved</span>
+        <div class="modebar" style="margin-left:auto" role="group" aria-label="Mode">
+          <button aria-pressed="${S.noteMode === 'edit'}" data-mode="edit">Edit</button>
+          <button aria-pressed="${S.noteMode === 'read'}" data-mode="read">Read</button>
+        </div>
+      </div>
+      <div class="note-inner">
+        <input class="note-title" id="ntitle" value="${esc(n.title)}" aria-label="Title">
+        ${a ? `<button class="anchor-card" data-jump="${a.item}" data-flash="${n.id}"><span class="label">Comment on</span><span class="q">“${esc(a.text)}”</span><span class="src">${esc(item(a.item).title)} · p. ${a.page} — open in reader ↗</span></button>` : ''}
+        <div class="chips">${n.tags.map(t => chipHTML(t, true)).join('')}<input class="tagin" placeholder="+ tag" data-addtag="${n.id}" aria-label="Add tag"></div>
+        ${S.noteMode === 'edit'
+          ? `<textarea class="editor" id="editor" aria-label="Note text">${esc(n.body)}</textarea>`
+          : `<div class="rendered">${renderMd(n.body) || '<p class="muted">Empty note. Switch to Edit to write.</p>'}</div>`}
+      </div>
+    </div>
+    <aside class="panel" aria-label="Links">${noteSide(n)}</aside>
+  </div>`;
+}
+function noteSide(n) {
+  const out = outLinks(n), back = backLinks(n);
+  return `
+    <section><span class="label">Links · ${out.length}</span>${out.map(l => linkRow(l.it, l.t)).join('') || '<p class="muted">Write [[Title]] to link a note or a source.</p>'}</section>
+    <section><span class="label">Backlinks · ${back.length}</span>${back.map(b => linkRow(b)).join('') || '<p class="muted">Nothing links here yet.</p>'}</section>
+    <section><span class="label">Projects</span><div class="chips">${n.projects.map(p => `<span class="chip">${esc(proj(p).n)}</span>`).join('')}<button class="chip addchip" data-soon="Add to project">+ project</button></div></section>`;
+}
+
+// ─── Routing & events ─────────────────────────────────────────────────────
+function render() {
+  $('#app').dataset.view = S.view;
+  $('#app').classList.remove('menu-open');
+  document.querySelectorAll('.strip [data-go]').forEach(b => b.setAttribute('aria-current', b.dataset.go === S.view));
+  renderSide();
+  ({ library: renderLibrary, reader: renderReader, note: renderNote })[S.view]();
+}
+function go(view) { S.view = view; closePop(); try { history.replaceState(null, '', '#' + view); } catch (e) {} render(); $('#main').scrollTop = 0; }
+function open(id) {
+  const i = item(id); if (!i) return;
+  S.selected = id;
+  if (isText(i)) { S.noteId = id; S.noteMode = i.body ? 'read' : 'edit'; go('note'); }
+  else { S.readerItem = id; S.newCard = null; go('reader'); }
+}
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('button, [data-open], [data-filter], [data-newnote], tr.row, mark');
+  if (!t) { closeAddMenu(); return; }
+  const d = t.dataset;
+  if (d.go) return go(d.go);
+  if (d.menu !== undefined) return $('#app').classList.toggle('menu-open');
+  if (d.filter) { const [kind, id] = d.filter.split(':'); S.filter = { kind, id }; return go('library'); }
+  if (d.select) { S.selected = d.select; return renderLibrary(); }
+  if (d.open) return open(d.open);
+  if (d.opennote) { if (S.view === 'reader' && t.tagName === 'MARK') { S.tab = 'notes'; S.newCard = null; return rerenderPanel(); } return open(d.opennote); }
+  if (d.quote) { S.tab = 'quotes'; S.newCard = d.quote; return rerenderPanel(); }
+  if (d.jump) {
+    S.readerItem = d.jump; S.tab = 'notes'; S.newCard = null; go('reader');
+    const m = d.flash && $(`mark[data-opennote="${d.flash}"]`);
+    if (m) { m.scrollIntoView({ block: 'center' }); m.classList.add('flash'); setTimeout(() => m.classList.remove('flash'), 1600); }
+    return;
+  }
+  if (d.tab) { S.tab = d.tab; return rerenderPanel(); }
+  if (d.sort) { S.sort = d.sort; return renderLibrary(); }
+  if (d.clearq !== undefined) { S.q = ''; return renderLibrary(); }
+  if (d.mode) { saveEditor(); S.noteMode = d.mode; return renderNote(); }
+  if (d.make) return makeFromSelection(d.make);
+  if (d.newnote) return newNote(d.newnote);
+  if (d.untag) {
+    const host = S.view === 'note' ? item(S.noteId) : item(S.view === 'reader' ? S.readerItem : S.selected);
+    host.tags = host.tags.filter(x => x !== d.untag); return render();
+  }
+  if (d.addmenu !== undefined) return toggleAddMenu(t);
+  if (d.add) { closeAddMenu(); if (d.add === 'note') return newNote('Untitled note'); if (d.add === 'fieldnote') return newNote('Fieldnote — ' + new Date().toLocaleDateString('es'), 'fieldnote'); return toast(d.add + ' — coming in the real app'); }
+  if (d.soon) return toast(d.soon + ' — coming in the real app');
+});
+function newNote(title, type = 'note') {
+  const id = 'n' + Date.now();
+  ITEMS.push({ id, type, title, creators: [], year: 2026, tags: [], projects: [], body: '' });
+  S.noteId = id; S.noteMode = 'edit'; go('note'); setTimeout(() => $('#editor')?.focus(), 30);
+}
+function toggleAddMenu(btn) {
+  if ($('.addmenu')) return closeAddMenu();
+  const m = document.createElement('div'); m.className = 'addmenu';
+  m.innerHTML = [['Upload PDF', 'Saved to Drive / Qipu', 'Upload PDF'], ['Add by DOI or ISBN', 'fills metadata', 'Add by DOI or ISBN'], ['Import BibTeX / RIS', 'with preview', 'Import BibTeX / RIS'], ['New note', '', 'note'], ['New fieldnote', '', 'fieldnote'], ['Add manually', '', 'Add manually']]
+    .map(([n, s, k]) => `<button data-add="${k}">${n}<span>${s}</span></button>`).join('');
+  btn.parentElement.append(m); btn.setAttribute('aria-expanded', 'true');
+}
+function closeAddMenu() { $('.addmenu')?.remove(); $('[data-addmenu]')?.setAttribute('aria-expanded', 'false'); }
+function saveEditor() { const ed = $('#editor'); if (ed) item(S.noteId).body = ed.value; }
+
+document.addEventListener('submit', e => { if (e.target.id === 'searchform') { e.preventDefault(); S.q = $('#q').value; renderLibrary(); } });
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if (e.key === 'Enter' && t.matches('tr.row')) { open(t.dataset.select); }
+  if (e.key === 'Enter' && t.matches('.wikilink')) t.click();
+  if (e.key === 'Enter' && t.matches('.tagin') && t.value.trim()) {
+    const v = t.value.trim().replace(/^#/, '');
+    if (!TAGS.some(x => x.n === v)) TAGS.push({ n: v });
+    if (t.dataset.qtag) { QUOTES.find(q => q.id === t.dataset.qtag).tags.push(v); rerenderPanel(); }
+    else { const it = item(t.dataset.addtag); if (!it.tags.includes(v)) it.tags.push(v); S.view === 'reader' ? rerenderPanel() : render(); renderSide(); }
+  }
+  if (e.key === 'Escape') { closePop(); closeAddMenu(); }
+});
+document.addEventListener('input', e => {
+  const t = e.target;
+  if (t.id === 'editor') item(S.noteId).body = t.value;
+  if (t.id === 'ntitle') { item(S.noteId).title = t.value; }
+  if (t.dataset.nbody) item(t.dataset.nbody).body = t.value;
+  if (t.dataset.ntitle) item(t.dataset.ntitle).title = t.value;
+});
+document.addEventListener('mouseup', e => {
+  if (S.view !== 'reader' || e.target.closest?.('#pop')) return;
+  setTimeout(() => {
+    const sel = getSelection();
+    if (!sel.rangeCount || sel.isCollapsed) { closePop(); return; }
+    const range = sel.getRangeAt(0);
+    const page = $('#page');
+    if (!page || !page.contains(range.commonAncestorContainer) || range.toString().trim().length < 3) { closePop(); return; }
+    pendingRange = range.cloneRange(); showPop(range);
+  }, 0);
+});
+document.addEventListener('touchend', e => e.target.dispatchEvent(new MouseEvent('mouseup', { bubbles: true })));
+$('#main').addEventListener('scroll', closePop, true);
+
+const start = (location.hash || '').slice(1);
+S.view = ['library', 'reader', 'note'].includes(start) ? start : 'library';
+render();
+</script>
