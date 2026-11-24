@@ -24,6 +24,7 @@
   "families": {
     "bibliography": "Bibliografía",
     "fieldwork": "Trabajo de campo",
+    "notes": "Notas",
     "multimedia": "Multimedia",
     "data": "Datos",
     "other": "Otros",
@@ -39,6 +40,7 @@
     "interview": "Entrevista",
     "fieldnote": "Nota de campo",
     "document": "Documento",
+    "note": "Nota",
     "webpage": "Página web",
     "image": "Imagen",
     "video": "Video",

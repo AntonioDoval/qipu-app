@@ -3,6 +3,7 @@
 export const ITEM_TYPES = [
   'book', 'book_chapter', 'journal_article', 'thesis', 'working_paper', 'conference_paper',
   'interview', 'fieldnote', 'document',
+  'note',
   'webpage', 'image', 'video', 'audio', 'social_media_post',
   'dataset', 'statistic',
   'custom',
@@ -10,7 +11,7 @@ export const ITEM_TYPES = [
 
 export type ItemType = typeof ITEM_TYPES[number];
 
-export const FAMILIES = ['bibliography', 'fieldwork', 'multimedia', 'data', 'other'] as const;
+export const FAMILIES = ['bibliography', 'fieldwork', 'notes', 'multimedia', 'data', 'other'] as const;
 export type Family = typeof FAMILIES[number];
 
 export const FAMILY_MAP: Record<ItemType, Family> = {
@@ -23,6 +24,7 @@ export const FAMILY_MAP: Record<ItemType, Family> = {
   interview:          'fieldwork',
   fieldnote:          'fieldwork',
   document:           'fieldwork',
+  note:               'notes',
   webpage:            'multimedia',
   image:              'multimedia',
   video:              'multimedia',
@@ -50,7 +52,8 @@ export interface Item {
   content_text?: string | null;       // extracted text for full-text search
   year?: number | null;               // extracted column for sorting
   creators?: string[] | null;         // extracted column for filtering
-  metadata: Record<string, unknown>;  // all other type-specific fields
+  anchor_item_id?: string | null;     // notes only: the item this note comments on
+  metadata: Record<string, unknown>;  // all other type-specific fields (notes: metadata.anchor)
   deleted_at?: string | null;
   created_at: string;
   updated_at: string;
@@ -83,22 +86,28 @@ export interface Quote {
   original_text: string;
   edited_text?: string | null;
   locator?: string | null;   // auto-generated (page, timecode, paragraph)
+  position?: TextPosition | null;
   context_note?: string | null;
   created_at: string;
   // relations
   tags?: Tag[];
 }
 
+// Where a quote or an anchored note sits inside a text item.
+export interface TextPosition {
+  page?: number;
+  paragraph?: number;
+  rects?: [number, number, number, number][];  // x, y, w, h on the page
+  text?: string;                                // the selected passage
+}
+
+// Simple, untyped link. Shown in both directions (links + backlinks).
 export interface ItemLink {
   from_item_id: string;
   to_item_id: string;
-  link_type: LinkType;
   note?: string | null;
   created_at: string;
 }
-
-export const LINK_TYPES = ['supports', 'contradicts', 'extends', 'see-also'] as const;
-export type LinkType = typeof LINK_TYPES[number];
 
 // ─── Join tables (enriched) ───────────────────────────────────────────────────
 
