@@ -3,8 +3,9 @@
 Status: agreed in design review, 2026-11-24. Nothing below is built yet.
 This replaces the old design references (`qipu-workspace-v3.jsx`, `qipu-viewer-v2.jsx`), which are lost.
 
-`docs/design/mockup-v1.html` is the first clickable mockup (colors, fonts, general feel).
-It is **outdated** in structure. Where it disagrees with this document, this document wins.
+`docs/design/mockup-v2.html` is the clickable mockup built from this spec (open it in a browser).
+`docs/design/mockup-v1.html` is the first, outdated mockup, kept for history.
+Where a mockup disagrees with this document, this document wins.
 
 Scope for now: text items only (PDFs and pasted text). Images, video and audio come later.
 
