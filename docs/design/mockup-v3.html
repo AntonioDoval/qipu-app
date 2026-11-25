@@ -1,0 +1,1573 @@
+<title>Qipu Workspace Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: universal navigator (left) · active view (center) · collapsible context panel (right). Spec: docs/ui-spec.md */
+:root {
+  /* Qipu tokens (src/lib/tokens.ts) */
+  --paper: #faf8f4; --cream: #f0ebdd; --sand: #e8e2d5; --dust: #d8cfba;
+  --stone: #a89b85; --sage: #7a7060; --ink: #1a1a1a;
+  --accent: #4a5b78; --accent2: #6b7d99; --soft: #e6ebf3; --softer: #eef2f8;
+  --surface: #ffffff; --shadow: rgba(60, 50, 30, .10); --danger: #a4462f;
+  /* kind colors */
+  --k-bib: #4a5b78; --k-src: #7a6a3e; --k-note: #8a5a7a;
+  /* PDF pages keep paper colors in both themes, like a real document */
+  --pdf-bg: #ffffff; --pdf-ink: #1c1b19; --pdf-muted: #8a8478; --pdf-bar: #ebe7de;
+  --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --body: 'Lora', Georgia, 'Times New Roman', serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #191816; --cream: #211f1b; --sand: #2a2823; --dust: #3a372f;
+  --stone: #8e8371; --sage: #b2a78f; --ink: #ece6da;
+  --accent: #9fb1d0; --accent2: #8194b4; --soft: #263044; --softer: #1f2533;
+  --surface: #23211d; --shadow: rgba(0,0,0,.4); --danger: #e08a72;
+  --k-bib: #9fb1d0; --k-src: #cdb27a; --k-note: #c99bbb;
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --paper: #191816; --cream: #211f1b; --sand: #2a2823; --dust: #3a372f;
+  --stone: #8e8371; --sage: #b2a78f; --ink: #ece6da;
+  --accent: #9fb1d0; --accent2: #8194b4; --soft: #263044; --softer: #1f2533;
+  --surface: #23211d; --shadow: rgba(0,0,0,.4); --danger: #e08a72;
+  --k-bib: #9fb1d0; --k-src: #cdb27a; --k-note: #c99bbb;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.5; overflow: hidden; }
+* { box-sizing: border-box; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0; }
+button:disabled { opacity: .4; cursor: not-allowed; }
+input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+::selection { background: color-mix(in srgb, var(--accent) 28%, transparent); }
+svg.i { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; vertical-align: -3px; }
+.mono { font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; }
+.label { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--sage); }
+.muted { color: var(--sage); font-size: 12.5px; }
+.grey { color: var(--stone); }
+
+/* mockup strip */
+.strip { display: flex; align-items: center; gap: 12px; height: 38px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--dust); background: var(--cream); white-space: nowrap; overflow-x: auto; }
+.strip nav { display: flex; gap: 2px; }
+.strip nav button { padding: 2px 10px; border-radius: 999px; font-size: 12.5px; color: var(--sage); }
+.strip nav button[aria-current="true"] { background: var(--ink); color: var(--paper); }
+.strip .right { margin-left: auto; display: flex; gap: 6px; }
+.kbd { font-family: var(--mono); font-size: 10.5px; border: 1px solid var(--dust); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; color: var(--sage); background: var(--surface); }
+
+/* app grid */
+.appbar { display: flex; align-items: center; gap: 6px; height: 48px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--dust); background: var(--cream); }
+.appbar .logo { font-family: var(--display); font-size: 21px; font-weight: 600; letter-spacing: -.02em; padding: 0 6px; }
+.appbar .mockpill { font-family: var(--mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--stone); border: 1px solid var(--dust); border-radius: 999px; padding: 1px 7px; white-space: nowrap; }
+.appbar .spacer { flex: 1; }
+.appbar .tg { width: 32px; height: 32px; }
+.tabs { display: flex; gap: 2px; margin-left: 24px; min-width: 0; }
+.tab { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 7px; font-size: 13.5px; color: var(--sage); white-space: nowrap; }
+.tab:hover { background: var(--sand); color: var(--ink); }
+.tab[aria-current="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px var(--shadow); }
+.tab .ts { color: var(--stone); font-size: 12.5px; }
+.app { display: grid; grid-template-columns: 268px minmax(0, 1fr); height: calc(100% - 48px); }
+.prow { display: flex; align-items: center; gap: 1px; padding-right: 2px; }
+.prow .row-nav { flex: 1; min-width: 0; }
+.ptog { width: 18px; height: 22px; display: grid; place-items: center; color: var(--stone); flex: none; border-radius: 4px; }
+.ptog:hover { background: var(--sand); color: var(--ink); }
+.ptog svg.i { width: 11px; height: 11px; transition: transform .12s; }
+.ptog[aria-expanded="true"] svg.i { transform: rotate(90deg); }
+.prow .sub { opacity: 0; width: 20px; height: 20px; }
+.prow:hover .sub, .prow:focus-within .sub { opacity: 1; }
+.sec-h .tw .n { font-family: var(--mono); font-size: 10px; color: var(--stone); margin-left: 4px; text-transform: none; }
+.lsearch { flex: 1 1 260px; min-width: 0; }
+.kseg { flex: none; }
+.kseg button { flex: none; padding: 4px 10px; }
+.chipsrow { min-height: 0; padding-block: 6px; }
+.alsonotes { display: block; padding: 14px 20px; text-align: left; }
+.app.side-off { grid-template-columns: minmax(0, 1fr); }
+.app.side-off .side { display: none; }
+.app:not(.side-off) .show-side { display: none; }
+main { min-width: 0; min-height: 0; height: 100%; }
+
+/* sidebar */
+.side { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--dust); background: var(--cream); }
+.side-head { padding: 14px 12px 8px; display: flex; flex-direction: column; gap: 8px; }
+.brand { display: flex; align-items: center; gap: 8px; padding: 0 4px; }
+.brand b { font-family: var(--display); font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
+.brand .iconbtn { margin-left: auto; }
+.sbox { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--dust); border-radius: 7px; padding: 4px 6px 4px 9px; }
+.sbox:focus-within { border-color: var(--accent2); }
+.sbox input { border: 0; outline: 0; background: none; width: 100%; min-width: 0; font-size: 13.5px; }
+.sbox .kbd { flex: none; }
+.iconbtn { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 6px; color: var(--sage); flex: none; }
+.iconbtn:hover { background: var(--sand); color: var(--ink); }
+.iconbtn[aria-pressed="true"] { background: var(--soft); color: var(--accent); }
+.scope { display: flex; align-items: center; gap: 6px; padding: 5px 6px 5px 10px; border-radius: 7px; background: var(--soft); color: var(--accent); font-size: 12.5px; }
+.scope span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.side-body { flex: 1; overflow-y: auto; padding: 4px 8px 16px; display: flex; flex-direction: column; gap: 10px; }
+.sec-h { display: flex; align-items: center; gap: 2px; padding: 2px 2px 2px 4px; border-radius: 5px; }
+.sec-h .tw { display: flex; align-items: center; gap: 4px; flex: 1; text-align: left; padding: 3px 0; }
+.sec-h .tw svg { width: 12px; height: 12px; transition: transform .12s; }
+.sec-h[aria-expanded="true"] .tw svg { transform: rotate(90deg); }
+.sec-h .iconbtn { width: 22px; height: 22px; }
+.row-nav { display: flex; align-items: center; gap: 7px; width: 100%; text-align: left; padding: 3px 6px; border-radius: 5px; font-size: 13px; min-width: 0; position: relative; }
+.row-nav:hover { background: var(--sand); }
+.row-nav[aria-current="true"] { background: var(--soft); color: var(--accent); }
+.row-nav .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-nav .n { font-family: var(--mono); font-size: 10.5px; color: var(--stone); }
+.row-nav .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.row-nav .sub { opacity: 0; }
+.row-nav:hover .sub, .row-nav:focus-within .sub { opacity: 1; }
+.lvl1 { padding-left: 22px; } .lvl2 { padding-left: 38px; } .lvl3 { padding-left: 54px; }
+.kindrow { display: flex; align-items: center; }
+.kindrow .row-nav { flex: 1; }
+.kindrow .tog { width: 20px; height: 22px; display: grid; place-items: center; color: var(--stone); }
+.kindrow .tog svg { width: 11px; height: 11px; transition: transform .12s; }
+.kindrow .tog[aria-expanded="true"] svg { transform: rotate(90deg); }
+.itemrow { display: flex; align-items: center; gap: 7px; width: 100%; text-align: left; padding: 2px 6px 2px 28px; border-radius: 5px; font-size: 12.5px; color: var(--ink); }
+.itemrow:hover { background: var(--sand); }
+.itemrow[aria-current="true"] { background: var(--soft); color: var(--accent); }
+.itemrow .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.itemrow svg.i { width: 13px; height: 13px; }
+.morelink { padding: 2px 6px 2px 28px; font-size: 12px; color: var(--accent); text-align: left; }
+.morelink:hover { text-decoration: underline; }
+.newrow { display: flex; gap: 6px; padding: 2px 6px 4px; }
+.newrow input { flex: 1; min-width: 0; border: 1px solid var(--accent2); border-radius: 5px; padding: 2px 7px; font-size: 13px; background: var(--surface); outline: 0; }
+.side-foot { border-top: 1px solid var(--dust); padding: 8px; display: flex; gap: 2px; padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+.side-foot .row-nav { flex: 1; }
+.results .grp { margin-top: 6px; }
+.results .itemrow { padding-left: 8px; }
+.results .hint { padding: 6px 8px; font-size: 12px; color: var(--sage); }
+
+/* kind icon */
+.k { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.k.bib { color: var(--k-bib); } .k.source { color: var(--k-src); } .k.note { color: var(--k-note); }
+.k small { font-family: var(--mono); font-size: 10px; color: var(--sage); letter-spacing: .02em; }
+
+/* view shell */
+.view { display: grid; grid-template-columns: minmax(0, 1fr) 330px; height: 100%; min-height: 0; }
+.view.panel-off { grid-template-columns: minmax(0, 1fr); }
+.view.panel-off > .panel { display: none; }
+.center { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 20px; border-bottom: 1px solid var(--dust); min-height: 56px; }
+.top h1 { font-family: var(--display); font-size: 21px; font-weight: 500; letter-spacing: -.01em; margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top .sub { color: var(--sage); font-size: 13px; }
+.top .spacer { flex: 1; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px; border-radius: 6px; border: 1px solid var(--dust); background: var(--surface); font-size: 13px; white-space: nowrap; }
+.btn:hover:not(:disabled) { border-color: var(--stone); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+.btn.quiet { border-color: transparent; background: none; color: var(--sage); }
+.btn.quiet:hover { background: var(--sand); color: var(--ink); }
+.btn.danger { color: var(--danger); }
+.btn.sm { padding: 2px 8px; font-size: 12px; }
+
+/* chips */
+.chips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: 5px; padding: 1px 8px; border-radius: 999px; background: var(--sand); font-size: 12px; white-space: nowrap; color: var(--ink); max-width: 100%; }
+button.chip:hover { background: var(--dust); }
+.chip .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+.chip.proj { background: var(--soft); color: var(--accent); }
+.chip.filter { background: var(--soft); color: var(--accent); }
+.chip .x { color: var(--stone); font-size: 13px; line-height: 1; }
+.tagin { width: 76px; border: 1px dashed var(--dust); border-radius: 999px; padding: 0 8px; background: none; font-size: 12px; outline: 0; }
+.tagin:focus { border-style: solid; border-color: var(--accent2); }
+
+/* library */
+.lib-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 20px; border-bottom: 1px solid var(--sand); min-height: 44px; }
+.selbar { background: var(--soft); }
+.selbar b { color: var(--accent); font-weight: 500; }
+.tablewrap { flex: 1; overflow: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { position: sticky; top: 0; background: var(--paper); text-align: left; font-weight: 400; padding: 7px 8px; border-bottom: 1px solid var(--dust); z-index: 1; white-space: nowrap; }
+th button { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--sage); display: inline-flex; gap: 3px; }
+th button[data-on="true"] { color: var(--ink); }
+td { padding: 8px; border-bottom: 1px solid var(--sand); vertical-align: top; }
+th:first-child, td:first-child { padding-left: 20px; width: 34px; }
+tr.r { cursor: default; }
+tr.r:hover td { background: var(--softer); }
+tr.r[aria-selected="true"] td { background: var(--soft); }
+tr.r.checked td { background: color-mix(in srgb, var(--soft) 70%, var(--paper)); }
+.ttl { font-weight: 500; line-height: 1.35; text-align: left; }
+.ttl:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }
+.snip { font-size: 12.5px; color: var(--sage); margin-top: 3px; }
+.snip em { font-style: normal; background: color-mix(in srgb, #f5d547 45%, transparent); color: var(--ink); }
+.au { font-size: 13px; color: var(--ink); white-space: nowrap; display: block; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+td.tcol { min-width: 230px; }
+.yr, .dt { font-family: var(--mono); font-size: 11.5px; color: var(--sage); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.has { display: flex; gap: 8px; color: var(--stone); font-family: var(--mono); font-size: 11px; white-space: nowrap; }
+.has span { display: inline-flex; gap: 3px; align-items: center; }
+.has svg.i { width: 12px; height: 12px; }
+input[type="checkbox"] { accent-color: var(--accent); width: 14px; height: 14px; margin: 2px 0 0; }
+.empty { padding: 48px 24px; color: var(--sage); font-style: italic; text-align: center; }
+
+/* panel */
+.panel { border-left: 1px solid var(--dust); background: var(--paper); overflow-y: auto; min-width: 0; display: flex; flex-direction: column; }
+.pbody { padding: 16px 18px 40px; display: flex; flex-direction: column; gap: 18px; }
+.panel h2 { font-family: var(--display); font-size: 19px; font-weight: 500; line-height: 1.25; margin: 2px 0; text-wrap: balance; }
+.panel section { display: flex; flex-direction: column; gap: 6px; }
+.meta { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 4px 10px; font-size: 13px; margin: 0; }
+.meta dt { color: var(--sage); font-family: var(--mono); font-size: 10.5px; padding-top: 2px; }
+.meta dd { margin: 0; overflow-wrap: anywhere; }
+.linkrow { display: flex; gap: 8px; align-items: center; padding: 3px 0; text-align: left; width: 100%; font-size: 13px; }
+.linkrow .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.linkrow:hover .t { color: var(--accent); text-decoration: underline; }
+.ptabs { display: flex; border-bottom: 1px solid var(--dust); padding: 0 10px; position: sticky; top: 0; background: var(--paper); z-index: 2; }
+.ptabs button { padding: 11px 9px 9px; font-size: 13px; color: var(--sage); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.ptabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.ptabs .n { font-family: var(--mono); font-size: 10.5px; color: var(--stone); margin-left: 3px; }
+
+/* annotation cards */
+.colorfilter { display: flex; gap: 4px; flex-wrap: wrap; }
+.cf { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--dust); font-size: 12px; }
+.cf[aria-pressed="true"] { border-color: var(--ink); }
+.sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.acard { border: 1px solid var(--dust); border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; background: var(--surface); border-left: 4px solid var(--ac); }
+.acard.flash { box-shadow: 0 0 0 2px var(--accent2); }
+.acard .head { display: flex; align-items: center; gap: 8px; }
+.acard .head .label { color: var(--sage); }
+.acard .txt { font-size: 13.5px; line-height: 1.5; cursor: pointer; }
+.acard .txt:hover { color: var(--accent); }
+.loc { width: 74px; border: 1px solid transparent; border-radius: 4px; padding: 0 5px; background: var(--softer); font-family: var(--mono); font-size: 11px; }
+.loc:hover, .loc:focus { border-color: var(--dust); outline: 0; }
+.notelink { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--k-note); text-align: left; }
+.notelink:hover { text-decoration: underline; }
+.multibar { position: sticky; bottom: 0; display: flex; gap: 8px; align-items: center; padding: 10px 18px; background: var(--soft); border-top: 1px solid var(--dust); margin-top: auto; }
+
+/* reader */
+.tools { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; padding: 6px 16px; border-bottom: 1px solid var(--dust); background: var(--paper); }
+.tools .sep { width: 1px; height: 20px; background: var(--dust); margin: 0 6px; }
+.tool { display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 6px; color: var(--sage); }
+.tool:hover:not(:disabled) { background: var(--sand); color: var(--ink); }
+.tool[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.swatch { display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 7px; border-radius: 6px; font-family: var(--mono); font-size: 11px; color: var(--sage); }
+.swatch i { width: 14px; height: 14px; border-radius: 4px; display: block; }
+.swatch[aria-pressed="true"] { background: var(--sand); color: var(--ink); box-shadow: inset 0 0 0 1px var(--stone); }
+.swatch:not([aria-pressed="true"]) .nm { display: none; }
+.swatch .nm { max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--body); font-size: 12px; }
+.pagewrap { flex: 1; overflow: auto; background: var(--sand); padding: 26px 18px 70px; }
+.page { position: relative; max-width: 660px; margin: 0 auto; background: var(--pdf-bg); color: var(--pdf-ink); box-shadow: 0 1px 3px var(--shadow), 0 10px 28px var(--shadow); padding: 56px 66px 60px; font-family: 'Times New Roman', Georgia, serif; font-size: 15.5px; line-height: 1.62; }
+.page.text { font-family: var(--body); font-size: 15px; line-height: 1.75; max-width: 700px; }
+.page.drawing { user-select: none; -webkit-user-select: none; }
+.page .runhead { display: flex; justify-content: space-between; font-size: 12px; color: var(--pdf-muted); letter-spacing: .06em; margin-bottom: 34px; font-variant: small-caps; }
+.page h3 { text-align: center; font-weight: 400; font-size: 14px; letter-spacing: .18em; margin: 0 0 4px; }
+.page h4 { text-align: center; font-weight: 400; font-size: 17px; letter-spacing: .08em; margin: 0 0 28px; }
+.page p { margin: 0 0 14px; text-indent: 1.6em; text-align: justify; hyphens: auto; }
+.page.text p { text-indent: 0; text-align: left; }
+.page .bar { height: 10px; background: var(--pdf-bar); border-radius: 2px; margin: 0 0 11px; }
+.page .foot { text-align: center; color: var(--pdf-muted); font-size: 12px; margin-top: 26px; text-indent: 0; }
+.page .srcmeta { font-family: var(--mono); font-size: 11px; color: var(--pdf-muted); margin-bottom: 22px; display: flex; gap: 14px; flex-wrap: wrap; }
+mark.hl { color: inherit; background: color-mix(in srgb, var(--hc) 42%, transparent); border-radius: 2px; cursor: pointer; padding: 1px 0; }
+mark.hl.noted { text-decoration: underline dotted var(--hc); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+mark.hl.flash, mark.hl.sel { outline: 2px solid var(--accent); }
+svg.ink { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+svg.ink .shape { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; pointer-events: visibleStroke; cursor: pointer; }
+svg.ink .shape.flash { stroke-width: 4.5; }
+.page.drawing svg.ink { pointer-events: all; cursor: crosshair; }
+.page.erasing svg.ink .shape { cursor: not-allowed; }
+.page.erasing mark.hl { cursor: not-allowed; }
+.nopdf { max-width: 560px; margin: 40px auto; display: flex; flex-direction: column; gap: 16px; }
+.dropzone { border: 2px dashed var(--dust); border-radius: 12px; padding: 36px 20px; text-align: center; color: var(--sage); display: flex; flex-direction: column; align-items: center; gap: 10px; background: var(--paper); }
+.dropzone.over { border-color: var(--accent); background: var(--softer); }
+
+/* notes */
+.note-scroll { flex: 1; overflow-y: auto; }
+.note-inner { max-width: 720px; margin: 0 auto; padding: 30px 32px 80px; display: flex; flex-direction: column; gap: 12px; }
+.note-title { font-family: var(--display); font-size: 30px; font-weight: 500; letter-spacing: -.015em; border: 0; outline: 0; background: none; width: 100%; padding: 0; }
+.saved { font-size: 12px; color: var(--stone); margin-top: -6px; }
+.attached { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 8px; background: var(--cream); }
+.attached .hlq { border-left: 3px solid var(--ac); padding: 1px 0 1px 10px; font-size: 13.5px; font-style: italic; text-align: left; }
+.attached .hlq:hover { color: var(--accent); }
+.attached .src { font-size: 12.5px; color: var(--sage); text-align: left; }
+.attached .src:hover { color: var(--accent); }
+.modebar { display: inline-flex; gap: 2px; background: var(--sand); border-radius: 6px; padding: 2px; }
+.modebar button { padding: 2px 10px; border-radius: 4px; font-size: 12px; color: var(--sage); }
+.modebar button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px var(--shadow); }
+.editor { width: 100%; min-height: 360px; border: 0; outline: 0; background: none; resize: none; font-family: var(--mono); font-size: 13.5px; line-height: 1.75; padding: 0; }
+.panel .editor { min-height: 200px; border: 1px solid var(--dust); border-radius: 6px; padding: 8px 10px; background: var(--surface); }
+.rendered { font-size: 15.5px; line-height: 1.75; max-width: 65ch; }
+.rendered p { margin: 0 0 14px; }
+.wikilink { color: var(--accent); border-bottom: 1px solid var(--accent2); cursor: pointer; }
+.wikilink.missing { color: var(--stone); border-bottom-style: dashed; }
+.hashtag { font-family: var(--mono); font-size: 12px; background: var(--sand); padding: 1px 7px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+.hashtag:hover { background: var(--dust); }
+
+/* floating layers */
+.pop { position: fixed; z-index: 50; background: var(--surface); border: 1px solid var(--dust); border-radius: 9px; box-shadow: 0 10px 30px var(--shadow); padding: 5px; min-width: 180px; max-width: calc(100vw - 16px); }
+.pop.dark { background: var(--ink); color: var(--paper); border-color: var(--ink); display: flex; gap: 2px; align-items: center; min-width: 0; padding: 4px; }
+.pop.dark button { color: var(--paper); padding: 5px 8px; border-radius: 5px; font-size: 12.5px; display: inline-flex; gap: 5px; align-items: center; }
+.pop.dark button:hover { background: rgba(127,127,127,.3); }
+.pop.dark .dotbtn { width: 26px; height: 26px; padding: 0; justify-content: center; position: relative; }
+.pop.dark .dotbtn i { width: 15px; height: 15px; border-radius: 50%; display: block; }
+.pop.dark .dotbtn sub { position: absolute; right: 1px; bottom: -1px; font-family: var(--mono); font-size: 8.5px; color: var(--paper); opacity: .8; }
+.pop.dark .vsep { width: 1px; height: 18px; background: rgba(127,127,127,.5); margin: 0 3px; }
+.menu { display: flex; flex-direction: column; }
+.menu button, .menu label { display: flex; align-items: center; gap: 9px; text-align: left; padding: 7px 10px; border-radius: 6px; font-size: 13px; }
+.menu button:hover, .menu label:hover { background: var(--softer); }
+.menu .d { margin-left: auto; color: var(--stone); font-size: 11.5px; padding-left: 14px; }
+.menu .h { padding: 8px 10px 3px; }
+.menu hr { border: 0; border-top: 1px solid var(--sand); margin: 4px 0; }
+.fpanel { padding: 10px; display: flex; flex-direction: column; gap: 12px; width: 270px; }
+.fpanel select { width: 100%; padding: 4px 6px; border: 1px solid var(--dust); border-radius: 6px; background: var(--surface); }
+.seg { display: flex; background: var(--sand); border-radius: 7px; padding: 2px; gap: 2px; }
+.seg button { flex: 1; padding: 4px 6px; border-radius: 5px; font-size: 12.5px; color: var(--sage); display: inline-flex; gap: 5px; align-items: center; justify-content: center; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px var(--shadow); }
+.ac { position: fixed; z-index: 60; background: var(--surface); border: 1px solid var(--dust); border-radius: 8px; box-shadow: 0 10px 30px var(--shadow); padding: 4px; width: 280px; max-height: 240px; overflow-y: auto; }
+.ac button { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 5px 8px; border-radius: 5px; font-size: 13px; }
+.ac button[aria-selected="true"] { background: var(--soft); color: var(--accent); }
+.ac .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.scrim { position: fixed; inset: 0; z-index: 70; background: rgba(20, 18, 14, .35); display: grid; place-items: start center; padding: 9vh 16px 16px; overflow-y: auto; }
+.modal { background: var(--paper); border: 1px solid var(--dust); border-radius: 12px; box-shadow: 0 20px 60px var(--shadow); width: min(100%, 560px); display: flex; flex-direction: column; max-height: 82vh; }
+.modal.wide { width: min(100%, 900px); }
+.modal .mh { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--dust); }
+.modal .mh h2 { font-family: var(--display); font-size: 19px; font-weight: 500; margin: 0; }
+.modal .mb { padding: 16px 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.modal .mf { display: flex; gap: 8px; align-items: center; justify-content: flex-end; padding: 12px 18px; border-top: 1px solid var(--dust); flex-wrap: wrap; }
+.field { display: flex; flex-direction: column; gap: 3px; }
+.field > span { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--sage); }
+.field input, .field select, .field textarea { border: 1px solid var(--dust); border-radius: 6px; padding: 5px 8px; background: var(--surface); outline: 0; font-size: 13.5px; width: 100%; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent2); }
+.field small { color: var(--stone); font-size: 11.5px; }
+.field.warn small { color: var(--danger); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fsec { border-top: 1px solid var(--sand); padding-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+.detected { background: var(--softer); border: 1px solid var(--soft); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: var(--accent); }
+.upl { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 0; flex: 1; }
+.upl-list { border-right: 1px solid var(--dust); overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 2px; background: var(--cream); }
+.upl-file { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 8px 10px; border-radius: 7px; }
+.upl-file:hover { background: var(--sand); }
+.upl-file[aria-current="true"] { background: var(--surface); box-shadow: 0 1px 3px var(--shadow); }
+.upl-file .fn { font-size: 12.5px; overflow-wrap: anywhere; }
+.status { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+.status.need { color: var(--danger); } .status.ok { color: var(--k-src); } .status.saved { color: var(--accent); }
+.upl-form { overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.cites { background: var(--surface); border: 1px solid var(--dust); border-radius: 8px; padding: 14px 16px; font-family: 'Times New Roman', Georgia, serif; font-size: 14.5px; line-height: 1.6; }
+.cites p { margin: 0 0 10px; padding-left: 2em; text-indent: -2em; }
+.kpal { width: min(100%, 620px); }
+.kpal input { border: 0; outline: 0; background: none; font-size: 17px; width: 100%; padding: 14px 18px; border-bottom: 1px solid var(--dust); }
+.kres { max-height: 52vh; overflow-y: auto; padding: 6px; }
+.kres .h { padding: 8px 10px 3px; }
+.kres button { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 7px 10px; border-radius: 6px; font-size: 13.5px; }
+.kres button[aria-selected="true"] { background: var(--soft); color: var(--accent); }
+.kres .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kres .d { color: var(--stone); font-size: 12px; }
+.toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 8px 14px; border-radius: 8px; font-size: 13px; z-index: 90; max-width: calc(100% - 32px); }
+.dropveil { position: fixed; inset: 0; z-index: 80; background: color-mix(in srgb, var(--accent) 18%, transparent); border: 3px dashed var(--accent); display: grid; place-items: center; font-family: var(--display); font-size: 24px; color: var(--accent); pointer-events: none; }
+.shortcuts { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13px; padding: 10px 12px; }
+
+@media (max-width: 860px) {
+  body { overflow: auto; }
+  .app, .app.side-off { display: block; height: auto; }
+  .app .side { display: none; position: fixed; z-index: 45; inset: 48px auto 0 0; width: 280px; box-shadow: 0 0 40px var(--shadow); }
+  .app.side-mobile .side { display: flex; }
+  .app .show-side { display: inline-grid !important; }
+  .view, .view.panel-off { display: block; height: auto; }
+  .view > .panel { border-left: 0; border-top: 1px solid var(--dust); }
+  .tablewrap, .note-scroll { overflow: visible; }
+  td.tcol { min-width: 0; }
+  .tablewrap { overflow-x: auto; }
+  .hide-sm { display: none; }
+  .top, .lib-bar, .tools { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  th:first-child, td:first-child { padding-left: 16px; }
+  .pagewrap { padding: 14px 8px 30px; overflow: visible; }
+  .page { padding: 30px 24px 40px; }
+  .note-inner { padding: 22px 16px 40px; }
+  .upl { grid-template-columns: 1fr; }
+  .upl-list { border-right: 0; border-bottom: 1px solid var(--dust); max-height: 160px; }
+  .grid2 { grid-template-columns: 1fr; }
+  .swatch .nm { display: none; }
+  .tabs { margin-left: 6px; }
+}
+@media (max-width: 600px) {
+  .tab .tl, .tab .ts, .appbar .mockpill { display: none; }
+  .tab { padding: 6px 9px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pop, .ac, .toast { animation: rise .14s ease-out; }
+  .modal { animation: rise .18s ease-out; }
+  @keyframes rise { from { opacity: 0; translate: 0 4px; } to { opacity: 1; translate: 0 0; } }
+}
+</style>
+
+<header class="appbar">
+  <button class="iconbtn tg" data-act="toggle-side" id="tgl" title="Sidebar (⌘\)" aria-label="Show or hide sidebar">§sidebar</button>
+  <button class="logo" data-act="home" title="Library home">Qipu</button><span class="mockpill">mockup · example data</span>
+  <nav class="tabs" id="tabs" aria-label="Views"></nav>
+  <span class="spacer"></span>
+  <button class="iconbtn tg" data-act="toggle-panel" id="tgr" title="Right panel (⌘.)" aria-label="Show or hide right panel">§panel</button>
+</header>
+<div class="app" id="app">
+  <aside class="side" aria-label="Navigator">
+    <div class="side-head">
+      <div class="sbox">§search<input id="sq" placeholder="Search everything…" aria-label="Search items, notes, projects and tags" autocomplete="off"></div>
+    </div>
+    <div class="side-body" id="sidebody"></div>
+    <div class="side-foot" id="sidefoot"></div>
+  </aside>
+  <main id="main"></main>
+</div>
+<input type="file" id="filepick" multiple accept=".pdf,.txt,.md,application/pdf,text/plain" hidden>
+
+<script>
+// ═══ Icons ════════════════════════════════════════════════════════════════
+const IC = {
+  bib: '<path d="M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h10"/>',
+  source: '<rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/><path d="M10 13h4"/>',
+  note: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  filter: '<path d="M3 5h18l-7 8v6l-4 2v-8z"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  chev: '<path d="m9 6 6 6-6 6"/>',
+  sidebar: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>',
+  panel: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M15 4v16"/>',
+  cursor: '<path d="M6 3l12 7-5.5 1.8L10 18z"/>',
+  rect: '<rect x="4" y="5" width="16" height="14" rx="1"/>',
+  circle: '<circle cx="12" cy="12" r="8"/>',
+  star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+  pen: '<path d="M3 17c2-4 4-6 6-3s3 4 5 0 4-7 7-7"/>',
+  eraser: '<path d="M8 20h12"/><path d="M5 15l9-9a2 2 0 0 1 2.8 0l2.2 2.2a2 2 0 0 1 0 2.8L12 18H8z"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
+  hl: '<path d="M4 20h7"/><path d="M14 4l6 6-8 8H6v-6z"/>',
+  pdf: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
+  trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  upload: '<path d="M12 16V4M7 9l5-5 5 5M4 20h16"/>',
+  paste: '<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/>',
+  file: '<path d="M6 3h8l4 4v14H6z"/><path d="M9 12h6M9 16h6"/>',
+  hand: '<path d="M4 20h16"/><path d="M6 16l9-9 3 3-9 9H6z"/>',
+  copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>',
+  download: '<path d="M12 4v12M7 11l5 5 5-5M4 20h16"/>',
+  folder: '<path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>',
+  tag: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  lib: '<path d="M4 4h4v16H4zM10 4h4v16h-4z"/><path d="m16.5 4.6 3.4.9-3.9 14.9-3.4-.9z"/>',
+  reader: '<path d="M3 5h6a3 3 0 0 1 3 3v12a2 2 0 0 0-2-2H3z"/><path d="M21 5h-6a3 3 0 0 0-3 3v12a2 2 0 0 1 2-2h7z"/>',
+};
+const ic = (n, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
+document.querySelectorAll('.side-head, .appbar').forEach(el => el.innerHTML = el.innerHTML.replace(/§(\w+)/g, (_, n) => ic(n)));
+
+// ═══ Example data ═════════════════════════════════════════════════════════
+const NOW = Date.now(), MIN = 6e4, HR = 36e5, DAY = 864e5;
+const KINDS = { bib: ['Bibliography', 'Bibliografía'], source: ['Sources', 'Fuentes'], note: ['Notes', 'Notas'] };
+const BIB_TYPES = { book: 'Book', chapter: 'Chapter', article: 'Article', thesis: 'Thesis', working_paper: 'Working paper', conference_paper: 'Conference paper' };
+let SOURCE_TYPES = ['Interview', 'Document', 'Archival record', 'Webpage', 'Image'];
+let PALETTE = [
+  { c: '#f2cf3a', n: 'Key argument' }, { c: '#6cbf84', n: 'Method' }, { c: '#e0559f', n: 'Disagree' },
+  { c: '#4f9fe0', n: 'Ethnographic detail' }, { c: '#f08a3c', n: 'To cite' },
+];
+let PROJECTS = [
+  { id: 'thesis', n: 'Thesis', c: '#4a5b78', p: null }, { id: 'ch1', n: 'Ch. 1 — Theories of exchange', p: 'thesis' },
+  { id: 'ch2', n: 'Ch. 2 — The Huancayo feria', p: 'thesis' }, { id: 'sem', n: 'Seminar: Economic anthropology', c: '#a8803a', p: null },
+];
+const TAGCOLORS = { exchange: '#a89b85', andes: '#7f9168', method: '#8c7aa0', 'to-revisit': '#b8743c' };
+
+const A = (f, g) => ({ f, g });
+let ITEMS = [
+  { id: 'malinowski', kind: 'bib', type: 'book', title: 'Argonauts of the Western Pacific', creators: [A('Malinowski', 'Bronisław')], year: 1922, publisher: 'Routledge & Kegan Paul', place: 'London', pages: 527, pdf: true, content: 'malinowski', tags: ['exchange/kula', 'exchange/reciprocity'], projects: ['ch1', 'sem'], links: ['mauss'], created: NOW - 41 * DAY, modified: NOW - 2 * DAY, opened: NOW - 1 * HR },
+  { id: 'mauss', kind: 'bib', type: 'article', title: 'Essai sur le don', creators: [A('Mauss', 'Marcel')], year: 1925, journal: "L'Année sociologique", volume: '1', pp: '30–186', pdf: true, pages: 157, tags: ['exchange/gift', 'exchange/reciprocity'], projects: ['ch1'], links: [], created: NOW - 39 * DAY, modified: NOW - 39 * DAY, opened: NOW - 3 * DAY },
+  { id: 'alberti', kind: 'bib', type: 'book', title: 'Reciprocidad e intercambio en los Andes peruanos', creators: [A('Alberti', 'Giorgio'), A('Mayer', 'Enrique')], year: 1974, publisher: 'Instituto de Estudios Peruanos', place: 'Lima', pdf: true, pages: 360, tags: ['andes/ayni', 'exchange/reciprocity'], projects: ['ch2'], links: [], created: NOW - 30 * DAY, modified: NOW - 6 * DAY, opened: NOW - 2 * DAY },
+  { id: 'mayer', kind: 'bib', type: 'book', title: 'The Articulated Peasant', creators: [A('Mayer', 'Enrique')], year: 2002, publisher: 'Westview Press', place: 'Boulder', pdf: true, pages: 382, tags: ['andes/feria'], projects: ['ch2'], links: [], created: NOW - 21 * DAY, modified: NOW - 21 * DAY, opened: NOW - 9 * DAY },
+  { id: 'strathern', kind: 'bib', type: 'book', title: 'The Gender of the Gift', creators: [A('Strathern', 'Marilyn')], year: 1988, publisher: 'University of California Press', place: 'Berkeley', pdf: false, tags: ['exchange/gift', 'to-revisit'], projects: ['ch1'], links: [], created: NOW - 400 * DAY, modified: NOW - 400 * DAY, opened: NOW - 20 * DAY },
+  { id: 'graeber', kind: 'bib', type: 'book', title: 'Toward an Anthropological Theory of Value', creators: [A('Graeber', 'David')], year: 2001, publisher: 'Palgrave', place: 'New York', pdf: true, pages: 320, tags: ['exchange'], projects: ['sem'], links: [], created: NOW - 12 * DAY, modified: NOW - 12 * DAY, opened: NOW - 12 * DAY },
+  { id: 'tsing', kind: 'bib', type: 'book', title: 'The Mushroom at the End of the World', creators: [A('Tsing', 'Anna Lowenhaupt')], year: 2015, publisher: 'Princeton University Press', place: 'Princeton', pdf: true, pages: 352, tags: ['exchange/circulation'], projects: ['sem'], links: [], created: NOW - 5 * DAY, modified: NOW - 5 * DAY, opened: NOW - 5 * DAY },
+  { id: 'rosa', kind: 'source', type: 'Interview', title: 'Entrevista a Doña R., comerciante de papa', creators: [], date: '2026-03-14', year: 2026, fields: { interviewee: 'Doña R.', interviewer: 'Me', place: 'Feria de Huancayo', language: 'Spanish', length: '48 min' }, content: 'rosa', pasted: true, tags: ['andes/feria', 'method'], projects: ['ch2'], links: [], created: NOW - 9 * DAY, modified: NOW - 9 * DAY, opened: NOW - 4 * HR },
+  { id: 'diario', kind: 'source', type: 'Document', title: 'Diario de campo, feria dominical (marzo 2026)', creators: [A('Me', '')], date: '2026-03', year: 2026, fields: {}, content: 'diario', pasted: true, tags: ['andes/feria', 'andes/minga'], projects: ['ch2'], links: [], created: NOW - 8 * DAY, modified: NOW - 8 * DAY, opened: NOW - 2 * DAY },
+  { id: 'ordenanza', kind: 'source', type: 'Archival record', title: 'Ordenanza municipal sobre comercio en ferias', creators: [], date: '2019', year: 2019, fields: { issuer: 'Municipalidad Provincial de Huancayo', archive: 'Archivo municipal', ref: 'Caja 14' }, pdf: true, pages: 12, tags: ['andes/feria'], projects: ['ch2'], links: [], created: NOW - 15 * DAY, modified: NOW - 15 * DAY, opened: NOW - 15 * DAY },
+  { id: 'n-kula', kind: 'note', type: 'note', title: 'Kula as circulation, not exchange', creators: [], projects: ['ch1'], anchor: { item: 'malinowski', anns: ['a3'] },
+    body: 'Malinowski insists the armshells and necklaces never stop moving. Nobody keeps them; holding one is a stage, not an end.\n\nCompare with [[Ayni vs. the Maussian gift]]: in Huancayo the open debt is also what keeps the relation going. Doña R. says it directly in [[Entrevista a Doña R., comerciante de papa]].\n\nQuestion for ch. 2: is the feria a ring or a hub? #exchange/kula #exchange/circulation',
+    created: NOW - 6 * DAY, modified: NOW - 2 * MIN, opened: NOW - 30 * MIN },
+  { id: 'n-ayni', kind: 'note', type: 'note', title: 'Ayni vs. the Maussian gift', creators: [], projects: ['ch1', 'ch2'],
+    body: 'Ayni returns labour in kind and in time: you help on my field, I help on yours. Mauss reads the obligation to return as a force in the thing itself; in ayni the obligation sits in the calendar and the kin network.\n\nSources: [[Reciprocidad e intercambio en los Andes peruanos]], [[Essai sur le don]], [[The Gender of the Gift]].\n\nStill missing: [[Harris on ayllu economies]] #andes/ayni #exchange/gift #to-revisit',
+    created: NOW - 11 * DAY, modified: NOW - 1 * DAY, opened: NOW - 1 * DAY },
+  { id: 'n-rosa', kind: 'note', type: 'note', title: 'Notes on the interview with Doña R.', creators: [], projects: ['ch2'], anchor: { item: 'rosa', anns: [] },
+    body: 'She frames fiado as ayni without being asked. Check whether other puesteras use the word, or whether it is her grandmother\'s vocabulary only.\n\nFollow-up questions in [[Ayni vs. the Maussian gift]]. #method #andes/ayni',
+    created: NOW - 9 * DAY, modified: NOW - 5 * DAY, opened: NOW - 5 * DAY },
+];
+// Text content (Malinowski 1922 is public domain; the Spanish sources are invented examples)
+const CONTENT = {
+  malinowski: { pdf: true, page: 81, runhead: 'Argonauts of the Western Pacific', h3: 'CHAPTER III', h4: 'THE ESSENTIALS OF THE KULA', paras: [
+    'Having thus described the scene, and the actors, let us now proceed to the performance. The Kula is a form of exchange, of extensive, inter-tribal character; it is carried on by communities inhabiting a wide ring of islands, which form a closed circuit. This circuit can be seen on Map V, where it is represented by the lines joining a number of islands to the North and East of the East end of New Guinea. Along this route, articles of two kinds, and these two kinds only, are constantly travelling in opposite directions. In the direction of the hands of a clock, moves constantly one of these kinds—long necklaces of red shell, called soulava. In the opposite direction moves the other kind—bracelets of white shell called mwali. Each of these articles, as it travels in its own direction on the closed circuit, meets on its way articles of the other class, and is constantly being exchanged for them.',
+    'Every movement of the Kula articles, every detail of the transactions is fixed and regulated by a set of traditional rules and conventions, and some acts of the Kula are accompanied by an elaborate magical ritual and public ceremonies.',
+  ] },
+  rosa: { paras: [
+    'E: ¿Desde cuándo vende en la feria?',
+    'R: Desde chiquita. Mi mamá vendía acá mismo, en esta esquina. Las caseras son de toda la vida; a ellas no les cobro igual que a la gente que pasa.',
+    'E: ¿Y cuando alguien no tiene para pagar?',
+    'R: Se le fía, pues. Acá nadie fía, dicen, pero todos deben. Si yo le fío a la señora del queso, cuando me falta ella me da. Es como en la chacra: hoy te ayudo, mañana me ayudas.',
+    'E: ¿Eso tiene un nombre?',
+    'R: Mi abuela decía ayni. Ahora nadie dice así en la feria, pero es lo mismo, ¿no?',
+  ] },
+  diario: { paras: [
+    'Domingo 14. Llegué 6:40, los puestos de papa ya armados. Mucho movimiento de bultos entre puestos antes de abrir: nadie anota nada, pero todas saben quién debe a quién.',
+    'Doña R. me presenta a su comadre, que vende queso dos filas más allá. Se pasan cosas sin pagar a lo largo de la mañana. Al final del día no veo que se salden cuentas.',
+    'Jueves hay minga en la chacra de la comadre. Doña R. va a ir "porque ella vino a la mía en enero".',
+  ] },
+};
+let ANNS = [
+  { id: 'a1', item: 'malinowski', type: 'hl', color: 0, text: 'The Kula is a form of exchange, of extensive, inter-tribal character', para: 0, tags: ['exchange/kula'], created: NOW - 40 * DAY },
+  { id: 'a2', item: 'malinowski', type: 'hl', color: 3, text: 'long necklaces of red shell, called soulava', para: 0, tags: [], created: NOW - 40 * DAY },
+  { id: 'a3', item: 'malinowski', type: 'hl', color: 2, text: 'Each of these articles, as it travels in its own direction on the closed circuit, meets on its way articles of the other class, and is constantly being exchanged for them.', para: 0, tags: ['exchange/circulation'], created: NOW - 6 * DAY },
+  { id: 'a4', item: 'malinowski', type: 'hl', color: 0, text: 'Every movement of the Kula articles, every detail of the transactions is fixed and regulated by a set of traditional rules and conventions', para: 1, tags: [], created: NOW - 6 * DAY },
+  { id: 's1', item: 'malinowski', type: 'star', color: 4, box: [18, 300, 26, 26], created: NOW - 6 * DAY },
+  { id: 'a5', item: 'rosa', type: 'hl', color: 3, text: 'Acá nadie fía, dicen, pero todos deben.', para: 3, tags: ['andes/feria'], created: NOW - 9 * DAY },
+  { id: 'a6', item: 'rosa', type: 'hl', color: 0, text: 'Es como en la chacra: hoy te ayudo, mañana me ayudas.', para: 3, tags: ['andes/ayni'], created: NOW - 9 * DAY },
+  { id: 'a7', item: 'rosa', type: 'hl', color: 4, text: 'Mi abuela decía ayni.', para: 5, tags: [], created: NOW - 9 * DAY },
+];
+ANNS.forEach(a => { if (a.type === 'hl') { const t = CONTENT[a.item].paras[a.para]; const s = t.indexOf(a.text); a.ranges = [{ p: a.para, s, e: s + a.text.length }]; } });
+
+// ═══ State ════════════════════════════════════════════════════════════════
+const S = {
+  view: 'library', side: true, panel: true, sideMobile: false,
+  filters: { kind: null, tag: null, project: null, has: [] }, trash: false, fulltext: '', lq: '', nq: '', nfilter: { tag: null, project: null },
+  sq: '', sort: { key: 'created', dir: -1 }, cols: { kind: 1, title: 1, authors: 1, year: 1, created: 1, modified: 1, tags: 1, has: 1 },
+  selected: 'malinowski', checked: new Set(),
+  reader: 'malinowski', rtab: 'annotations', panelNote: null, tool: 'select', color: 0, colorFilter: null, annChecked: new Set(), rsearch: '',
+  note: 'n-kula', noteMode: 'read',
+  open: { all: false, projects: true, tags: true }, popen: { thesis: true, ch2: true },
+};
+let UNDO = [];
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const fold = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const foldKeep = s => [...String(s)].map(ch => fold(ch).charAt(0) || ch).join(''); // same length as input
+const item = id => ITEMS.find(i => i.id === id);
+const live = () => ITEMS.filter(i => !i.deleted);
+const byTitle = t => live().find(i => fold(i.title) === fold(t.trim()));
+const proj = id => PROJECTS.find(p => p.id === id);
+const projDesc = id => [id, ...PROJECTS.filter(p => p.p === id).flatMap(p => projDesc(p.id))];
+const projDepth = id => { let d = 0, p = proj(id); while (p && p.p) { d++; p = proj(p.p); } return d; };
+const rootColor = id => { let p = proj(id); while (p && p.p) p = proj(p.p); return p?.c || '#a89b85'; };
+const tagsOf = i => i.kind === 'note' ? [...new Set([...(i.body || '').matchAll(/(?:^|\s)#([\wÀ-ɏ/-]+)/g)].map(m => m[1]))] : (i.tags || []);
+const allTags = () => { const s = new Set(); live().forEach(i => tagsOf(i).forEach(t => { const parts = t.split('/'); parts.forEach((_, k) => s.add(parts.slice(0, k + 1).join('/'))); })); ANNS.forEach(a => (a.tags || []).forEach(t => s.add(t))); return [...s].sort(); };
+const tagColor = t => TAGCOLORS[t.split('/')[0]] || '#a89b85';
+const annsOf = id => ANNS.filter(a => a.item === id);
+const notesOn = id => live().filter(n => n.anchor && n.anchor.item === id);
+const notesOnAnn = aid => live().filter(n => n.anchor && n.anchor.anns.includes(aid));
+const outLinks = i => {
+  const fromBody = [...new Set([...(i.body || '').matchAll(/\[\[([^\]\n]+)\]\]/g)].map(m => m[1]))].map(t => ({ t, it: byTitle(t) }));
+  return fromBody.concat((i.links || []).map(id => ({ t: item(id).title, it: item(id) })));
+};
+const backLinks = i => live().filter(o => o.id !== i.id && outLinks(o).some(l => l.it && l.it.id === i.id));
+const typeLabel = i => i.kind === 'bib' ? BIB_TYPES[i.type] : i.kind === 'source' ? i.type : 'Note';
+const kindIcon = (i, withType = true) => `<span class="k ${i.kind}" title="${KINDS[i.kind][0]} · ${esc(typeLabel(i))}">${ic(i.kind)}${withType ? `<small>${esc(typeLabel(i))}</small>` : ''}</span>`;
+const authorsShort = i => { const c = i.creators.filter(x => x.f && x.f !== 'Me'); if (!c.length) return i.fields?.interviewee ? i.fields.interviewee : i.fields?.issuer || ''; if (c.length === 1) return c[0].f; if (c.length === 2) return `${c[0].f} & ${c[1].f}`; return `${c[0].f} et al.`; };
+const locOf = a => a.loc || (a.type === 'hl' ? (CONTENT[a.item]?.pdf ? `p. ${CONTENT[a.item].page}` : `¶${a.ranges[0].p + 1}`) : `p. ${CONTENT[a.item]?.page || 1}`);
+function citekey(i) {
+  if (i.kind !== 'bib') return '';
+  const base = (fold(i.creators[0]?.f || i.title.split(' ')[0]).replace(/[^a-z]/g, '')) + (i.year || '');
+  const same = live().filter(o => o.kind === 'bib' && (fold(o.creators[0]?.f || o.title.split(' ')[0]).replace(/[^a-z]/g, '') + (o.year || '')) === base).sort((a, b) => a.created - b.created);
+  const k = same.findIndex(o => o.id === i.id);
+  return base + (k > 0 ? String.fromCharCode(97 + k) : '');
+}
+const ANNTYPE = { hl: 'Highlight', rect: 'Square', circle: 'Circle', star: 'Star', ink: 'Drawing' };
+
+function smartDate(ts) {
+  const d = new Date(ts), now = new Date();
+  const sameDay = (a, b) => a.toDateString() === b.toDateString();
+  const y = new Date(now); y.setDate(now.getDate() - 1);
+  if (sameDay(d, now)) return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  if (sameDay(d, y)) return 'Yesterday';
+  if (now - d < 6 * DAY) return d.toLocaleDateString('en-GB', { weekday: 'short' });
+  if (d.getFullYear() === now.getFullYear()) return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+const fullDate = ts => new Date(ts).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+function ago(ts) {
+  const s = Math.round((Date.now() - ts) / 1000);
+  if (s < 45) return 'just now';
+  const m = Math.round(s / 60); if (m < 60) return `${m} minute${m === 1 ? '' : 's'} ago`;
+  const h = Math.round(m / 60); if (h < 24) return `${h} hour${h === 1 ? '' : 's'} ago`;
+  return smartDate(ts);
+}
+function toast(msg) { $$('.toast').forEach(t => t.remove()); const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg; document.body.append(t); setTimeout(() => t.remove(), 2800); }
+const soon = what => toast(`${what}: coming in the real app`);
+
+// ═══ Filtering (shared by sidebar search, library and finder) ═════════════
+function inScope() { return true; } // no global project mode (removed in review 2026-11-25)
+function passes(i, f = S.filters) {
+  if (f.kind && i.kind !== f.kind) return false;
+  if (f.project && !(i.projects || []).some(p => projDesc(f.project).includes(p))) return false;
+  if (f.tag && !tagsOf(i).some(t => t === f.tag || t.startsWith(f.tag + '/')) && !annsOf(i.id).some(a => (a.tags || []).includes(f.tag))) return false;
+  for (const h of f.has) {
+    if (h === 'pdf' && !i.pdf) return false;
+    if (h === 'hl' && !annsOf(i.id).length) return false;
+    if (h === 'notes' && !notesOn(i.id).length) return false;
+  }
+  return true;
+}
+const scoped = () => live().filter(inScope);
+function quickMatch(q) { const f = fold(q); return scoped().filter(i => fold(i.title + ' ' + authorsShort(i) + ' ' + i.creators.map(c => c.f + ' ' + c.g).join(' ')).includes(f)); }
+function textOf(i) { if (i.kind === 'note') return i.body; const c = CONTENT[i.content]; return c ? c.paras.join('\n') : ''; }
+function snippet(text, q) {
+  const ft = foldKeep(text), k = ft.indexOf(fold(q)); if (k < 0) return '';
+  const a = Math.max(0, k - 50), b = Math.min(text.length, k + q.length + 70);
+  return (a ? '…' : '') + esc(text.slice(a, k)) + '<em>' + esc(text.slice(k, k + q.length)) + '</em>' + esc(text.slice(k + q.length, b)) + (b < text.length ? '…' : '');
+}
+
+// ═══ Sidebar ══════════════════════════════════════════════════════════════
+let SIDE_FIRST = null;
+const countProj = id => live().filter(i => (i.projects || []).some(x => projDesc(id).includes(x))).length;
+function secHead(key, label, addAct, addTitle, n) {
+  return `<div class="sec-h" aria-expanded="${S.open[key]}"><button class="tw label" data-act="sec" data-k="${key}">${ic('chev')}${label}${n !== undefined ? `<span class="n">${n}</span>` : ''}</button>${addAct ? `<button class="iconbtn" data-act="${addAct}" title="${addTitle}" aria-label="${addTitle}">${ic('plus')}</button>` : ''}</div>`;
+}
+function renderSide() {
+  const body = $('#sidebody');
+  if (S.sq.trim()) {
+    const f = fold(S.sq.trim());
+    const res = live().filter(i => fold(i.title + ' ' + authorsShort(i) + ' ' + i.creators.map(c => c.f + ' ' + c.g).join(' ') + ' ' + (i.citekey || '')).includes(f));
+    const pr = PROJECTS.filter(p => fold(p.n).includes(f)), tg = allTags().filter(t => fold(t).includes(f));
+    SIDE_FIRST = res[0] ? { open: res[0].id } : pr[0] ? { scope: pr[0].id } : tg[0] ? { tag: tg[0] } : null;
+    const grp = (label, rows) => rows ? `<div class="grp"><div class="label" style="padding:0 8px 2px">${label}</div>${rows}</div>` : '';
+    body.innerHTML = `<div class="results">
+      ${['bib', 'source', 'note'].map(k => grp(KINDS[k][0], res.filter(i => i.kind === k).slice(0, 8).map(i => itemRow(i, 8)).join(''))).join('')}
+      ${grp('Projects', pr.slice(0, 5).map(p => `<button class="itemrow" style="padding-left:8px" data-scope="${p.id}">${ic('folder')}<span class="t">${esc(p.n)}</span></button>`).join(''))}
+      ${grp('Tags', tg.slice(0, 5).map(t => `<button class="itemrow" style="padding-left:8px" data-tag="${esc(t)}"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:${tagColor(t)}"></span><span class="t">#${esc(t)}</span></button>`).join(''))}
+      <div class="hint">${SIDE_FIRST ? 'Enter opens the first result.' : 'Nothing matches.'}</div></div>`;
+  } else {
+    const all = live().slice().sort((a, b) => fold(a.title).localeCompare(fold(b.title)));
+    const tree = (parent, lvl) => PROJECTS.filter(p => p.p === parent).map(p => {
+      const open = !!S.popen[p.id], ind = 2 + lvl * 14;
+      const direct = live().filter(i => (i.projects || []).includes(p.id)).sort((a, b) => fold(a.title).localeCompare(fold(b.title)));
+      const has = direct.length || PROJECTS.some(c => c.p === p.id);
+      return `<div class="prow" style="padding-left:${ind}px">
+          <button class="ptog" data-act="ptog" data-p="${p.id}" aria-expanded="${open}" aria-label="${open ? 'Close' : 'Open'} ${esc(p.n)}" ${has ? '' : 'style="visibility:hidden"'}>${ic('chev')}</button>
+          <button class="row-nav" data-scope="${p.id}" aria-current="${S.view === 'library' && S.filters.project === p.id}" title="Show in Library"><span class="dot" style="background:${rootColor(p.id)};${lvl ? 'opacity:.55' : ''}"></span><span class="t">${esc(p.n)}</span><span class="n">${countProj(p.id)}</span></button>
+          ${projDepth(p.id) < 19 ? `<button class="iconbtn sub" data-act="newsubproj" data-p="${p.id}" title="New project inside" aria-label="New project inside ${esc(p.n)}">${ic('plus')}</button>` : ''}
+        </div>
+        ${S.newProjUnder === p.id ? newProjRow(ind + 34) : ''}
+        ${open ? tree(p.id, lvl + 1) + direct.map(i => itemRow(i, ind + 36)).join('') : ''}`;
+    }).join('');
+    const tagRows = allTags().map(t => { const lvl = t.split('/').length - 1; const n = live().filter(i => passes(i, { kind: null, tag: t, has: [] })).length; return `<button class="row-nav lvl${Math.min(lvl, 3)}" data-tag="${esc(t)}" aria-current="${S.view === 'library' && S.filters.tag === t}" title="Show in Library"><span class="dot" style="background:${tagColor(t)}"></span><span class="t">${esc(t.split('/').pop())}</span><span class="n">${n}</span></button>`; }).join('');
+    body.innerHTML = `
+      <section>${secHead('all', 'All items', null, null, all.length)}${S.open.all ? all.map(i => itemRow(i, 22)).join('') : ''}</section>
+      <section>${secHead('projects', 'Projects', 'newproj', 'New project')}${S.open.projects ? (S.newProjUnder === '' ? newProjRow(22) : '') + tree(null, 0) : ''}</section>
+      <section>${secHead('tags', 'Tags')}${S.open.tags ? tagRows : ''}</section>`;
+  }
+  $('#sidefoot').innerHTML = `<button class="row-nav" data-act="trash" aria-current="${S.trash}">${ic('trash')}<span class="t">Trash</span><span class="n">${ITEMS.filter(i => i.deleted).length}</span></button><button class="row-nav" data-act="settings">${ic('gear')}<span class="t">Settings</span></button>`;
+}
+const curId = () => S.view === 'reader' ? S.reader : S.view === 'note' ? S.note : null;
+const itemRow = (i, pad = 22) => `<button class="itemrow" style="padding-left:${pad}px" data-open="${i.id}" draggable="true" data-drag="${esc(i.title)}" aria-current="${curId() === i.id}" title="${esc(i.title)}"><span class="k ${i.kind}">${ic(i.kind)}</span><span class="t">${esc(i.title)}</span></button>`;
+const newProjRow = pad => `<div class="newrow" style="padding-left:${pad}px"><input id="newproj" placeholder="Project name, Enter to create" aria-label="New project name"></div>`;
+
+// ═══ Library ══════════════════════════════════════════════════════════════
+const COLS = [['kind', 'Kind'], ['title', 'Title'], ['authors', 'Authors'], ['year', 'Year'], ['created', 'Created'], ['modified', 'Modified'], ['tags', 'Tags'], ['has', 'Has']];
+function libItems() {
+  let list = S.trash ? ITEMS.filter(i => i.deleted) : live().filter(i => i.kind !== 'note' && passes(i));
+  if (!S.trash && S.fulltext) { const q = fold(S.fulltext); list = list.filter(i => fold(i.title + ' ' + authorsShort(i) + ' ' + textOf(i)).includes(q)); }
+  else if (!S.trash && S.lq.trim()) { const q = fold(S.lq.trim()); list = list.filter(i => fold(i.title + ' ' + authorsShort(i) + ' ' + i.creators.map(c => c.f + ' ' + c.g).join(' ')).includes(q)); }
+  const { key, dir } = S.sort;
+  const v = i => key === 'title' ? fold(i.title) : key === 'authors' ? fold(authorsShort(i) || '~') : key === 'year' ? i.year : key === 'kind' ? i.kind + typeLabel(i) : i[key];
+  return list.sort((a, b) => (v(a) > v(b) ? 1 : v(a) < v(b) ? -1 : 0) * dir);
+}
+function notesMatching() {
+  const f = S.filters, q = fold((S.fulltext || S.lq).trim());
+  if (S.trash || !(f.tag || f.project || q)) return [];
+  return live().filter(n => n.kind === 'note' && passes(n, { ...f, kind: null, has: [] }) && (!q || fold(n.title + ' ' + (S.fulltext ? n.body : '')).includes(q)));
+}
+function renderLibrary() {
+  const list = libItems(), ids = list.map(i => i.id);
+  [...S.checked].forEach(id => { if (!ids.includes(id)) S.checked.delete(id); });
+  const c = S.cols, sel = [...S.checked].map(item), f = S.filters;
+  const th = (k, l, cls = '') => c[k] ? `<th class="${cls}"><button data-sort="${k}" data-on="${S.sort.key === k}">${l}${S.sort.key === k ? (S.sort.dir < 0 ? ' ↓' : ' ↑') : ''}</button></th>` : '';
+  const rows = list.map(i => {
+    const nh = annsOf(i.id).length, nn = notesOn(i.id).length;
+    return `<tr class="r ${S.checked.has(i.id) ? 'checked' : ''}" data-select="${i.id}" aria-selected="${S.selected === i.id}">
+      <td><input type="checkbox" data-check="${i.id}" ${S.checked.has(i.id) ? 'checked' : ''} aria-label="Select ${esc(i.title)}"></td>
+      ${c.kind ? `<td>${kindIcon(i)}</td>` : ''}
+      ${c.title ? `<td class="tcol"><button class="ttl" data-open="${i.id}">${esc(i.title)}</button>${S.fulltext ? `<div class="snip">${snippet(textOf(i), S.fulltext) || snippet(i.title, S.fulltext)}</div>` : ''}</td>` : ''}
+      ${c.authors ? `<td class="hide-sm"><span class="au" title="${esc(authorsShort(i))}">${esc(authorsShort(i))}</span></td>` : ''}
+      ${c.year ? `<td class="hide-sm"><span class="yr">${i.year}</span></td>` : ''}
+      ${c.created ? `<td class="hide-sm"><span class="dt" title="${fullDate(i.created)}">${smartDate(i.created)}</span></td>` : ''}
+      ${c.modified ? `<td class="hide-sm"><span class="dt" title="${fullDate(i.modified)}">${smartDate(i.modified)}</span></td>` : ''}
+      ${c.tags ? `<td class="hide-sm"><div class="chips">${tagsOf(i).slice(0, 3).map(t => tagChip(t)).join('')}${tagsOf(i).length > 3 ? `<span class="grey mono">+${tagsOf(i).length - 3}</span>` : ''}</div></td>` : ''}
+      ${c.has ? `<td class="hide-sm"><div class="has">${nh ? `<span title="${nh} annotations">${ic('hl')}${nh}</span>` : ''}${nn ? `<span title="${nn} notes on this item">${ic('note')}${nn}</span>` : ''}${i.pdf ? `<span title="PDF in Drive">${ic('pdf')}</span>` : ''}</div></td>` : ''}
+    </tr>`;
+  }).join('');
+  const allBib = sel.length && sel.every(i => i.kind === 'bib');
+  const chips = S.trash ? '' : [
+    f.project ? `<span class="chip filter">${ic('folder')}${esc(proj(f.project).n)}<button class="x" data-act="clearf" data-f="project" aria-label="Remove project filter">×</button></span>` : '',
+    f.tag ? `<span class="chip filter">#${esc(f.tag)}<button class="x" data-act="clearf" data-f="tag" aria-label="Remove tag filter">×</button></span>` : '',
+    ...f.has.map(h => `<span class="chip filter">has ${{ pdf: 'PDF', hl: 'annotations', notes: 'notes' }[h]}<button class="x" data-act="clearhas" data-h="${h}" aria-label="Remove">×</button></span>`),
+    S.fulltext ? `<span class="chip filter">full text: “${esc(S.fulltext)}”<button class="x" data-act="clearft" aria-label="Clear search">×</button></span>` : '',
+  ].join('');
+  const nm = notesMatching();
+  $('#main').innerHTML = `
+  <div class="view ${S.panel ? '' : 'panel-off'}">
+    <div class="center">
+      <div class="top">
+        <h1>${S.trash ? 'Trash' : f.kind ? KINDS[f.kind][0] : 'Library'}</h1><span class="sub">${list.length} item${list.length === 1 ? '' : 's'}</span>
+        <span class="spacer"></span>
+        ${S.trash ? `<button class="btn sm quiet" data-act="home">← Back to library</button>` : `<button class="btn primary" data-act="add">${ic('plus')}Add</button>`}
+      </div>
+      ${S.trash ? '' : `<div class="lib-bar">
+        <div class="sbox lsearch">${ic('search')}<input id="lq" value="${esc(S.fulltext || S.lq)}" placeholder="Search titles and authors · Enter for full text" aria-label="Search the library" autocomplete="off"></div>
+        <div class="seg kseg">${[['', 'All'], ['bib', 'Bibliography'], ['source', 'Sources']].map(([k, n]) => `<button data-lkind="${k}" aria-pressed="${(f.kind || '') === k}">${n}</button>`).join('')}</div>
+        <button class="btn sm" data-act="filters">${ic('filter')}Filter</button>
+        <button class="btn sm quiet hide-sm" data-act="cols">Columns</button>
+      </div>`}
+      ${chips ? `<div class="lib-bar chipsrow"><div class="chips">${chips}</div><button class="btn sm quiet" data-act="clearall">Clear all</button></div>` : ''}
+      ${S.checked.size ? `
+      <div class="lib-bar selbar">
+        <b>${S.checked.size} selected</b>
+        <button class="btn sm" data-act="bulk-tag">${ic('tag')}Tag</button>
+        <button class="btn sm" data-act="bulk-proj">${ic('folder')}Add to project</button>
+        <button class="btn sm" data-act="cite" ${allBib ? '' : 'disabled title="Citations are for bibliography items only"'}>${ic('copy')}Copy citations</button>
+        <button class="btn sm hide-sm" data-act="bibtex" ${allBib ? '' : 'disabled'}>Export BibTeX</button>
+        ${S.trash ? `<button class="btn sm" data-act="restore">Restore</button>` : `<button class="btn sm danger" data-act="bulk-trash">${ic('trash')}Move to trash</button>`}
+        <span style="flex:1"></span><button class="btn sm quiet" data-act="uncheck">Clear selection</button>
+      </div>` : ''}
+      <div class="tablewrap">${list.length ? `<table>
+        <thead><tr><th><input type="checkbox" data-act="checkall" ${list.every(i => S.checked.has(i.id)) ? 'checked' : ''} aria-label="Select all"></th>
+          ${th('kind', 'Kind')}${th('title', 'Title')}${th('authors', 'Authors', 'hide-sm')}${th('year', 'Year', 'hide-sm')}${th('created', 'Created', 'hide-sm')}${th('modified', 'Modified', 'hide-sm')}
+          ${c.tags ? '<th class="hide-sm"><span class="label">Tags</span></th>' : ''}${c.has ? '<th class="hide-sm"><span class="label">Has</span></th>' : ''}</tr></thead>
+        <tbody>${rows}</tbody></table>` : `<div class="empty">${S.trash ? 'Trash is empty. Items stay here 30 days.' : live().some(i => i.kind !== 'note') ? 'Nothing matches. Clear a filter or try other words.' : 'Your library is empty. Drop your first PDF anywhere, or use + Add to import from Zotero or BibTeX.'}</div>`}
+        ${nm.length ? `<button class="morelink alsonotes" data-act="notes-from-lib">Also ${nm.length} note${nm.length === 1 ? '' : 's'} match${nm.length === 1 ? 'es' : ''} → show in Notes</button>` : ''}</div>
+    </div>
+    <aside class="panel" aria-label="Details"><div class="pbody">${infoHTML(item(S.selected), 'library')}</div></aside>
+  </div>`;
+}
+function renderNotesList() {
+  const q = fold(S.nq.trim()), f = S.nfilter;
+  const list = live().filter(n => n.kind === 'note'
+    && (!f.tag || tagsOf(n).some(t => t === f.tag || t.startsWith(f.tag + '/')))
+    && (!f.project || (n.projects || []).some(p => projDesc(f.project).includes(p)))
+    && (!q || fold(n.title + ' ' + n.body).includes(q))).sort((a, b) => b.modified - a.modified);
+  const chips = [f.project ? `<span class="chip filter">${ic('folder')}${esc(proj(f.project).n)}<button class="x" data-act="nclear" data-f="project" aria-label="Remove">×</button></span>` : '',
+    f.tag ? `<span class="chip filter">#${esc(f.tag)}<button class="x" data-act="nclear" data-f="tag" aria-label="Remove">×</button></span>` : ''].join('');
+  const plain = s => s.replace(/\[\[([^\]]+)\]\]/g, '$1').replace(/\n+/g, ' ');
+  $('#main').innerHTML = `
+  <div class="view panel-off"><div class="center">
+    <div class="top"><h1>Notes</h1><span class="sub">${list.length} note${list.length === 1 ? '' : 's'}</span><span class="spacer"></span><button class="btn primary" data-act="newnote">${ic('plus')}New note</button></div>
+    <div class="lib-bar"><div class="sbox lsearch">${ic('search')}<input id="nq" value="${esc(S.nq)}" placeholder="Search notes (title and text)" aria-label="Search notes" autocomplete="off"></div>${chips ? `<div class="chips">${chips}</div>` : ''}</div>
+    <div class="tablewrap">${list.length ? `<table><thead><tr><th class="label" style="width:auto">Note</th><th class="hide-sm"><span class="label">Attached to</span></th><th class="hide-sm"><span class="label">Tags</span></th><th class="hide-sm"><span class="label">Created</span></th><th><span class="label">Modified ↓</span></th></tr></thead><tbody>
+      ${list.map(n => { const src = n.anchor && item(n.anchor.item); return `<tr class="r">
+        <td class="tcol" style="padding-left:20px"><button class="ttl" data-open="${n.id}">${esc(n.title || 'Untitled')}</button><div class="snip">${q && S.nq.trim() ? snippet(n.body, S.nq.trim()) || esc(plain(n.body).slice(0, 110)) : esc(plain(n.body).slice(0, 110))}${!q && n.body.length > 110 ? '…' : ''}</div></td>
+        <td class="hide-sm">${src ? `<button class="linkrow" data-open="${src.id}" style="padding:0"><span class="k ${src.kind}">${ic(src.kind)}</span><span class="t" style="max-width:160px">${esc(readerLabel(src))}</span></button>` : '<span class="grey">—</span>'}</td>
+        <td class="hide-sm"><div class="chips">${tagsOf(n).slice(0, 3).map(t => tagChip(t)).join('')}</div></td>
+        <td class="hide-sm"><span class="dt" title="${fullDate(n.created)}">${smartDate(n.created)}</span></td>
+        <td><span class="dt" title="${fullDate(n.modified)}">${smartDate(n.modified)}</span></td></tr>`; }).join('')}
+      </tbody></table>` : `<div class="empty">${S.nq || f.tag || f.project ? 'No notes match.' : 'No notes yet. Start one with + New note, or select text while reading.'}</div>`}</div>
+  </div></div>`;
+}
+function renderReaderHome() {
+  const list = live().filter(i => i.kind !== 'note').sort((a, b) => b.opened - a.opened).slice(0, 12);
+  $('#main').innerHTML = `
+  <div class="view panel-off"><div class="center">
+    <div class="top"><h1>Reader</h1><span class="sub">Nothing open. Recently opened:</span></div>
+    <div class="tablewrap"><table><tbody>${list.map(i => `<tr class="r">
+      <td style="padding-left:20px;width:120px">${kindIcon(i)}</td>
+      <td class="tcol"><button class="ttl" data-open="${i.id}">${esc(i.title)}</button></td>
+      <td class="hide-sm"><span class="au">${esc(authorsShort(i))}</span></td><td class="hide-sm"><span class="yr">${i.year}</span></td>
+      <td><span class="dt" title="Opened ${fullDate(i.opened)}">${smartDate(i.opened)}</span></td></tr>`).join('')}</tbody></table></div>
+  </div></div>`;
+}
+const trimLabel = (s, n = 15) => s.length > n ? s.slice(0, n).trimEnd() + '…' : s;
+function readerLabel(i) { const a = authorsShort(i); return a ? `${trimLabel(a)}${i.year ? ', ' + i.year : ''}` : trimLabel(i.title); }
+function renderTabs() {
+  const r = S.reader && item(S.reader), n = S.note && item(S.note);
+  const tab = (g, icon, name, sub, full) => `<button class="tab" data-go="${g}" aria-current="${S.view === g}" title="${esc(full || name)}">${ic(icon)}<span class="tl">${name}</span>${sub ? `<span class="ts">· ${esc(sub)}</span>` : ''}</button>`;
+  $('#tabs').innerHTML = tab('library', 'lib', 'Library') + tab('reader', 'reader', 'Reader', r && !r.deleted ? readerLabel(r) : '', r ? 'Reader: ' + r.title : '') + tab('note', 'note', 'Notes', n && !n.deleted ? trimLabel(n.title || 'Untitled') : '', n ? 'Notes: ' + (n.title || 'Untitled') : '');
+  $('#tgl').setAttribute('aria-pressed', innerWidth <= 860 ? S.sideMobile : S.side);
+  $('#tgr').setAttribute('aria-pressed', S.panel);
+}
+const tagChip = (t, removeFrom) => `<button class="chip" data-tag="${esc(t)}" title="Show #${esc(t)} in Library"><span class="dot" style="background:${tagColor(t)}"></span>${esc(t)}${removeFrom ? `<span class="x" role="button" tabindex="0" data-untag="${esc(t)}" data-from="${removeFrom}" aria-label="Remove tag">×</span>` : ''}</button>`;
+const projChip = p => `<button class="chip proj" data-scope="${p}" title="Show in Library">${esc(proj(p).n)}</button>`;
+
+function infoHTML(i, ctx) {
+  if (!i || i.deleted && ctx !== 'library') return '<p class="muted">Select an item to see its details.</p>';
+  const f = i.fields || {};
+  const meta = (i.kind === 'bib'
+    ? [['Citekey', citekey(i)], ['Type', BIB_TYPES[i.type]], ['Authors', i.creators.map(c => `${c.f}, ${c.g}`).join('; ')], ['Year', i.year], ['Journal', i.journal], ['Volume', i.volume], ['Pages', i.pp], ['Publisher', i.publisher], ['Place', i.place], ['PDF', i.pdf ? `${i.pages} pages · Drive / Qipu` : 'not attached']]
+    : [['Type', i.type], ['Date', i.date], ['Author', i.creators.map(c => c.f).join('; ')], ['Interviewee', f.interviewee], ['Interviewer', f.interviewer], ['Place', f.place], ['Language', f.language], ['Length', f.length], ['Issued by', f.issuer], ['Archive', f.archive], ['Reference', f.ref], ['URL', f.url], ['Accessed', f.accessed], ['Content', i.pasted ? 'Pasted text' : i.pdf ? `PDF, ${i.pages} pages` : '']])
+    .filter(([, v]) => v).map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('');
+  const notes = notesOn(i.id), out = outLinks(i), back = backLinks(i);
+  return `
+    ${ctx === 'library' ? `<section>${kindIcon(i)}<h2>${esc(i.title)}</h2><div><button class="btn primary sm" data-open="${i.id}">Open</button> <span class="muted">or ⌘-click for a new tab</span></div></section>` : ''}
+    ${i.kind !== 'note' ? `<section><span class="label">Details</span><dl class="meta">${meta}</dl></section>` : ''}
+    ${i.kind !== 'note' ? `<section><span class="label">Tags</span><div class="chips">${tagsOf(i).map(t => tagChip(t, i.id)).join('')}<input class="tagin" placeholder="+ tag" data-addtag="${i.id}" aria-label="Add tag"></div></section>`
+      : `<section><span class="label">Tags</span><div class="chips">${tagsOf(i).map(t => tagChip(t)).join('') || '<span class="muted">Write #tag in the text.</span>'}</div></section>`}
+    <section><span class="label">Projects</span><div class="chips">${(i.projects || []).map(projChip).join('')}<button class="chip" data-act="addproj" data-id="${i.id}" style="background:none;border:1px dashed var(--dust);color:var(--stone)">+ project</button></div></section>
+    ${i.kind !== 'note' ? `<section><span class="label">Notes on this text · ${notes.length}</span>
+      ${notes.map(n => `<button class="notelink" data-open="${n.id}">${ic('note')}${esc(n.title)}${n.anchor.anns.length ? `<span class="grey mono">· ${n.anchor.anns.length} highlight${n.anchor.anns.length > 1 ? 's' : ''}</span>` : '<span class="grey mono">· whole text</span>'}</button>`).join('')}
+      ${ctx === 'reader' ? `<button class="btn sm" style="align-self:flex-start" data-act="note-whole">${ic('plus')}Note on the whole text</button>` : notes.length ? '' : '<span class="muted">None yet. Open the text to add one.</span>'}</section>` : ''}
+    <section><span class="label">Links · ${out.length}</span>${out.map(l => linkRow(l.it, l.t)).join('') || '<span class="muted">None.</span>'}</section>
+    <section><span class="label">Backlinks · ${back.length}</span>${back.map(b => linkRow(b)).join('') || '<span class="muted">Nothing links here yet.</span>'}</section>
+    ${ctx === 'library' ? `<section><span class="label">Dates</span><dl class="meta"><dt>Created</dt><dd>${fullDate(i.created)}</dd><dt>Modified</dt><dd>${fullDate(i.modified)}</dd></dl></section>` : ''}`;
+}
+function linkRow(it, t) {
+  if (!it) return `<button class="linkrow" data-newnote="${esc(t)}" title="Create this note">${ic('note', 'grey')}<span class="t grey">${esc(t)} <i>(create note)</i></span></button>`;
+  return `<button class="linkrow" data-open="${it.id}"><span class="k ${it.kind}">${ic(it.kind)}</span><span class="t">${esc(it.title)}</span></button>`;
+}
+
+// ═══ Reader ═══════════════════════════════════════════════════════════════
+function paraHTML(itemId, pi, text) {
+  const hls = ANNS.filter(a => a.item === itemId && a.type === 'hl' && a.ranges.some(r => r.p === pi));
+  const cuts = new Set([0, text.length]);
+  hls.forEach(a => a.ranges.filter(r => r.p === pi).forEach(r => { cuts.add(r.s); cuts.add(r.e); }));
+  const pts = [...cuts].sort((x, y) => x - y);
+  let out = '';
+  for (let k = 0; k < pts.length - 1; k++) {
+    const s = pts[k], e = pts[k + 1], seg = text.slice(s, e);
+    const cover = hls.filter(a => a.ranges.some(r => r.p === pi && r.s <= s && r.e >= e));
+    const a = cover[cover.length - 1];
+    if (!a || (S.colorFilter !== null && a.color !== S.colorFilter)) { out += esc(seg); continue; }
+    out += `<mark class="hl ${notesOnAnn(a.id).length ? 'noted' : ''}" data-ann="${a.id}" style="--hc:${PALETTE[a.color].c}">${esc(seg)}</mark>`;
+  }
+  return out;
+}
+function starPts(x, y, w, h) { const cx = x + w / 2, cy = y + h / 2, R = Math.min(w, h) / 2, r = R * .45; return Array.from({ length: 10 }, (_, k) => { const ang = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r : R; return `${(cx + rr * Math.cos(ang)).toFixed(1)},${(cy + rr * Math.sin(ang)).toFixed(1)}`; }).join(' '); }
+function shapeSVG(a) {
+  if (S.colorFilter !== null && a.color !== S.colorFilter) return '';
+  const col = PALETTE[a.color].c, at = `class="shape" data-ann="${a.id}" stroke="${col}"`;
+  if (a.type === 'rect') { const [x, y, w, h] = a.box; return `<rect ${at} x="${x}" y="${y}" width="${w}" height="${h}" rx="2"/>`; }
+  if (a.type === 'circle') { const [x, y, w, h] = a.box; return `<ellipse ${at} cx="${x + w / 2}" cy="${y + h / 2}" rx="${w / 2}" ry="${h / 2}"/>`; }
+  if (a.type === 'star') { const [x, y, w, h] = a.box; return `<polygon ${at} points="${starPts(x, y, w, h)}"/>`; }
+  if (a.type === 'ink') return `<polyline ${at} points="${a.pts.map(p => p.join(',')).join(' ')}"/>`;
+  return '';
+}
+function pageHTML(i) {
+  const c = CONTENT[i.content];
+  const ink = `<svg class="ink" id="ink">${annsOf(i.id).filter(a => a.type !== 'hl').map(shapeSVG).join('')}</svg>`;
+  if (c && c.pdf) return `<article class="page ${['rect', 'circle', 'star', 'ink'].includes(S.tool) ? 'drawing' : ''} ${S.tool === 'eraser' ? 'erasing' : ''}" id="page">
+      <div class="runhead"><span>${esc(c.runhead)}</span><span>${c.page}</span></div><h3>${c.h3}</h3><h4>${c.h4}</h4>
+      ${c.paras.map((t, k) => `<p data-para="${k}">${paraHTML(i.id, k, t)}</p>`).join('')}
+      <p class="foot">example page · Malinowski 1922, public domain</p>${ink}</article>`;
+  if (c) return `<article class="page text ${S.tool === 'eraser' ? 'erasing' : ''}" id="page">
+      <div class="srcmeta"><span>${esc(i.type)}</span><span>${esc(i.date || '')}</span>${i.fields?.interviewee ? `<span>Interviewee: ${esc(i.fields.interviewee)}</span>` : ''}<span>pasted text · read-only</span></div>
+      ${c.paras.map((t, k) => `<p data-para="${k}">${paraHTML(i.id, k, t)}</p>`).join('')}</article>`;
+  const w = [96, 100, 92, 100, 88, 97, 100, 64, 0, 100, 95, 100, 90, 98, 72, 0, 100, 94, 99, 81, 100, 60];
+  return `<article class="page ${['rect', 'circle', 'star', 'ink'].includes(S.tool) ? 'drawing' : ''}" id="page">
+      <div class="runhead"><span>${esc(authorsShort(i))}</span><span>1</span></div>
+      <p class="foot" style="margin:0 0 22px">Example PDF without a text layer. Open <button class="wikilink" data-open="malinowski">Argonauts</button> to try highlighting.</p>
+      ${w.map(x => x ? `<div class="bar" style="width:${x}%"></div>` : '<div style="height:14px"></div>').join('')}${ink}</article>`;
+}
+function renderReader() {
+  const i = item(S.reader);
+  const c = CONTENT[i.content];
+  const isPdf = i.pdf;
+  const drawTools = [['rect', 'Square'], ['circle', 'Circle'], ['star', 'Star'], ['ink', 'Pen']];
+  const center = !i.pdf && !i.pasted ? `
+      <div class="pagewrap"><div class="nopdf">
+        <h2 style="font-family:var(--display);font-weight:500;margin:0">${esc(i.title)}</h2>
+        <p class="muted">${esc(authorsShort(i))} · ${i.year} · ${esc(i.publisher || '')}. This reference has no PDF yet.</p>
+        <div class="dropzone" id="attachzone">${ic('upload')}<b>Attach a PDF</b><span>Drop the file here, or</span><button class="btn" data-act="attach">Choose file</button></div>
+      </div></div>` : `
+      <div class="tools" role="toolbar" aria-label="Annotation tools">
+        <button class="tool" data-tool="select" aria-pressed="${S.tool === 'select'}" title="Select and highlight text (Esc)" aria-label="Select">${ic('cursor')}</button>
+        ${drawTools.map(([t, n]) => `<button class="tool" data-tool="${t}" aria-pressed="${S.tool === t}" ${isPdf ? '' : 'disabled'} title="${isPdf ? n : n + ': PDFs only'}" aria-label="${n}">${ic(t)}</button>`).join('')}
+        <button class="tool" data-tool="eraser" aria-pressed="${S.tool === 'eraser'}" title="Eraser: click an annotation to remove it" aria-label="Eraser">${ic('eraser')}</button>
+        <span class="sep"></span>
+        ${PALETTE.map((p, k) => `<button class="swatch" data-color="${k}" aria-pressed="${S.color === k}" title="${k + 1}: ${esc(p.n)}">${k + 1}<i style="background:${p.c}"></i><span class="nm hide-sm">${esc(p.n)}</span></button>`).join('')}
+        <button class="tool" data-act="palette" title="Edit colors and names" aria-label="Edit colors">${ic('gear')}</button>
+        <span style="flex:1"></span>
+        ${isPdf ? `<button class="btn sm quiet hide-sm" data-act="download">${ic('download')}Annotated PDF</button>` : ''}
+      </div>
+      <div class="pagewrap" id="pagewrap">${pageHTML(i)}</div>`;
+  $('#main').innerHTML = `
+  <div class="view ${S.panel ? '' : 'panel-off'}">
+    <div class="center">
+      <div class="top">
+        ${kindIcon(i, false)}<h1 style="font-size:18px">${esc(i.title)}</h1><span class="sub hide-sm">${esc(authorsShort(i))}${i.year ? ' · ' + i.year : ''}</span>
+        <span class="spacer"></span>
+        ${c && c.pdf ? `<span class="mono grey hide-sm">p. ${c.page} / ${i.pages}</span>` : i.pdf ? `<span class="mono grey hide-sm">p. 1 / ${i.pages}</span>` : ''}
+        <button class="iconbtn" data-act="closereader" title="Close this text" aria-label="Close this text">${ic('x')}</button>
+      </div>
+      ${center}
+    </div>
+    <aside class="panel" id="rpanel" aria-label="Info, annotations and search">${readerPanel()}</aside>
+  </div>`;
+}
+function readerPanel() {
+  const i = item(S.reader);
+  if (S.panelNote && item(S.panelNote) && !item(S.panelNote).deleted) return panelNoteHTML(item(S.panelNote));
+  const anns = annsOf(i.id).filter(a => S.colorFilter === null || a.color === S.colorFilter).sort((a, b) => (a.ranges?.[0]?.p ?? 0) - (b.ranges?.[0]?.p ?? 0) || (a.ranges?.[0]?.s ?? 0) - (b.ranges?.[0]?.s ?? 0));
+  const tab = (id, n, c) => `<button role="tab" aria-selected="${S.rtab === id}" data-rtab="${id}">${n}${c !== undefined ? `<span class="n">${c}</span>` : ''}</button>`;
+  let body = '';
+  if (S.rtab === 'info') body = infoHTML(i, 'reader');
+  if (S.rtab === 'annotations') {
+    body = `<div class="colorfilter"><button class="cf" data-cf="" aria-pressed="${S.colorFilter === null}">All</button>${PALETTE.map((p, k) => `<button class="cf" data-cf="${k}" aria-pressed="${S.colorFilter === k}" title="${esc(p.n)}"><span class="sw" style="background:${p.c}"></span>${esc(p.n)}</button>`).join('')}</div>
+      ${anns.length ? anns.map(annCard).join('') : `<p class="muted">${annsOf(i.id).length ? 'No annotations in this color.' : 'Select text and press 1–5 to highlight it.'}</p>`}`;
+  }
+  if (S.rtab === 'search') {
+    const hits = searchHits(i, S.rsearch);
+    body = `<div class="sbox">${ic('search')}<input id="rsq" value="${esc(S.rsearch)}" placeholder="Search in this text" aria-label="Search in this text" autocomplete="off"></div>
+      ${S.rsearch.trim() ? (CONTENT[i.content] ? `<span class="label">${hits.length} result${hits.length === 1 ? '' : 's'}</span>` + hits.map((h, k) => `<button class="acard" style="--ac:var(--dust);text-align:left" data-hit="${k}"><span class="mono grey">${h.loc}</span><span class="txt">${h.html}</span></button>`).join('') : '<p class="muted">This example PDF has no text to search. Try Argonauts or the interview.</p>') : '<p class="muted">Results jump to the passage and select it, so you can press 1–5 to highlight.</p>'}`;
+  }
+  const multi = S.rtab === 'annotations' && S.annChecked.size ? `<div class="multibar"><b class="mono">${S.annChecked.size} selected</b><button class="btn sm primary" data-act="note-on-anns">${ic('note')}Note on these</button><button class="btn sm quiet" data-act="ann-uncheck">Clear</button></div>` : '';
+  return `<div class="ptabs" role="tablist">${tab('info', 'Info')}${tab('annotations', 'Annotations', annsOf(i.id).length)}${tab('search', 'Search')}</div><div class="pbody">${body}</div>${multi}`;
+}
+function annCard(a) {
+  const notes = notesOnAnn(a.id);
+  return `<div class="acard" id="card-${a.id}" style="--ac:${PALETTE[a.color].c}">
+    <div class="head"><input type="checkbox" data-anncheck="${a.id}" ${S.annChecked.has(a.id) ? 'checked' : ''} aria-label="Select annotation"><span class="label">${ANNTYPE[a.type]} · ${esc(PALETTE[a.color].n)}</span><span style="flex:1"></span><input class="loc" value="${esc(locOf(a))}" data-loc="${a.id}" aria-label="Locator" title="Locator (automatic, editable)"></div>
+    ${a.type === 'hl' ? `<div class="txt" data-goto="${a.id}" role="button" tabindex="0">${esc(a.text)}</div>` : `<button class="txt muted" data-goto="${a.id}" style="text-align:left">${ANNTYPE[a.type]} on ${locOf(a)}. Click to show.</button>`}
+    <div class="chips">${(a.tags || []).map(t => tagChip(t)).join('')}<input class="tagin" placeholder="+ tag" data-anntag="${a.id}" aria-label="Tag this annotation"></div>
+    ${notes.map(n => `<button class="notelink" data-pnote="${n.id}">${ic('note')}${esc(n.title)}</button>`).join('')}
+    <div class="chips"><button class="btn sm quiet" data-act="note-on" data-ann="${a.id}">${ic('plus')}Add note</button>${a.type === 'hl' ? `<button class="btn sm quiet" data-act="copyann" data-ann="${a.id}">${ic('copy')}Copy</button>` : ''}</div>
+  </div>`;
+}
+function searchHits(i, q) {
+  const c = CONTENT[i.content]; if (!c || !q.trim()) return [];
+  const fq = fold(q.trim()), out = [];
+  c.paras.forEach((t, p) => { const ft = foldKeep(t); let k = ft.indexOf(fq); while (k >= 0 && out.length < 50) { const a = Math.max(0, k - 40), b = Math.min(t.length, k + fq.length + 50); out.push({ p, s: k, e: k + fq.length, loc: c.pdf ? `p. ${c.page}, ¶${p + 1}` : `¶${p + 1}`, html: (a ? '…' : '') + esc(t.slice(a, k)) + `<b>${esc(t.slice(k, k + fq.length))}</b>` + esc(t.slice(k + fq.length, b)) + (b < t.length ? '…' : '') }); k = ft.indexOf(fq, k + 1); } });
+  return out;
+}
+function rerenderPanel() { const p = $('#rpanel'); if (p) { const st = p.scrollTop; p.innerHTML = readerPanel(); p.scrollTop = st; } }
+function rerenderPage() { const w = $('#pagewrap'); if (w) { const st = w.scrollTop; w.innerHTML = pageHTML(item(S.reader)); w.scrollTop = st; } }
+function snapshot() { UNDO.push(JSON.stringify(ANNS)); if (UNDO.length > 50) UNDO.shift(); }
+function undo() { if (!UNDO.length) return toast('Nothing to undo'); ANNS = JSON.parse(UNDO.pop()); rerenderPage(); rerenderPanel(); toast('Undone'); }
+
+// selection → highlight
+function offsetIn(p, node, off) { const r = document.createRange(); r.setStart(p, 0); r.setEnd(node, off); return r.toString().length; }
+function selectionRanges() {
+  const sel = getSelection(); if (!sel.rangeCount || sel.isCollapsed) return null;
+  const range = sel.getRangeAt(0), page = $('#page');
+  if (!page || !page.contains(range.commonAncestorContainer)) return null;
+  const out = [];
+  $$('p[data-para]', page).forEach(p => {
+    if (!range.intersectsNode(p)) return;
+    const s = p.contains(range.startContainer) ? offsetIn(p, range.startContainer, range.startOffset) : 0;
+    const e = p.contains(range.endContainer) ? offsetIn(p, range.endContainer, range.endOffset) : p.textContent.length;
+    if (e > s) out.push({ p: +p.dataset.para, s, e });
+  });
+  return out.length ? out : null;
+}
+function highlightSelection(color, fromPop) {
+  const ranges = selectionRanges() || (fromPop ? PENDING : null); if (!ranges) return false; PENDING = null;
+  const c = CONTENT[item(S.reader).content];
+  const text = ranges.map(r => c.paras[r.p].slice(r.s, r.e)).join(' ').trim();
+  if (text.length < 2) return false;
+  snapshot();
+  const a = { id: 'a' + Date.now(), item: S.reader, type: 'hl', color, ranges, text, tags: [], created: Date.now() };
+  ANNS.push(a); item(S.reader).modified = Date.now();
+  getSelection().removeAllRanges(); closeLayer();
+  S.rtab = 'annotations'; rerenderPage(); rerenderPanel();
+  flashAnn(a.id, false);
+  return true;
+}
+function flashAnn(id, scrollPage = true) {
+  const els = $$(`[data-ann="${id}"]`, $('#page') || document);
+  if (scrollPage && els[0]) els[0].scrollIntoView({ block: 'center', behavior: 'smooth' });
+  els.forEach(el => el.classList.add('flash')); setTimeout(() => els.forEach(el => el.classList.remove('flash')), 1500);
+  const card = $('#card-' + id); if (card) { card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); card.classList.add('flash'); setTimeout(() => card.classList.remove('flash'), 1500); }
+}
+function selectOffsets(p, s, e) {
+  const pEl = $(`#page p[data-para="${p}"]`); if (!pEl) return;
+  const walk = document.createTreeWalker(pEl, NodeFilter.SHOW_TEXT); let pos = 0, n, r = document.createRange(), started = false;
+  while ((n = walk.nextNode())) { const len = n.textContent.length; if (!started && s <= pos + len) { r.setStart(n, s - pos); started = true; } if (started && e <= pos + len) { r.setEnd(n, e - pos); break; } pos += len; }
+  const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  pEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  setTimeout(() => showSelPop(r), 250);
+}
+
+// ═══ Notes ════════════════════════════════════════════════════════════════
+function renderMd(s) {
+  return s.split(/\n{2,}/).map(p => '<p>' + esc(p)
+    .replace(/\[\[([^\]\n]+)\]\]/g, (_, t) => { const it = byTitle(t); return `<span class="wikilink ${it ? '' : 'missing'}" ${it ? `data-open="${it.id}"` : `data-newnote="${t}"`} role="link" tabindex="0">${t}</span>`; })
+    .replace(/(^|\s)#([\wÀ-ɏ/-]+)/g, (_, sp, t) => `${sp}<span class="hashtag" data-tag="${t}" role="link" tabindex="0">#${t}</span>`)
+    .replace(/\n/g, '<br>') + '</p>').join('');
+}
+function attachedHTML(n) {
+  if (!n.anchor) return '';
+  const src = item(n.anchor.item), anns = n.anchor.anns.map(id => ANNS.find(a => a.id === id)).filter(Boolean);
+  return `<div class="attached"><span class="label">Attached to</span>
+    ${anns.map(a => `<button class="hlq" style="--ac:${PALETTE[a.color].c}" data-jump="${src.id}" data-flash="${a.id}">${a.type === 'hl' ? '“' + esc(a.text) + '”' : ANNTYPE[a.type]} <span class="mono grey">${esc(locOf(a))}</span></button>`).join('')}
+    <button class="src" data-jump="${src.id}">${kindIcon(src, false)} ${esc(src.title)}${anns.length ? '' : ' · whole text'} · open ↗</button></div>`;
+}
+function renderNote() {
+  const n = item(S.note);
+  $('#main').innerHTML = `
+  <div class="view ${S.panel ? '' : 'panel-off'}">
+    <div class="center">
+      <div class="top">
+        <button class="btn sm quiet" data-act="allnotes">← All notes</button>
+        ${kindIcon(n)}<span class="spacer"></span>
+        <div class="modebar" role="group" aria-label="Mode"><button aria-pressed="${S.noteMode === 'edit'}" data-mode="edit">Edit</button><button aria-pressed="${S.noteMode === 'read'}" data-mode="read">Read</button></div>
+      </div>
+      <div class="note-scroll"><div class="note-inner">
+        <input class="note-title" id="ntitle" data-ntitle="${n.id}" value="${esc(n.title)}" aria-label="Title" placeholder="Untitled">
+        <div class="saved" data-saved="${n.id}">Saved ${ago(n.modified)}</div>
+        ${attachedHTML(n)}
+        ${S.noteMode === 'edit'
+          ? `<textarea class="editor" id="editor" data-nbody="${n.id}" aria-label="Note text" placeholder="Write. [[ links a note or source, # adds a tag.">${esc(n.body)}</textarea>`
+          : `<div class="rendered">${renderMd(n.body) || '<p class="muted">Empty note. Switch to Edit to write.</p>'}</div>`}
+      </div></div>
+    </div>
+    <aside class="panel" id="npanel" aria-label="Links"><div class="pbody">${noteSide(n)}</div></aside>
+  </div>`;
+}
+function noteSide(n) {
+  const out = outLinks(n), back = backLinks(n);
+  return `<section><span class="label">Links · ${out.length}</span>${out.map(l => linkRow(l.it, l.t)).join('') || '<span class="muted">Write [[ to link a note or source.</span>'}</section>
+    <section><span class="label">Backlinks · ${back.length}</span>${back.map(b => linkRow(b)).join('') || '<span class="muted">Nothing links here yet.</span>'}</section>
+    <section><span class="label">Tags</span><div class="chips">${tagsOf(n).map(t => tagChip(t)).join('') || '<span class="muted">Write #tag in the text.</span>'}</div></section>
+    <section><span class="label">Projects</span><div class="chips">${(n.projects || []).map(projChip).join('')}<button class="chip" data-act="addproj" data-id="${n.id}" style="background:none;border:1px dashed var(--dust);color:var(--stone)">+ project</button></div></section>
+    <section><span class="label">Dates</span><dl class="meta"><dt>Created</dt><dd>${fullDate(n.created)}</dd><dt>Modified</dt><dd data-modified="${n.id}">${fullDate(n.modified)}</dd></dl></section>`;
+}
+function panelNoteHTML(n) {
+  return `<div class="ptabs"><button data-act="pnote-close" style="padding:11px 4px 9px">← Annotations</button><span style="flex:1"></span><button data-open="${n.id}" style="padding:11px 4px 9px;color:var(--accent)">Open in Notes →</button></div>
+    <div class="pbody">
+      <input class="note-title" style="font-size:18px" data-ntitle="${n.id}" value="${esc(n.title)}" aria-label="Note title" placeholder="Untitled">
+      <div class="saved" data-saved="${n.id}">Saved ${ago(n.modified)}</div>
+      ${attachedHTML(n)}
+      <textarea class="editor" id="peditor" data-nbody="${n.id}" placeholder="Write. [[ links a note or source, # adds a tag.">${esc(n.body)}</textarea>
+      <span class="muted">This is a full note: it also lives in Notes, with links and tags.</span>
+    </div>`;
+}
+function newNote(opts = {}) {
+  const id = 'n' + Date.now();
+  const n = { id, kind: 'note', type: 'note', title: opts.title || '', creators: [], projects: opts.projects || (S.filters.project ? [S.filters.project] : []), body: '', anchor: opts.anchor || null, created: Date.now(), modified: Date.now(), opened: Date.now() };
+  ITEMS.push(n); return n;
+}
+
+// ═══ Autocomplete for [[ and # ═══════════════════════════════════════════
+let AC = null;
+function caretXY(ta) {
+  const m = document.createElement('div'), cs = getComputedStyle(ta);
+  ['fontFamily', 'fontSize', 'lineHeight', 'paddingTop', 'paddingLeft', 'paddingRight', 'borderTopWidth', 'borderLeftWidth', 'letterSpacing', 'whiteSpace', 'wordWrap', 'width', 'boxSizing'].forEach(k => m.style[k] = cs[k]);
+  Object.assign(m.style, { position: 'absolute', visibility: 'hidden', whiteSpace: 'pre-wrap', overflowWrap: 'break-word', top: 0, left: 0 });
+  m.textContent = ta.value.slice(0, ta.selectionStart); const sp = document.createElement('span'); sp.textContent = '​'; m.append(sp);
+  document.body.append(m); const r = ta.getBoundingClientRect(); const x = r.left + sp.offsetLeft, y = r.top + sp.offsetTop - ta.scrollTop + parseFloat(cs.lineHeight || 20); m.remove();
+  return { x, y };
+}
+function updateAC(ta) {
+  const before = ta.value.slice(0, ta.selectionStart);
+  let m = before.match(/\[\[([^\]\n]*)$/), kind = 'link';
+  if (!m) { m = before.match(/(?:^|\s)#([\wÀ-ɏ/-]*)$/); kind = 'tag'; }
+  if (!m) return closeAC();
+  const q = fold(m[1]);
+  let opts = kind === 'link'
+    ? live().filter(i => i.id !== ta.dataset.nbody && fold(i.title).includes(q)).slice(0, 8).map(i => ({ v: i.title, html: `<span class="k ${i.kind}">${ic(i.kind)}</span><span class="t">${esc(i.title)}</span>` }))
+    : allTags().filter(t => fold(t).includes(q)).slice(0, 8).map(t => ({ v: t, html: `<span class="dot" style="width:8px;height:8px;border-radius:50%;background:${tagColor(t)}"></span><span class="t">#${esc(t)}</span>` }));
+  if (kind === 'link' && m[1].trim() && !opts.some(o => fold(o.v) === q)) opts.push({ v: m[1].trim(), html: `${ic('plus')}<span class="t">New note “${esc(m[1].trim())}”</span>` });
+  if (!opts.length) return closeAC();
+  closeAC();
+  const el = document.createElement('div'); el.className = 'ac'; el.setAttribute('role', 'listbox');
+  const { x, y } = caretXY(ta);
+  el.style.left = Math.max(8, Math.min(innerWidth - 290, x)) + 'px'; el.style.top = Math.min(innerHeight - 60, y + 4) + 'px';
+  document.body.append(el);
+  AC = { el, ta, kind, start: ta.selectionStart - m[1].length, opts, k: 0 };
+  drawAC();
+}
+function drawAC() { AC.el.innerHTML = AC.opts.map((o, k) => `<button role="option" aria-selected="${k === AC.k}" data-ack="${k}">${o.html}</button>`).join(''); }
+function pickAC(k) {
+  const { ta, kind, start, opts } = AC, o = opts[k]; const end = ta.selectionStart;
+  let ins = kind === 'link' ? o.v + ']]' : o.v + ' ';
+  const after = ta.value.slice(end); if (kind === 'link' && after.startsWith(']]')) ins = o.v;
+  ta.value = ta.value.slice(0, start) + ins + after; const pos = start + ins.length + (kind === 'link' && after.startsWith(']]') ? 2 : 0);
+  ta.setSelectionRange(pos, pos); ta.focus(); closeAC(); ta.dispatchEvent(new Event('input', { bubbles: true }));
+}
+function closeAC() { if (AC) { AC.el.remove(); AC = null; } }
+
+// ═══ Floating layers: popovers, menus, modals ════════════════════════════
+function closeLayer() { $$('.pop').forEach(p => p.remove()); }
+function closeModal() { $$('.scrim').forEach(p => p.remove()); }
+function popAt(html, anchor, opts = {}) {
+  closeLayer();
+  const el = document.createElement('div'); el.className = 'pop ' + (opts.cls || ''); el.innerHTML = html; document.body.append(el);
+  const r = anchor.getBoundingClientRect ? anchor.getBoundingClientRect() : anchor;
+  const w = el.offsetWidth, h = el.offsetHeight;
+  let left = opts.center ? r.left + r.width / 2 - w / 2 : (opts.right ? r.right - w : r.left);
+  let top = opts.above ? r.top - h - 8 : r.bottom + 6;
+  if (top < 44) top = r.bottom + 8; if (top + h > innerHeight - 8) top = Math.max(44, r.top - h - 8);
+  el.style.left = Math.max(8, Math.min(innerWidth - w - 8, left)) + 'px'; el.style.top = top + 'px';
+  return el;
+}
+function modal(html, cls = '') {
+  closeModal(); closeLayer();
+  const s = document.createElement('div'); s.className = 'scrim'; s.innerHTML = `<div class="modal ${cls}" role="dialog" aria-modal="true">${html}</div>`;
+  s.addEventListener('mousedown', e => { if (e.target === s) closeModal(); });
+  document.body.append(s); return s;
+}
+let PENDING = null;
+function showSelPop(range) {
+  const r = range.getBoundingClientRect(); if (!r.width && !r.height) return;
+  PENDING = selectionRanges();
+  popAt(`${PALETTE.map((p, k) => `<button class="dotbtn" data-hlc="${k}" title="${k + 1}: ${esc(p.n)}" aria-label="Highlight ${esc(p.n)}"><i style="background:${p.c}"></i><sub>${k + 1}</sub></button>`).join('')}`, r, { cls: 'dark', center: true, above: true });
+}
+function showAnnPop(id, anchor) {
+  const a = ANNS.find(x => x.id === id);
+  popAt(`${PALETTE.map((p, k) => `<button class="dotbtn" data-recolor="${k}" data-ann="${id}" title="${k + 1}: ${esc(p.n)}" aria-label="Change to ${esc(p.n)}"><i style="background:${p.c};${a.color === k ? 'box-shadow:0 0 0 2px var(--paper)' : ''}"></i><sub>${k + 1}</sub></button>`).join('')}
+    <span class="vsep"></span><button data-act="note-on" data-ann="${id}">${ic('note')}Note</button><button data-act="ann-tags" data-ann="${id}">${ic('tag')}Tags</button>${a.type === 'hl' ? `<button data-act="copyann" data-ann="${id}">${ic('copy')}</button>` : ''}<button data-act="delann" data-ann="${id}" aria-label="Delete">${ic('trash')}</button>`, anchor, { cls: 'dark', center: true, above: true });
+}
+function addMenu(anchor) {
+  popAt(`<div class="menu">
+    <div class="h label">Bibliography or source</div>
+    <button data-act="upload">${ic('upload')}Upload files<span class="d">or drop anywhere</span></button>
+    <div class="h label">Bibliography</div>
+    <button data-act="doi">${ic('link')}Add by DOI, ISBN or link</button>
+    <button data-act="bibimport">${ic('file')}Import BibTeX / RIS</button>
+    <button data-act="manual">${ic('hand')}Add reference by hand<span class="d">no PDF</span></button>
+    <div class="h label">Source</div>
+    <button data-act="paste">${ic('paste')}Paste text</button></div>`, anchor, {});
+}
+function filterPanel(anchor) {
+  const f = S.filters;
+  popAt(`<div class="fpanel">
+    <div class="field"><span>Kind</span><div class="seg">${[['', 'All'], ['bib', 'Bibliography'], ['source', 'Sources']].map(([k, n]) => `<button data-fkind="${k}" aria-pressed="${(f.kind || '') === k}">${n}</button>`).join('')}</div></div>
+    <label class="field"><span>Project</span><select id="fproj"><option value="">All projects</option>${PROJECTS.map(p => `<option value="${p.id}" ${S.filters.project === p.id ? 'selected' : ''}>${' '.repeat(projDepth(p.id))}${esc(p.n)}</option>`).join('')}</select></label>
+    <label class="field"><span>Tag</span><select id="ftag"><option value="">Any tag</option>${allTags().map(t => `<option ${f.tag === t ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></label>
+    <div class="field"><span>Has</span><div class="menu">${[['pdf', 'PDF'], ['hl', 'Annotations'], ['notes', 'Notes on it']].map(([k, n]) => `<label><input type="checkbox" data-fhas="${k}" ${f.has.includes(k) ? 'checked' : ''}>${n}</label>`).join('')}</div></div>
+    <div style="display:flex;justify-content:space-between"><button class="btn sm quiet" data-act="resetf">Reset</button><button class="btn sm primary" data-act="closepop">Done</button></div></div>`, anchor, {});
+}
+function paletteEditor(anchor) {
+  popAt(`<div class="fpanel"><span class="label">Highlight colors</span>
+    ${PALETTE.map((p, k) => `<div style="display:flex;gap:8px;align-items:center"><span class="kbd">${k + 1}</span><input type="color" value="${p.c}" data-pc="${k}" aria-label="Color ${k + 1}" style="width:34px;height:26px;border:0;padding:0;background:none"><input value="${esc(p.n)}" data-pn="${k}" aria-label="Name for color ${k + 1}" style="flex:1;min-width:0;border:1px solid var(--dust);border-radius:5px;padding:2px 7px;background:var(--surface)"></div>`).join('')}
+    <span class="muted">Changing a color recolors every highlight that uses it. Downloaded PDFs use these exact colors.</span></div>`, anchor, { right: true });
+}
+
+// ── Finder (⌘K) ──
+let KP = null;
+function openFinder() {
+  closeLayer();
+  const s = modal(`<div class="kpal"><input id="kq" placeholder="Jump to an item, note, tag or project, or type a command" aria-label="Finder" autocomplete="off"><div class="kres" id="kres"></div></div>`, 'kpal');
+  KP = { k: 0, list: [] }; drawFinder(''); setTimeout(() => $('#kq')?.focus(), 10);
+}
+function drawFinder(q) {
+  const f = fold(q), L = [];
+  const acts = [['New note', 'newnote', 'note'], ['Upload files', 'upload', 'upload'], ['Paste text as a source', 'paste', 'paste'], ['Add reference by hand', 'manual', 'hand'], ['Go to library', 'golib', 'bib']];
+  acts.filter(a => !f || fold(a[0]).includes(f)).forEach(a => L.push({ g: 'Actions', html: `${ic(a[2])}<span class="t">${a[0]}</span>`, run: () => act(a[1]) }));
+  const its = (f ? scoped().filter(i => fold(i.title + ' ' + authorsShort(i)).includes(f)) : scoped().slice().sort((a, b) => b.opened - a.opened)).slice(0, f ? 12 : 6);
+  its.forEach(i => L.push({ g: f ? 'Items' : 'Recent', html: `<span class="k ${i.kind}">${ic(i.kind)}</span><span class="t">${esc(i.title)}</span><span class="d">${esc(authorsShort(i))}</span>`, run: () => openItem(i.id) }));
+  if (f) {
+    allTags().filter(t => fold(t).includes(f)).slice(0, 4).forEach(t => L.push({ g: 'Tags', html: `${ic('tag')}<span class="t">#${esc(t)}</span>`, run: () => filterTag(t) }));
+    PROJECTS.filter(p => fold(p.n).includes(f)).slice(0, 4).forEach(p => L.push({ g: 'Projects', html: `${ic('folder')}<span class="t">${esc(p.n)}</span><span class="d">show in Library</span>`, run: () => setScope(p.id) }));
+    L.push({ g: 'Search', html: `${ic('search')}<span class="t">Search full text for “${esc(q)}”</span>`, run: () => runFulltext(q) });
+  }
+  KP.list = L; KP.k = Math.min(KP.k, Math.max(0, L.length - 1));
+  let g = ''; $('#kres').innerHTML = L.map((x, k) => (x.g !== g ? `<div class="h label">${(g = x.g)}</div>` : '') + `<button data-kp="${k}" aria-selected="${k === KP.k}">${x.html}</button>`).join('') || '<div class="muted" style="padding:12px">Nothing found.</div>';
+}
+
+// ── Upload dialog ──
+let UP = null;
+const EXAMPLE_FILES = [
+  { name: 'weiner-1992-inalienable-possessions.pdf', detect: { kind: 'bib', type: 'book', title: 'Inalienable Possessions: The Paradox of Keeping-While-Giving', authors: 'Weiner, Annette B.', year: '1992', publisher: 'University of California Press', place: 'Berkeley', id: 'ISBN 9780520076037' } },
+  { name: 'entrevista-don-T-2026-03-21.pdf', detect: null },
+  { name: 'acta-asamblea-comerciantes-2018.pdf', detect: null },
+];
+function blankFile(name, detect) {
+  const d = detect || {};
+  return { name, detect: !!detect, saved: false, kind: d.kind || null, f: { type: d.type || (d.kind === 'bib' ? 'book' : ''), title: d.title || name.replace(/\.(pdf|txt|md)$/i, '').replace(/[-_]+/g, ' '), authors: d.authors || '', year: d.year || '', publisher: d.publisher || '', place: d.place || '', journal: '', detectedId: d.id || '', date: '', creator: '', interviewee: '', interviewer: '', iplace: '', language: '', length: '', issuer: '', archive: '', ref: '', url: '', accessed: '' }, projects: S.filters.project ? [S.filters.project] : [], tags: [] };
+}
+function openUpload(files) {
+  UP = { files: files.map(x => blankFile(x.name, x.detect)), cur: 0, mode: 'upload' };
+  drawUpload();
+}
+function fileStatus(x) {
+  if (x.saved) return ['saved', 'Saved'];
+  if (!x.kind) return ['need', 'Choose bibliography or source'];
+  if (!x.f.title.trim()) return ['need', 'Needs a title'];
+  if (x.kind === 'source' && !x.f.type) return ['need', 'Needs a source type'];
+  if (UP && UP.mode === 'paste' && !(x.f.pasted || '').trim()) return ['need', 'Paste some text'];
+  return ['ok', 'Ready to save'];
+}
+function drawUpload() {
+  const paste = UP.mode === 'paste', manual = UP.mode === 'manual';
+  const x = UP.files[UP.cur];
+  const title = paste ? 'Paste text as a source' : manual ? 'Add reference by hand' : `Upload ${UP.files.length} file${UP.files.length > 1 ? 's' : ''}`;
+  const list = paste || manual ? '' : `<div class="upl-list">${UP.files.map((f, k) => { const [cls, txt] = fileStatus(f); return `<button class="upl-file" data-upcur="${k}" aria-current="${k === UP.cur}"><span class="fn">${ic('pdf')} ${esc(f.name)}</span><span class="status ${cls}">${txt}</span></button>`; }).join('')}</div>`;
+  const s = $('.scrim .upl') ? $('.scrim') : modal('', 'wide');
+  s.querySelector('.modal').innerHTML = `
+    <div class="mh"><h2>${title}</h2><span style="flex:1"></span><button class="iconbtn" data-act="closemodal" aria-label="Close">${ic('x')}</button></div>
+    <div class="upl" style="${paste || manual ? 'grid-template-columns:1fr' : ''}">${list}<div class="upl-form" id="upform">${x.saved ? `<div class="empty">Saved. ${UP.files.some(f => !f.saved) ? 'Pick the next file on the left.' : 'All files are in your library.'}</div>` : uploadForm(x, paste, manual)}</div></div>
+    <div class="mf">${paste || manual || UP.cur === 0 ? '' : `<button class="btn quiet" data-act="copyprev" ${x.saved ? 'disabled' : ''}>Copy settings from previous file</button>`}<span style="flex:1"></span>
+      <button class="btn primary" data-act="upsave" ${x.saved || fileStatus(x)[0] !== 'ok' ? 'disabled' : ''}>${paste || manual ? 'Add to library' : 'Save this file'}</button></div>`;
+}
+function fld(key, label, x, opts = {}) {
+  const v = x.f[key] ?? '';
+  return `<label class="field ${opts.warn ? 'warn' : ''}"><span>${label}</span>${opts.area ? `<textarea data-uf="${key}" rows="${opts.rows || 3}" placeholder="${opts.ph || ''}">${esc(v)}</textarea>` : `<input data-uf="${key}" value="${esc(v)}" placeholder="${opts.ph || ''}">`}${opts.hint ? `<small>${opts.hint}</small>` : ''}</label>`;
+}
+function uploadForm(x, paste, manual) {
+  const kindSeg = paste || manual ? '' : `<div class="field"><span>What is this file?</span><div class="seg"><button data-upkind="bib" aria-pressed="${x.kind === 'bib'}">${ic('bib')}Bibliography</button><button data-upkind="source" aria-pressed="${x.kind === 'source'}">${ic('source')}Source</button></div></div>`;
+  let body = '';
+  if (x.kind === 'bib') body = `
+    ${x.detect ? `<div class="detected">Found ${esc(x.f.detectedId)} in the file and filled in the details. Check them before saving.</div>` : manual ? '' : `<div class="detected">No DOI or ISBN found in this file. Fill in the details, or <button class="wikilink" data-act="doi">look it up by DOI/ISBN</button>.</div>`}
+    <label class="field"><span>Type</span><select data-uf="type">${Object.entries(BIB_TYPES).map(([k, n]) => `<option value="${k}" ${x.f.type === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+    ${fld('title', 'Title', x, { warn: !x.f.title.trim() })}
+    ${fld('authors', 'Authors', x, { area: true, rows: 2, ph: 'Family, Given (one per line)' })}
+    <div class="grid2">${fld('year', 'Year', x)}${x.f.type === 'article' ? fld('journal', 'Journal', x) : fld('publisher', 'Publisher', x)}</div>
+    ${x.f.type !== 'article' ? fld('place', 'Place', x) : ''}`;
+  if (x.kind === 'source') {
+    const t = x.f.type;
+    body = `${paste ? fld('pasted', 'Text', x, { area: true, rows: 7, ph: 'Paste the text here. It is saved read-only; you can highlight and annotate it.' }) : ''}
+    <label class="field ${!t ? 'warn' : ''}"><span>Source type</span><select data-uf="type"><option value="" ${!t ? 'selected' : ''}>Choose…</option>${SOURCE_TYPES.map(n => `<option ${t === n ? 'selected' : ''}>${esc(n)}</option>`).join('')}<option value="__new">+ New type…</option></select>${!t ? '<small>Pick one, or add your own.</small>' : ''}</label>
+    ${fld('title', 'Title', x, { warn: !x.f.title.trim() })}
+    <div class="grid2">${fld('date', 'Source date', x, { ph: '1987 · 2019-03 · 2026-03-14', hint: 'When it happened or was issued. Not the upload date.' })}${fld('creator', 'Author / creator', x)}</div>
+    ${t === 'Interview' ? `<div class="fsec"><span class="label">Interview</span>
+      <div class="grid2">${fld('interviewee', 'Interviewee alias', x, { ph: 'e.g. Don T.', hint: 'Alias only. Never store real names.' })}${fld('interviewer', 'Interviewer', x)}</div>
+      <div class="grid2">${fld('iplace', 'Place', x)}${fld('language', 'Language', x)}</div>${fld('length', 'Length', x, { ph: '48 min' })}</div>` : ''}
+    ${t === 'Document' || t === 'Archival record' ? `<div class="fsec"><span class="label">${esc(t)}</span>${fld('issuer', 'Issued by', x)}<div class="grid2">${fld('archive', 'Archive', x)}${fld('ref', 'Catalogue reference', x)}</div></div>` : ''}
+    ${t === 'Webpage' ? `<div class="fsec"><span class="label">Webpage</span><div class="grid2">${fld('url', 'URL', x)}${fld('accessed', 'Date accessed', x)}</div></div>` : ''}`;
+  }
+  const common = x.kind ? `<div class="fsec">
+    <div class="field"><span>Projects</span><div class="chips">${PROJECTS.map(p => `<button class="chip ${x.projects.includes(p.id) ? 'proj' : ''}" data-upproj="${p.id}" aria-pressed="${x.projects.includes(p.id)}">${x.projects.includes(p.id) ? '✓ ' : ''}${esc(p.n)}</button>`).join('')}</div></div>
+    <div class="field"><span>Tags</span><div class="chips">${x.tags.map(t => `<span class="chip"><span class="dot" style="background:${tagColor(t)}"></span>${esc(t)}<button class="x" data-uptagdel="${esc(t)}" aria-label="Remove">×</button></span>`).join('')}<input class="tagin" data-uptag placeholder="+ tag" list="taglist" aria-label="Add tag"></div></div></div>` : '';
+  return `${kindSeg}${body}${common}<datalist id="taglist">${allTags().map(t => `<option value="${esc(t)}">`).join('')}</datalist>`;
+}
+function saveUpload() {
+  const x = UP.files[UP.cur], f = x.f, now = Date.now();
+  const id = 'i' + now;
+  const base = { id, kind: x.kind, title: f.title.trim(), tags: [...x.tags], projects: [...x.projects], links: [], created: now, modified: now, opened: now };
+  if (x.kind === 'bib') Object.assign(base, { type: f.type, creators: f.authors.split('\n').filter(Boolean).map(l => { const [fa, gi] = l.split(','); return A(fa.trim(), (gi || '').trim()); }), year: +f.year || '', publisher: f.publisher, place: f.place, journal: f.journal, pdf: UP.mode === 'upload', pages: UP.mode === 'upload' ? 24 : undefined });
+  else {
+    Object.assign(base, { type: f.type, creators: f.creator ? [A(f.creator, '')] : [], date: f.date, year: +(f.date || '').slice(0, 4) || new Date().getFullYear(), fields: { interviewee: f.interviewee, interviewer: f.interviewer, place: f.iplace, language: f.language, length: f.length, issuer: f.issuer, archive: f.archive, ref: f.ref, url: f.url, accessed: f.accessed } });
+    if (UP.mode === 'paste') { CONTENT[id] = { paras: (f.pasted || '').split(/\n\s*\n/).map(s => s.trim()).filter(Boolean) }; base.content = id; base.pasted = true; }
+    else { base.pdf = true; base.pages = 8; }
+  }
+  ITEMS.push(base); x.saved = true;
+  toast(`Saved “${base.title}” to ${KINDS[base.kind][0]}`);
+  if (UP.mode !== 'upload') { closeModal(); S.selected = id; render(); return; }
+  const next = UP.files.findIndex(z => !z.saved);
+  if (next >= 0) UP.cur = next;
+  drawUpload(); renderSide(); if (S.view === 'library') renderLibrary();
+}
+
+// ── Citations ──
+const ini = g => g.split(/[\s]+/).filter(Boolean).map(p => p[0] + '.').join(' ');
+function apaNames(c) { const n = c.map(x => `${x.f}, ${ini(x.g)}`); return n.length === 1 ? n[0] : n.length === 2 ? `${n[0]}, & ${n[1]}` : n.slice(0, -1).join(', ') + ', & ' + n[n.length - 1]; }
+function chiNames(c) { const n = c.map((x, k) => k ? `${x.g} ${x.f}` : `${x.f}, ${x.g}`); return n.length === 1 ? n[0] : n.length === 2 ? `${n[0]}, and ${n[1]}` : n.slice(0, -1).join(', ') + ', and ' + n[n.length - 1]; }
+function mlaNames(c) { return c.length === 1 ? `${c[0].f}, ${c[0].g}` : c.length === 2 ? `${c[0].f}, ${c[0].g}, and ${c[1].g} ${c[1].f}` : `${c[0].f}, ${c[0].g}, et al`; }
+function cite(i, style) {
+  const art = i.type === 'article', T = esc(i.title), J = esc(i.journal || ''), P = esc(i.publisher || ''), L = esc(i.place || '');
+  if (style === 'apa7') return art ? `${apaNames(i.creators)} (${i.year}). ${T}. <i>${J}</i>, <i>${i.volume}</i>, ${i.pp}.` : `${apaNames(i.creators)} (${i.year}). <i>${T}</i>. ${P}.`;
+  if (style === 'apa6') return art ? `${apaNames(i.creators)} (${i.year}). ${T}. <i>${J}, ${i.volume}</i>, ${i.pp}.` : `${apaNames(i.creators)} (${i.year}). <i>${T}</i>. ${L}: ${P}.`;
+  if (style === 'chicago') return art ? `${chiNames(i.creators)}. ${i.year}. “${T}.” <i>${J}</i> ${i.volume}: ${i.pp}.` : `${chiNames(i.creators)}. ${i.year}. <i>${T}</i>. ${L}: ${P}.`;
+  return art ? `${mlaNames(i.creators)}. “${T}.” <i>${J}</i>, vol. ${i.volume}, ${i.year}, pp. ${i.pp}.` : `${mlaNames(i.creators)}. <i>${T}</i>. ${P}, ${i.year}.`;
+}
+let CITESTYLE = 'apa7';
+function citeModal() {
+  const its = [...S.checked].map(item).filter(i => i.kind === 'bib').sort((a, b) => fold(a.creators[0]?.f || a.title).localeCompare(fold(b.creators[0]?.f || b.title)));
+  const s = modal(`<div class="mh"><h2>Copy citations</h2><span style="flex:1"></span><button class="iconbtn" data-act="closemodal" aria-label="Close">${ic('x')}</button></div>
+    <div class="mb"><div class="seg">${[['apa7', 'APA 7'], ['apa6', 'APA 6'], ['chicago', 'Chicago'], ['mla', 'MLA'], ['custom', 'Custom…']].map(([k, n]) => `<button data-cstyle="${k}" aria-pressed="${CITESTYLE === k}">${n}</button>`).join('')}</div>
+      <div class="cites" id="cites">${its.map(i => `<p>${cite(i, CITESTYLE)}</p>`).join('')}</div>
+      <span class="muted">${its.length} reference${its.length > 1 ? 's' : ''}, sorted alphabetically. Italics are kept when you paste into Word or Google Docs.</span></div>
+    <div class="mf"><button class="btn primary" data-act="copycites">${ic('copy')}Copy</button></div>`);
+}
+async function copyRich(el) {
+  const html = el.innerHTML, plain = el.innerText;
+  try { await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], { type: 'text/html' }), 'text/plain': new Blob([plain], { type: 'text/plain' }) })]); toast('Copied with formatting'); }
+  catch (e) { try { await navigator.clipboard.writeText(plain); toast('Copied as plain text'); } catch (e2) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Selected. Press ⌘C to copy.'); } }
+}
+
+// ═══ Navigation ═══════════════════════════════════════════════════════════
+function render() {
+  const app = $('#app');
+  app.classList.toggle('side-off', !S.side); app.classList.toggle('side-mobile', S.sideMobile);
+  closeLayer(); closeAC();
+  renderTabs(); renderSide();
+  const ok = id => id && item(id) && !item(id).deleted;
+  if (S.view === 'library') renderLibrary(); else if (S.view === 'reader') (ok(S.reader) ? renderReader : renderReaderHome)(); else (ok(S.note) ? renderNote : renderNotesList)();
+}
+function go(view) { S.view = view; S.sideMobile = false; try { history.replaceState(null, '', '#' + view); } catch (e) {} render(); }
+function openItem(id, newTab) {
+  const i = item(id); if (!i) return;
+  if (newTab) return toast('Would open in a new browser tab (every item has its own address)');
+  closeModal(); i.opened = Date.now(); if (i.kind !== 'note') S.selected = id;
+  if (i.kind === 'note') { S.note = id; S.noteMode = i.body ? 'read' : 'edit'; go('note'); if (!i.body) setTimeout(() => (i.title ? $('#editor') : $('#ntitle'))?.focus(), 30); }
+  else { S.reader = id; S.panelNote = null; if (!i.pdf) S.tool = 'select'; S.colorFilter = null; S.annChecked.clear(); if (S.rtab === 'search') S.rsearch = ''; go('reader'); }
+}
+function toLibrary() { S.trash = false; S.checked.clear(); go('library'); }
+function filterTag(t) { S.filters.tag = t; S.lq = ''; S.fulltext = ''; toLibrary(); }
+function setScope(id) { S.filters.project = id; S.lq = ''; S.fulltext = ''; closeModal(); toLibrary(); }
+function runFulltext(q) { S.fulltext = q.trim(); S.lq = q.trim(); S.trash = false; S.checked.clear(); closeModal(); go('library'); }
+function createNoteAndOpen(opts) { const n = newNote(opts); openItem(n.id); return n; }
+function noteOnAnns(ids) {
+  const src = item(S.reader);
+  const a = ANNS.find(x => x.id === ids[0]);
+  const n = newNote({ title: `On ${src.title}, ${locOf(a)}`, anchor: { item: src.id, anns: ids }, projects: [...(src.projects || [])] });
+  S.panelNote = n.id; S.panel = true; S.annChecked.clear(); closeLayer();
+  rerenderPage(); $('#main .view').classList.remove('panel-off'); rerenderPanel(); renderSide();
+  setTimeout(() => $('#peditor')?.focus(), 30);
+}
+
+// ═══ Actions ══════════════════════════════════════════════════════════════
+function act(name, t = {}, ev) {
+  const d = t.dataset || {};
+  switch (name) {
+    case 'toggle-side': if (innerWidth <= 860) { S.sideMobile = !S.sideMobile; $('#app').classList.toggle('side-mobile', S.sideMobile); } else { S.side = !S.side; $('#app').classList.toggle('side-off', !S.side); } return renderTabs();
+    case 'toggle-panel': { S.panel = !S.panel; const v = $('#main .view'); if (v && v.querySelector(':scope > .panel')) v.classList.toggle('panel-off', !S.panel); return renderTabs(); }
+    case 'sec': S.open[d.k] = !S.open[d.k]; return renderSide();
+    case 'add': return addMenu(t);
+    case 'filters': return filterPanel(t);
+    case 'home': S.filters = { kind: null, tag: null, project: null, has: [] }; S.lq = ''; S.fulltext = ''; S.sq = ''; $('#sq').value = ''; return toLibrary();
+    case 'ptog': S.popen[d.p] = !S.popen[d.p]; return renderSide();
+    case 'closereader': S.reader = null; return go('reader');
+    case 'allnotes': S.note = null; return go('note');
+    case 'nclear': S.nfilter[d.f] = null; return renderNotesList();
+    case 'notes-from-lib': S.nfilter = { tag: S.filters.tag, project: S.filters.project }; S.nq = S.fulltext || S.lq; S.note = null; return go('note');
+    case 'clearall': S.filters = { kind: S.filters.kind, tag: null, project: null, has: [] }; S.lq = ''; S.fulltext = ''; renderSide(); return renderLibrary();
+    case 'soon': return soon(d.what);
+    case 'newproj': S.open.projects = true; S.newProjUnder = ''; renderSide(); return $('#newproj')?.focus();
+    case 'newsubproj': S.newProjUnder = d.p; S.popen[d.p] = true; renderSide(); return $('#newproj')?.focus();
+    case 'newnote': closeModal(); return createNoteAndOpen({});
+    case 'trash': S.trash = true; S.fulltext = ''; S.checked.clear(); return go('library');
+    case 'settings': return popAt(`<div class="fpanel" style="width:300px"><span class="label">Settings</span><div class="menu">
+      <button data-act="soon" data-what="Google account and Drive folder">Google Drive<span class="d">connected · Qipu/</span></button>
+      <button data-act="soon" data-what="Language (ES / EN)">Language<span class="d">English</span></button>
+      <button data-act="soon" data-what="Default citation style">Citation style<span class="d">APA 7</span></button>
+      <button data-act="soon" data-what="Backups to Drive">Backups<span class="d">weekly · Qipu/Backups</span></button></div>
+      <span class="label">Keyboard shortcuts</span><div class="shortcuts" style="padding:0"><span class="kbd">⌘K</span><span>Jump to anything</span><span class="kbd">⌘\\</span><span>Left sidebar</span><span class="kbd">⌘.</span><span>Right panel</span><span class="kbd">1–5</span><span>Highlight selection</span><span class="kbd">Esc</span><span>Select tool</span><span class="kbd">⌘Z</span><span>Undo annotation</span><span class="kbd">[[ / #</span><span>Link / tag in a note</span></div></div>`, t, {});
+    case 'golib': closeModal(); S.filters.kind = null; S.filters.tag = null; return toLibrary();
+    case 'kpal': return openFinder();
+    case 'shortcuts': return popAt(`<div class="shortcuts"><span class="kbd">⌘K</span><span>Finder</span><span class="kbd">⌘\\</span><span>Show / hide sidebar</span><span class="kbd">⌘.</span><span>Show / hide right panel</span><span class="kbd">1–5</span><span>Highlight the selection (reader)</span><span class="kbd">Esc</span><span>Back to select tool</span><span class="kbd">⌘Z</span><span>Undo annotation</span><span class="kbd">[[</span><span>Link (in a note)</span><span class="kbd">#</span><span>Tag (in a note)</span></div>`, t, { right: true });
+    case 'upload': closeLayer(); return openUpload([]);
+    case 'paste': closeLayer(); closeModal(); UP = { files: [blankFile('Pasted text', null)], cur: 0, mode: 'paste' }; UP.files[0].kind = 'source'; UP.files[0].f.title = ''; return drawUpload();
+    case 'manual': closeLayer(); closeModal(); UP = { files: [blankFile('', null)], cur: 0, mode: 'manual' }; Object.assign(UP.files[0], { kind: 'bib' }); UP.files[0].f.type = 'book'; UP.files[0].f.title = ''; return drawUpload();
+    case 'doi': closeLayer(); return doiModal();
+    case 'bibimport': closeLayer(); return soon('Import BibTeX / RIS with a preview of what will be added');
+    case 'closepop': return closeLayer();
+    case 'closemodal': return closeModal();
+    case 'resetf': S.filters = { kind: S.filters.kind, tag: null, project: null, has: [] }; closeLayer(); renderSide(); return renderLibrary();
+    case 'clearf': S.filters[d.f] = null; renderSide(); return renderLibrary();
+    case 'clearhas': S.filters.has = S.filters.has.filter(h => h !== d.h); return renderLibrary();
+    case 'clearft': S.fulltext = ''; S.lq = ''; return renderLibrary();
+    case 'cols': return popAt(`<div class="menu">${COLS.map(([k, n]) => `<label><input type="checkbox" data-col="${k}" ${S.cols[k] ? 'checked' : ''} ${k === 'title' ? 'disabled' : ''}>${n}</label>`).join('')}</div>`, t, { right: true });
+    case 'checkall': { const ids = libItems().map(i => i.id); const all = ids.every(id => S.checked.has(id)); ids.forEach(id => all ? S.checked.delete(id) : S.checked.add(id)); return renderLibrary(); }
+    case 'uncheck': S.checked.clear(); return renderLibrary();
+    case 'bulk-trash': { const n = S.checked.size; S.checked.forEach(id => item(id).deleted = true); S.checked.clear(); toast(`${n} item${n > 1 ? 's' : ''} moved to trash`); return render(); }
+    case 'restore': S.checked.forEach(id => delete item(id).deleted); S.checked.clear(); toast('Restored'); return render();
+    case 'bulk-tag': { const el = popAt(`<div class="fpanel"><label class="field"><span>Add tag to ${S.checked.size} items</span><input id="bulktag" list="taglist2" placeholder="tag or parent/child"></label><datalist id="taglist2">${allTags().map(x => `<option value="${esc(x)}">`).join('')}</datalist><button class="btn sm primary" data-act="bulk-tag-go">Add tag</button></div>`, t); return $('#bulktag', el).focus(); }
+    case 'bulk-tag-go': { const v = $('#bulktag').value.trim().replace(/^#/, ''); if (!v) return; S.checked.forEach(id => { const i = item(id); if (i.kind === 'note') i.body += ` #${v}`; else if (!i.tags.includes(v)) i.tags.push(v); }); toast(`Tagged ${S.checked.size} items #${v}`); return render(); }
+    case 'bulk-proj': return popAt(`<div class="menu"><div class="h label">Add ${S.checked.size} items to</div>${PROJECTS.map(p => `<button data-act="bulk-proj-go" data-p="${p.id}" style="padding-left:${10 + projDepth(p.id) * 14}px">${esc(p.n)}</button>`).join('')}</div>`, t);
+    case 'bulk-proj-go': S.checked.forEach(id => { const i = item(id); if (!i.projects.includes(d.p)) i.projects.push(d.p); }); toast(`Added to ${proj(d.p).n}`); return render();
+    case 'cite': return citeModal();
+    case 'copycites': return copyRich($('#cites'));
+    case 'bibtex': return soon('Export BibTeX / RIS');
+    case 'addproj': return popAt(`<div class="menu"><div class="h label">Add to project</div>${PROJECTS.map(p => `<button data-act="addproj-go" data-id="${d.id}" data-p="${p.id}" style="padding-left:${10 + projDepth(p.id) * 14}px">${item(d.id).projects.includes(p.id) ? '✓ ' : ''}${esc(p.n)}</button>`).join('')}</div>`, t);
+    case 'addproj-go': { const i = item(d.id); i.projects = i.projects.includes(d.p) ? i.projects.filter(x => x !== d.p) : [...i.projects, d.p]; closeLayer(); return S.view === 'reader' ? rerenderPanel() : render(); }
+    case 'palette': return paletteEditor(t);
+    case 'download': return toast('Would download the PDF with editable highlights, shapes and notes in these exact colors. Your Drive file stays untouched.');
+    case 'attach': return toast('Would open a file picker and attach the PDF to this reference');
+    case 'note-whole': { const src = item(S.reader); const n = newNote({ title: `On ${src.title}`, anchor: { item: src.id, anns: [] }, projects: [...src.projects] }); S.panelNote = n.id; rerenderPanel(); renderSide(); return setTimeout(() => $('#peditor')?.focus(), 30); }
+    case 'note-on': return noteOnAnns([d.ann]);
+    case 'note-on-anns': return noteOnAnns([...S.annChecked]);
+    case 'ann-uncheck': S.annChecked.clear(); return rerenderPanel();
+    case 'pnote-close': S.panelNote = null; return rerenderPanel();
+    case 'ann-tags': closeLayer(); S.rtab = 'annotations'; S.panelNote = null; rerenderPanel(); return setTimeout(() => { $(`[data-anntag="${d.ann}"]`)?.focus(); flashAnn(d.ann, false); }, 30);
+    case 'copyann': { const a = ANNS.find(x => x.id === d.ann); closeLayer(); const src = item(a.item); const txt = `“${a.text}” (${authorsShort(src)}${src.year ? ' ' + src.year : ''}, ${locOf(a)})`; (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => toast('Copied with its citation'), () => toast(txt)); return; }
+    case 'delann': snapshot(); ANNS = ANNS.filter(a => a.id !== d.ann); closeLayer(); rerenderPage(); rerenderPanel(); return toast('Annotation deleted. ⌘Z to undo.');
+    case 'upsave': return saveUpload();
+    case 'copyprev': { const prev = UP.files[UP.cur - 1], x = UP.files[UP.cur]; x.kind = prev.kind; x.projects = [...prev.projects]; x.tags = [...prev.tags]; ['type', 'date', 'creator', 'interviewer', 'iplace', 'language', 'issuer', 'archive', 'publisher', 'place'].forEach(k => x.f[k] = prev.f[k]); toast('Copied settings. Title and file-specific details are untouched.'); return drawUpload(); }
+    case 'examples': UP = null; return openUpload(EXAMPLE_FILES);
+    case 'pick': return $('#filepick').click();
+  }
+}
+function drawUploadEmpty() {
+  modal(`<div class="mh"><h2>Upload files</h2><span style="flex:1"></span><button class="iconbtn" data-act="closemodal" aria-label="Close">${ic('x')}</button></div>
+    <div class="mb"><div class="dropzone" id="updrop">${ic('upload')}<b>Drop PDFs or text files here</b><span>You'll set up each file individually: bibliography or source, details, projects and tags.</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn" data-act="pick">Choose files</button><button class="btn quiet" data-act="examples">Try with 3 example files</button></div></div></div>`, 'wide');
+}
+function doiModal() {
+  modal(`<div class="mh"><h2>Add by DOI, ISBN or link</h2><span style="flex:1"></span><button class="iconbtn" data-act="closemodal" aria-label="Close">${ic('x')}</button></div>
+    <div class="mb"><label class="field"><span>DOI, ISBN or URL</span><input id="doiin" value="9780520076037" placeholder="10.1086/… · 978… · https://…"></label>
+    <div class="detected">Found: <b>Weiner, Annette B. 1992. <i>Inalienable Possessions</i>. University of California Press.</b></div><span class="muted">Example lookup. You can attach a PDF later from the reference's page.</span></div>
+    <div class="mf"><button class="btn primary" data-act="doi-add">Add to library</button></div>`);
+  $('#doiin').focus();
+}
+
+// ═══ Events ═══════════════════════════════════════════════════════════════
+document.addEventListener('click', e => {
+  if (AC && !e.target.closest('.ac')) closeAC();
+  const t = e.target.closest('button, [data-act], [data-open], [data-tag], [data-scope], [data-newnote], [data-goto], [data-jump], mark.hl, tr.r, [data-untag], [data-anncheck], [data-check]');
+  if (!t) { if (!e.target.closest('.pop')) closeLayer(); return; }
+  const d = t.dataset;
+  if (t.matches('input[type="checkbox"]')) {
+    if (d.check) { S.checked.has(d.check) ? S.checked.delete(d.check) : S.checked.add(d.check); return renderLibrary(); }
+    if (d.anncheck) { S.annChecked.has(d.anncheck) ? S.annChecked.delete(d.anncheck) : S.annChecked.add(d.anncheck); return rerenderPanel(); }
+    if (d.act === 'checkall') return act('checkall');
+    if (d.fhas) { const h = d.fhas; S.filters.has = t.checked ? [...S.filters.has, h] : S.filters.has.filter(x => x !== h); S.trash = false; return refreshAfterFilter(); }
+    if (d.col) { S.cols[d.col] = t.checked ? 1 : 0; return renderLibrary(); }
+    return;
+  }
+  if (!t.closest('.pop') && !d.act?.startsWith?.('bulk-') ) closeLayer();
+  if (d.untag) { e.stopPropagation(); const i = item(d.from); i.tags = i.tags.filter(x => x !== d.untag); return S.view === 'reader' ? rerenderPanel() : render(); }
+  if (d.go) { if (d.go === 'library') return toLibrary(); if (d.go === 'reader') return S.reader && item(S.reader) ? openItem(S.reader) : go('reader'); if (S.view === 'note' && S.note) { S.note = null; return go('note'); } return S.note && item(S.note) ? openItem(S.note) : go('note'); }
+  if (d.act === 'doi-add') { const id = 'weiner'; if (!item(id)) ITEMS.push({ id, kind: 'bib', type: 'book', title: 'Inalienable Possessions: The Paradox of Keeping-While-Giving', creators: [A('Weiner', 'Annette B.')], year: 1992, publisher: 'University of California Press', place: 'Berkeley', pdf: false, tags: [], projects: S.filters.project ? [S.filters.project] : [], links: [], created: Date.now(), modified: Date.now(), opened: Date.now() }); closeModal(); toast('Added to Bibliography'); S.selected = id; return toLibrary(); }
+  if (d.act) return act(d.act, t, e);
+  if (d.open) return openItem(d.open, e.metaKey || e.ctrlKey);
+  if (d.kind !== undefined && t.matches('.row-nav, .morelink')) { S.filters.kind = d.kind || null; S.filters.tag = null; return toLibrary(); }
+  if (d.tag) { closeModal(); return filterTag(d.tag); }
+  if (d.scope) return setScope(d.scope);
+  if (d.newnote) { const n = createNoteAndOpen({ title: d.newnote }); return; }
+  if (d.sort) { S.sort = S.sort.key === d.sort ? { key: d.sort, dir: -S.sort.dir } : { key: d.sort, dir: ['created', 'modified', 'year'].includes(d.sort) ? -1 : 1 }; return renderLibrary(); }
+  if (t.matches('tr.r')) { S.selected = d.select; $$('tr.r').forEach(r => r.setAttribute('aria-selected', r.dataset.select === d.select)); const pb = $('#main .panel .pbody'); if (pb) pb.innerHTML = infoHTML(item(d.select), 'library'); return; }
+  // reader
+  if (d.tool) { S.tool = d.tool; return rerenderToolsAndPage(); }
+  if (d.color !== undefined) { S.color = +d.color; if (!highlightSelection(S.color)) { $$('.swatch').forEach(s => s.setAttribute('aria-pressed', +s.dataset.color === S.color)); } return; }
+  if (d.hlc !== undefined) return highlightSelection(+d.hlc, true);
+  if (d.recolor !== undefined) { snapshot(); ANNS.find(a => a.id === d.ann).color = +d.recolor; closeLayer(); rerenderPage(); rerenderPanel(); return; }
+  if (t.matches('mark.hl')) {
+    if (!getSelection().isCollapsed) return;
+    if (S.tool === 'eraser') { snapshot(); ANNS = ANNS.filter(a => a.id !== d.ann); rerenderPage(); rerenderPanel(); return; }
+    $$('mark.hl.sel').forEach(m => m.classList.remove('sel')); $$(`mark[data-ann="${d.ann}"]`).forEach(m => m.classList.add('sel'));
+    S.rtab = 'annotations'; if (!S.panelNote) rerenderPanel(); flashAnn(d.ann, false);
+    return showAnnPop(d.ann, t);
+  }
+  if (d.rtab) { S.rtab = d.rtab; S.panelNote = null; rerenderPanel(); if (d.rtab === 'search') $('#rsq')?.focus(); return; }
+  if (d.cf !== undefined) { S.colorFilter = d.cf === '' ? null : +d.cf; rerenderPanel(); return rerenderPage(); }
+  if (d.goto) return flashAnn(d.goto);
+  if (d.hit !== undefined) { const h = searchHits(item(S.reader), S.rsearch)[+d.hit]; return selectOffsets(h.p, h.s, h.e); }
+  if (d.pnote) { S.panelNote = d.pnote; return rerenderPanel(); }
+  if (d.jump) { const id = d.jump, fl = d.flash; S.reader = id; S.panelNote = null; S.rtab = 'annotations'; item(id).opened = Date.now(); go('reader'); if (fl) setTimeout(() => flashAnn(fl), 60); return; }
+  // notes
+  if (d.mode) { S.noteMode = d.mode; renderNote(); if (d.mode === 'edit') $('#editor')?.focus(); return; }
+  // menus & dialogs
+  if (d.lkind !== undefined) { S.filters.kind = d.lkind || null; return renderLibrary(); }
+  if (d.fkind !== undefined) { S.filters.kind = d.fkind || null; $$('[data-fkind]').forEach(b => b.setAttribute('aria-pressed', b.dataset.fkind === d.fkind)); return refreshAfterFilter(); }
+  if (d.kp !== undefined) { const x = KP.list[+d.kp]; closeModal(); return x.run(); }
+  if (d.upcur !== undefined) { UP.cur = +d.upcur; return drawUpload(); }
+  if (d.upkind) { const x = UP.files[UP.cur]; x.kind = d.upkind; if (d.upkind === 'bib' && !BIB_TYPES[x.f.type]) x.f.type = 'book'; if (d.upkind === 'source' && BIB_TYPES[x.f.type]) x.f.type = ''; return drawUpload(); }
+  if (d.upproj) { const x = UP.files[UP.cur]; x.projects = x.projects.includes(d.upproj) ? x.projects.filter(p => p !== d.upproj) : [...x.projects, d.upproj]; return drawUpload(); }
+  if (d.uptagdel) { const x = UP.files[UP.cur]; x.tags = x.tags.filter(z => z !== d.uptagdel); return drawUpload(); }
+  if (d.cstyle) { if (d.cstyle === 'custom') return soon('Custom citation styles (CSL)'); CITESTYLE = d.cstyle; return citeModal(); }
+  if (d.ack !== undefined) return pickAC(+d.ack);
+});
+function refreshAfterFilter() { renderSide(); if (S.view === 'library') renderLibrary(); else toLibrary(); }
+function rerenderToolsAndPage() { renderReader(); }
+
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.id === 'fproj') { S.filters.project = t.value || null; return refreshAfterFilter(); }
+  if (t.id === 'ftag') { S.filters.tag = t.value || null; return refreshAfterFilter(); }
+  if (t.dataset.uf === 'type') {
+    const x = UP.files[UP.cur];
+    if (t.value === '__new') {
+      const s = $('#upform'); const row = document.createElement('div'); row.className = 'newrow'; row.style.padding = 0;
+      row.innerHTML = `<input id="newtype" placeholder="New source type, e.g. Price list" aria-label="New source type"><button class="btn sm primary" data-act="noop" id="newtypebtn">Add type</button>`;
+      t.closest('.field').after(row); $('#newtype').focus(); t.value = x.f.type; return;
+    }
+    x.f.type = t.value; return drawUpload();
+  }
+  if (t.dataset.pc !== undefined) { PALETTE[+t.dataset.pc].c = t.value; rerenderPage(); rerenderPanel(); $$('.swatch i')[+t.dataset.pc].style.background = t.value; }
+});
+document.addEventListener('input', e => {
+  const t = e.target, d = t.dataset;
+  if (t.id === 'sq') { S.sq = t.value; renderSide(); return; }
+  if (t.id === 'lq' || t.id === 'nq') { const pos = t.selectionStart; if (t.id === 'lq') { S.lq = t.value; S.fulltext = ''; renderLibrary(); } else { S.nq = t.value; renderNotesList(); } const n = $('#' + t.id); n.focus(); n.setSelectionRange(pos, pos); return; }
+  if (t.id === 'rsq') { S.rsearch = t.value; const pos = t.selectionStart; rerenderPanel(); const n = $('#rsq'); n.focus(); n.setSelectionRange(pos, pos); return; }
+  if (t.id === 'kq') { KP.k = 0; return drawFinder(t.value); }
+  if (d.uf) { const x = UP.files[UP.cur]; x.f[d.uf] = t.value; const [cls, txt] = fileStatus(x); const btn = $(`[data-upcur="${UP.cur}"] .status`); if (btn) { btn.className = 'status ' + cls; btn.textContent = txt; } const sv = $('[data-act="upsave"]'); if (sv) sv.disabled = cls !== 'ok'; return; }
+  if (d.pn !== undefined) { PALETTE[+d.pn].n = t.value; $$('.swatch .nm')[+d.pn].textContent = t.value; return; }
+  if (d.pc !== undefined) { PALETTE[+d.pc].c = t.value; $$('.swatch i')[+d.pc].style.background = t.value; $$(`mark.hl`).forEach(m => { const a = ANNS.find(x => x.id === m.dataset.ann); if (a && a.color === +d.pc) m.style.setProperty('--hc', t.value); }); return; }
+  if (d.ntitle || d.nbody) {
+    const n = item(d.ntitle || d.nbody);
+    if (d.ntitle) n.title = t.value; else n.body = t.value;
+    n.modified = Date.now();
+    $$(`[data-saved="${n.id}"]`).forEach(s => s.textContent = 'Saving…');
+    clearTimeout(window._sv); window._sv = setTimeout(() => { $$(`[data-saved="${n.id}"]`).forEach(s => s.textContent = 'Saved just now'); const np = $('#npanel .pbody'); if (np) np.innerHTML = noteSide(n); renderSide(); renderTabs(); }, 600);
+    if (d.nbody) updateAC(t);
+  }
+  if (d.loc) { const a = ANNS.find(x => x.id === d.loc); a.loc = t.value; }
+});
+document.addEventListener('keydown', e => {
+  const t = e.target, mod = e.metaKey || e.ctrlKey;
+  const typing = t.matches('input, textarea, select, [contenteditable]');
+  // autocomplete navigation
+  if (AC && ['ArrowDown', 'ArrowUp', 'Enter', 'Tab', 'Escape'].includes(e.key)) {
+    e.preventDefault();
+    if (e.key === 'Escape') return closeAC();
+    if (e.key === 'ArrowDown') AC.k = (AC.k + 1) % AC.opts.length; else if (e.key === 'ArrowUp') AC.k = (AC.k - 1 + AC.opts.length) % AC.opts.length; else return pickAC(AC.k);
+    return drawAC();
+  }
+  if (mod && e.key.toLowerCase() === 'k') { e.preventDefault(); return $('.kpal') ? closeModal() : openFinder(); }
+  if (mod && e.key === '\\') { e.preventDefault(); return act('toggle-side'); }
+  if (mod && e.key === '.') { e.preventDefault(); return act('toggle-panel'); }
+  if (t.id === 'kq') {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); KP.k = (KP.k + (e.key === 'ArrowDown' ? 1 : -1) + KP.list.length) % Math.max(1, KP.list.length); return drawFinder(t.value); }
+    if (e.key === 'Enter' && KP.list[KP.k]) { e.preventDefault(); const x = KP.list[KP.k]; closeModal(); return x.run(); }
+  }
+  if (e.key === 'Escape') { if (t.id === 'newproj') { S.newProjUnder = undefined; return renderSide(); } if ($('.scrim')) return closeModal(); if ($('.pop')) return closeLayer(); if (S.view === 'reader' && S.tool !== 'select') { S.tool = 'select'; return renderReader(); } if (t.id === 'sq') { t.value = ''; S.sq = ''; renderSide(); } return; }
+  if (t.id === 'sq' && e.key === 'Enter' && SIDE_FIRST && t.value.trim()) { e.preventDefault(); const F = SIDE_FIRST; return F.open ? openItem(F.open) : F.scope ? setScope(F.scope) : filterTag(F.tag); }
+  if (t.id === 'lq' && e.key === 'Enter') { e.preventDefault(); S.fulltext = t.value.trim(); S.lq = t.value; renderLibrary(); const n = $('#lq'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); return; }
+  if (t.id === 'newproj' && e.key === 'Enter' && t.value.trim()) { const id = 'p' + Date.now(); if (S.newProjUnder) S.popen[S.newProjUnder] = true; PROJECTS.splice(S.newProjUnder ? PROJECTS.findIndex(p => p.id === S.newProjUnder) + 1 : PROJECTS.length, 0, { id, n: t.value.trim(), p: S.newProjUnder || null, c: S.newProjUnder ? null : '#7f9168' }); S.newProjUnder = undefined; renderSide(); return toast('Project created. Hover a project and press its + to nest one inside.'); }
+  if (t.id === 'newproj' && e.key === 'Escape') { S.newProjUnder = undefined; return renderSide(); }
+  if (t.id === 'newtype' && e.key === 'Enter' && t.value.trim()) { e.preventDefault(); return addSourceType(t.value.trim()); }
+  if (t.matches('[data-addtag], [data-anntag], [data-uptag]') && e.key === 'Enter' && t.value.trim()) {
+    const v = t.value.trim().replace(/^#/, '');
+    if (t.dataset.addtag) { const i = item(t.dataset.addtag); if (!i.tags.includes(v)) i.tags.push(v); S.view === 'reader' ? rerenderPanel() : render(); renderSide(); setTimeout(() => $(`[data-addtag="${i.id}"]`)?.focus(), 10); }
+    else if (t.dataset.anntag) { const a = ANNS.find(x => x.id === t.dataset.anntag); if (!a.tags.includes(v)) a.tags.push(v); rerenderPanel(); renderSide(); setTimeout(() => $(`[data-anntag="${a.id}"]`)?.focus(), 10); }
+    else { const x = UP.files[UP.cur]; if (!x.tags.includes(v)) x.tags.push(v); drawUpload(); setTimeout(() => $('[data-uptag]')?.focus(), 10); }
+    return;
+  }
+  if (t.id === 'bulktag' && e.key === 'Enter') return act('bulk-tag-go');
+  if (t.matches('[role="button"], .wikilink, .hashtag') && e.key === 'Enter') return t.click();
+  if (typing) return;
+  if (S.view === 'reader' && mod && e.key.toLowerCase() === 'z') { e.preventDefault(); return undo(); }
+  if (S.view === 'reader' && /^[1-5]$/.test(e.key) && !mod) {
+    const k = +e.key - 1;
+    if (highlightSelection(k)) return;
+    const selMark = $('mark.hl.sel');
+    if (selMark && $('.pop.dark')) { snapshot(); ANNS.find(a => a.id === selMark.dataset.ann).color = k; closeLayer(); rerenderPage(); rerenderPanel(); return; }
+    S.color = k; $$('.swatch').forEach(s => s.setAttribute('aria-pressed', +s.dataset.color === k)); return toast(`Active color ${k + 1}: ${PALETTE[k].n}`);
+  }
+  if (t.matches('tr.r') && e.key === 'Enter') return openItem(t.dataset.select);
+});
+document.addEventListener('click', e => { if (e.target.id === 'newtypebtn') { const v = $('#newtype').value.trim(); if (v) addSourceType(v); } });
+function addSourceType(v) { if (!SOURCE_TYPES.includes(v)) SOURCE_TYPES.push(v); UP.files[UP.cur].f.type = v; drawUpload(); toast(`Added source type “${v}”. It's now available for every source.`); }
+
+document.addEventListener('mousedown', e => { if (e.target.closest?.('.pop.dark .dotbtn, .tools .swatch')) e.preventDefault(); });
+// text selection in the reader → color popover
+document.addEventListener('mouseup', e => {
+  if (S.view !== 'reader' || S.tool !== 'select' || e.target.closest?.('.pop, .panel, .tools')) return;
+  setTimeout(() => { const sel = getSelection(); if (!sel.rangeCount || sel.isCollapsed) return; const r = sel.getRangeAt(0); if ($('#page')?.contains(r.commonAncestorContainer) && r.toString().trim().length > 1) showSelPop(r); }, 0);
+});
+
+// drawing shapes and ink on PDF pages
+let DRAW = null;
+document.addEventListener('pointerdown', e => {
+  const svg = e.target.closest?.('svg.ink');
+  if (svg && S.tool === 'eraser' && e.target.dataset.ann) { snapshot(); ANNS = ANNS.filter(a => a.id !== e.target.dataset.ann); rerenderPage(); rerenderPanel(); return; }
+  if (svg && S.tool === 'select' && e.target.dataset.ann) { e.preventDefault(); S.rtab = 'annotations'; if (!S.panelNote) rerenderPanel(); flashAnn(e.target.dataset.ann, false); return showAnnPop(e.target.dataset.ann, e.target); }
+  if (!svg || !['rect', 'circle', 'star', 'ink'].includes(S.tool)) return;
+  e.preventDefault(); svg.setPointerCapture?.(e.pointerId);
+  const r = $('#page').getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  const el = document.createElementNS('http://www.w3.org/2000/svg', S.tool === 'rect' ? 'rect' : S.tool === 'circle' ? 'ellipse' : S.tool === 'star' ? 'polygon' : 'polyline');
+  el.setAttribute('class', 'shape'); el.setAttribute('stroke', PALETTE[S.color].c); svg.append(el);
+  DRAW = { x, y, el, pts: [[x, y]], r };
+});
+document.addEventListener('pointermove', e => {
+  if (!DRAW) return;
+  const x = e.clientX - DRAW.r.left, y = e.clientY - DRAW.r.top, el = DRAW.el;
+  if (S.tool === 'ink') { DRAW.pts.push([Math.round(x), Math.round(y)]); el.setAttribute('points', DRAW.pts.map(p => p.join(',')).join(' ')); return; }
+  const bx = Math.min(x, DRAW.x), by = Math.min(y, DRAW.y), bw = Math.abs(x - DRAW.x), bh = Math.abs(y - DRAW.y); DRAW.box = [bx, by, bw, bh].map(Math.round);
+  if (S.tool === 'rect') { el.setAttribute('x', bx); el.setAttribute('y', by); el.setAttribute('width', bw); el.setAttribute('height', bh); }
+  if (S.tool === 'circle') { el.setAttribute('cx', bx + bw / 2); el.setAttribute('cy', by + bh / 2); el.setAttribute('rx', bw / 2); el.setAttribute('ry', bh / 2); }
+  if (S.tool === 'star') el.setAttribute('points', starPts(bx, by, bw, bh));
+});
+document.addEventListener('pointerup', () => {
+  if (!DRAW) return;
+  const D = DRAW; DRAW = null;
+  const ok = S.tool === 'ink' ? D.pts.length > 3 : D.box && D.box[2] > 6 && D.box[3] > 6;
+  if (!ok) { D.el.remove(); return; }
+  snapshot();
+  ANNS.push({ id: 'a' + Date.now(), item: S.reader, type: S.tool, color: S.color, box: D.box, pts: S.tool === 'ink' ? D.pts : undefined, tags: [], created: Date.now() });
+  rerenderPage(); rerenderPanel();
+});
+
+// drag & drop: files onto the window → upload dialog; sidebar items into a note → [[link]]
+document.addEventListener('dragstart', e => { const t = e.target.closest?.('[data-drag]'); if (t) { e.dataTransfer.setData('text/plain', `[[${t.dataset.drag}]]`); e.dataTransfer.effectAllowed = 'copy'; } });
+let veil = null;
+document.addEventListener('dragover', e => {
+  if (![...e.dataTransfer.types].includes('Files')) return;
+  e.preventDefault();
+  if (!veil) { veil = document.createElement('div'); veil.className = 'dropveil'; veil.textContent = 'Drop to add to your library'; document.body.append(veil); }
+  clearTimeout(window._vt); window._vt = setTimeout(() => { veil?.remove(); veil = null; }, 150);
+});
+document.addEventListener('drop', e => {
+  if (![...e.dataTransfer.types].includes('Files')) return;
+  e.preventDefault(); veil?.remove(); veil = null;
+  const files = [...e.dataTransfer.files].map(f => ({ name: f.name, detect: null }));
+  if (S.view === 'reader' && e.target.closest?.('#attachzone')) { const i = item(S.reader); i.pdf = true; i.pages = 24; toast('PDF attached'); return renderReader(); }
+  if (files.length) { closeModal(); openUpload(files); }
+});
+$('#filepick').addEventListener('change', e => { const files = [...e.target.files].map(f => ({ name: f.name, detect: null })); e.target.value = ''; if (files.length) { closeModal(); openUpload(files); } });
+const _openUpload = openUpload;
+openUpload = files => { if (!files.length) return drawUploadEmpty(); _openUpload(files); };
+
+document.addEventListener('dblclick', e => { const r = e.target.closest?.('tr.r'); if (r && !e.target.closest('input, button')) openItem(r.dataset.select); });
+$('#main').addEventListener('scroll', () => { if (!$('.pop.dark')) return; closeLayer(); }, true);
+setInterval(() => $$('[data-saved]').forEach(s => { const n = item(s.dataset.saved); if (n && s.textContent !== 'Saving…') s.textContent = 'Saved ' + ago(n.modified); }), 30000);
+window.addEventListener('resize', () => { if (innerWidth > 860 && S.sideMobile) { S.sideMobile = false; $('#app').classList.remove('side-mobile'); } });
+
+const start = (location.hash || '').slice(1);
+if (start === 'reader') openItem('malinowski'); else if (start === 'note') openItem('n-kula'); else render();
+window.addEventListener('resize', renderTabs);
+</script>
