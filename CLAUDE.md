@@ -29,7 +29,8 @@ Qipu is one place for the whole academic reading-writing process: discover liter
 
 ## Database
 - Migrations live in `supabase/migrations/`, applied with the Supabase CLI. **Never edit a migration that has been applied anywhere**; add a new one.
-- Two Supabase projects: staging (for `develop`) and production (for `main`). Test every migration on staging first.
+- **For now there is one Supabase project** (ref `otbpolbikpylzjbosjgc`), shared by `develop` and `main`: the free plan's two-project limit is used up. It holds no real data yet. Until a separate staging database exists, every migration must pass the GitHub check and be shown to the user before it is applied.
+- **Must-do before Qipu holds real research data:** set up a separate staging database (Supabase Pro, or a local Supabase), and point `develop` at it.
 - Row-level security on every table; join tables check ownership of **both** sides.
 - TypeScript database types are generated from the database, not written by hand.
 - Interview data: aliases only, never real names.

@@ -195,7 +195,7 @@ Tabs: **Info · Annotations · Search**.
 ### Tooling and process
 - Next.js 16 (not 14 as the old handoff said). Upgrade to the versions Next 16 expects (React 19, ESLint 9 flat config). Remove `legacy-peer-deps`. Rename `middleware.ts` → `proxy.ts`.
 - Every push runs a GitHub check: type-check, lint, build, and all migrations on a throwaway Postgres.
-- Two Supabase projects: **staging** (branch `develop`) and **production** (branch `main`).
+- **Staging database: postponed (decided 2026-11-25).** The free plan's two projects are in use, so for now `develop` and `main` share the one Qipu project, which holds no real data. Every migration is tested on a fresh database by the GitHub check and reviewed before it is applied. **Must-do before real use:** a separate staging database (Supabase Pro, or local Supabase), with `develop` pointed at it.
 - Migrations through the Supabase CLI; never edit a migration that has been applied anywhere.
 - TypeScript database types are **generated** from the database, not written by hand.
 - One source for design tokens (`tokens.ts` → CSS variables). No hardcoded colors. Every UI string goes through the ES/EN message files.
