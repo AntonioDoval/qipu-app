@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- Qipu — Migration 002: core model
 --
--- Implements docs/ui-spec.md §7 "Foundations". It REPLACES the library tables
+-- Implements docs/ui-spec.md §10 "Foundations" (and tag inheritance, §6). It REPLACES the library tables
 -- created by 001 (items, tags, projects, quotes, links and their join tables),
 -- which hold no data yet. It keeps: profiles, handle_new_user(), set_updated_at().
 --
@@ -15,6 +15,7 @@
 --   • links between items, untyped; origin says whether a note's text created them.
 --   • annotations (highlight, square, circle, star, ink) with two anchors:
 --     position in PDF coordinates and the quoted text with its context.
+--   • highlights inherit their item's tags (view annotation_tags_effective).
 --   • PDF text stored per page (item_pages) for full-text search with page numbers.
 --   • search: language-neutral and accent-insensitive (config `qipu`).
 --   • row-level security on every table; join tables check BOTH sides.
@@ -519,6 +520,20 @@ create policy "own note annotations" on public.note_annotations for all to authe
 
 create policy "own item activity" on public.item_activity for all to authenticated
   using (user_id = auth.uid()) with check (user_id = auth.uid() and public.owns_item(item_id));
+
+
+-- ─── 12b. Tag inheritance: a highlight carries its item's tags ───────────────
+-- Own tags (inherited = false) plus the item's tags it does not already have
+-- (inherited = true). Runs with the caller's rights, so row-level security applies.
+create view public.annotation_tags_effective with (security_invoker = true) as
+  select at.annotation_id, at.tag_id, false as inherited
+  from public.annotation_tags at
+  union all
+  select a.id, it.tag_id, true
+  from public.annotations a
+  join public.item_tags it on it.item_id = a.item_id
+  where not exists (select 1 from public.annotation_tags x
+                    where x.annotation_id = a.id and x.tag_id = it.tag_id);
 
 
 -- ─── 13. Full-text search (titles, authors, notes, pasted text, PDF pages) ───

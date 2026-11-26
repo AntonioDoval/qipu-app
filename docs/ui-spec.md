@@ -1,11 +1,11 @@
 # Qipu — product & UI spec (agreed, not yet implemented)
 
-Status: agreed in design reviews on 2026-11-24 and 2026-11-25. Nothing below is built yet.
+Status: agreed in design reviews on 2026-11-24, 2026-11-25 and 2026-11-26. Nothing below is built yet.
 This replaces the old design references (`qipu-workspace-v3.jsx`, `qipu-viewer-v2.jsx`), which are lost.
 
-- `docs/design/mockup-v3.html`: the clickable mockup for this spec. Open it in a browser.
-- `docs/design/mockup-v1.html` and `mockup-v2.html`: earlier, outdated mockups, kept for history.
-- Where a mockup disagrees with this document, this document wins. The mockup has known small bugs; it only shows layout and flow.
+- `docs/design/mockup-v3.html`: the clickable mockup. **Partly outdated:** it still shows three tabs (Library · Reader · Notes). The agreed design (§2) has a single Library view instead. Colors, sidebar, library list, reader and note editor still apply.
+- `docs/design/mockup-v1.html` and `mockup-v2.html`: earlier mockups, kept for history.
+- Where a mockup disagrees with this document, this document wins.
 
 Scope for now: text items only (PDFs and pasted text). Images, video and audio come later.
 
@@ -22,38 +22,37 @@ Scope for now: text items only (PDFs and pasted text). Images, video and audio c
 
 - There is **no "fieldnote" type**. Existing field notes are uploaded or pasted as a Source. Notes written inside Qipu are Notes.
 - Each kind is shown with **one icon** (3 icons), with the type in small grey text next to it.
-- "Library" means Bibliography + Sources. **Notes are not listed in the Library**; they have their own tab.
 
-### Three tabs, one browser window
-- **Library:** list of Bibliography and Sources.
-- **Reader:** opens a Bibliography item or a Source (PDF or pasted text).
-- **Notes:** list of notes, or the note editor.
-
-Every item has its own URL (`/item/[uuid]`), so Cmd/Ctrl+click opens anything in a new browser tab.
+### One view at a time, one browser window (decided 2026-11-26)
+- **Library** is the home: one list of **everything** (Bibliography, Sources and Notes).
+- **Opening** an item or note replaces the library in the same place: the **reader** for Bibliography and Sources (PDF or pasted text), the **note editor** for notes.
+- **Back to the library** with one click: **← Library** in the top bar, the Qipu logo, or the browser's back button.
+- **The library keeps its state** when you come back: search, filters, sort, scroll position and selection.
+- **Reopening a text returns to the page you were on.**
+- Every item has its own URL (`/item/[uuid]`), so Cmd/Ctrl+click opens anything in a new browser tab. Together with the sidebar and Cmd+K, this replaces tabs for switching between texts.
 
 ---
 
 ## 2. Top bar (always visible)
 
 ```
-[◧]  Qipu      Library · Reader · Malinowski, 1922 · Notes · Kula as circul…            [◨]
+In the library:   [◧]  Qipu                                                        [◨]
+Item open:        [◧]  Qipu   ← Library   Malinowski, 1922 · Argonauts of the…     [◨]
 ```
 
 From left to right:
 1. **Left sidebar toggle** (Cmd+\). Fixed position whether the sidebar is open or closed.
 2. **Qipu logo/name.** Goes to the Library home: no filters, no search.
-3. After a gap, the **tabs**:
-   - **Library**
-   - **Reader**, labelled with what is open: `author, year`. The author is cut at 15 characters, with "…" **only if it was cut** (e.g. "Malinowski, 1922", "Municipalidad P…, 2019"). If there is no author, the title is used.
-   - **Notes**, labelled with the open note's title, cut at 15 characters with "…" only if cut.
+3. Only while something is open: **← Library**, then the item's short name.
+   - Bibliography / Sources: `author, year`. The author is cut at 15 characters, with "…" **only if it was cut** (e.g. "Malinowski, 1922", "Municipalidad P…, 2019"). If there is no author, the title is used.
+   - Notes: the note's title, cut at 15 characters with "…" only if cut.
 4. Far right: **right panel toggle** (Cmd+.). Fixed position whether the panel is open or closed.
 
-- On a phone, the tabs show **icons only**.
-- There are no Finder or Shortcuts buttons. **Cmd+K** is a keyboard shortcut only. The shortcut list lives in Settings.
+- There are no tabs, and no Finder or Shortcuts buttons. **Cmd+K** is a keyboard shortcut only. The shortcut list lives in Settings.
 
 ---
 
-## 3. Left sidebar (the same in every tab)
+## 3. Left sidebar (the same everywhere)
 
 ```
 [ 🔍 Search everything… ]
@@ -73,30 +72,30 @@ Trash · Settings
 - **Projects:**
   - **+** creates a project. Hover a project and press its **+** to create a subproject (max depth 20).
   - **▸ / ▾** opens a project in place, showing its subprojects and its items and notes.
-  - **Clicking a project's name** opens the Library tab filtered to that project (shown as a removable badge in the Library search bar).
-- **Tags:** tree by path (`andes` → `ayni`). Clicking a tag opens the Library filtered to that tag. Tags have no +; they are created by typing them.
+  - **Clicking a project's name** shows the Library filtered to that project (shown as a removable badge in the Library search bar).
+- **Tags:** tree by path (`andes` → `ayni`). Clicking a tag shows the Library filtered to that tag. Tags have no +; they are created by typing them.
 - Items in the sidebar can be dragged into a note to insert a `[[link]]`.
 - The sidebar has **no filter button**. There is **no global "Working in" project mode**: projects filter the Library only.
 - Each section collapses. The open/closed state is remembered.
 
 ---
 
-## 4. Library tab
+## 4. Library
 
 ### Search bar (independent from the sidebar)
-- Typing filters by **title and author** instantly. **Enter** searches the **full text**, including PDF text, and shows the matching passage under each title.
-- **All · Bibliography · Sources** switch.
+- Typing filters by **title and author** instantly. **Enter** searches the **full text** (PDF text, pasted text and notes) and shows the matching passage under each title.
+- **All · Bibliography · Sources · Notes** switch. **All** includes notes.
+- **Items | Annotations** toggle (see §7).
 - **Filter** button: project, tag, type, year, has PDF / annotations / notes. Active filters show as removable badges.
-- **+ Add** button and **Columns** picker.
-- When notes also match the current search or filter, a line under the list says "Also 2 notes match" and opens them in the Notes tab.
+- **+ Add** button (items) and **+ New note**; **Columns** picker.
 
 ### List
 | Column | Details |
 |---|---|
 | Kind | Icon plus type in small grey text |
 | Title | |
-| Authors | "Malinowski" · "Alberti & Mayer" · "Mayer et al."; sorts by first author's surname |
-| Year | |
+| Authors | "Malinowski" · "Alberti & Mayer" · "Mayer et al."; sorts by first author's surname. Empty for notes. |
+| Year | Empty for notes |
 | Created | Smart dates; **default sort: newest first** |
 | Modified | Smart dates |
 | Tags | |
@@ -109,23 +108,23 @@ Trash · Settings
   - **Copy citations** (APA 6/7, Chicago, MLA, any CSL style), formatted with italics, sorted alphabetically, ready to paste into a paper's bibliography
   - export BibTeX / RIS
 - Right panel: details of the selected item.
-- **Empty library (first run):** a clear empty state: drop your first PDF, or import from Zotero / BibTeX.
+- **Empty library (first run):** a clear empty state: drop your first PDF, import from Paperpile / Zotero / BibTeX, or write a note.
 
 ### Adding items (+ Add)
 | Option | Kind |
 |---|---|
 | Upload files (or drag & drop anywhere) | Bibliography or Source |
 | Add by DOI / ISBN / link | Bibliography |
-| Import BibTeX / RIS (with preview) | Bibliography |
+| Import a library (BibTeX/RIS + PDFs, e.g. from Paperpile), §5 | Bibliography |
 | Add reference by hand (no PDF) | **Bibliography only** |
 | Paste text | Source |
 
-New notes come from the Notes tab (+ New note) or Cmd+K, not from this menu.
+New notes come from **+ New note** or Cmd+K.
 
 ### Upload dialog
 - **Multiple files:** file list on the left, form for the selected file on the right. **Every file is set up individually.** Each shows complete / missing info and can be saved on its own. Optional "Copy settings from previous file" (it pre-fills only; nothing applies to all files at once).
 - **Per file:** Bibliography or Source · project(s) · tags.
-- **Bibliography:** details detected from DOI/ISBN, shown for checking.
+- **Bibliography:** details **detected automatically** (§5), shown for checking.
 - **Source:**
   - type (default list, plus custom types the user adds)
   - **source date** (when the interview took place, when the document was issued); partial dates allowed ("1987", "2019-03"); separate from the automatic creation date
@@ -137,10 +136,30 @@ New notes come from the Notes tab (+ New note) or Cmd+K, not from this menu.
 
 ---
 
-## 5. Reader tab
+## 5. Import and automatic details (decided 2026-11-26)
 
-- With nothing open: **recently opened** items.
-- A ✕ in the reader closes the current text and returns to that list.
+### Automatic details on every upload (runs in the browser)
+1. Look for a **DOI** in the first pages → fetch the full details from **CrossRef**.
+2. Look for an **ISBN** → fetch from OpenLibrary / Google Books.
+3. No identifier: **guess the title** (largest text on page 1) → search CrossRef → candidates with a confidence level.
+4. Fall back on the PDF's internal metadata and the file name.
+
+The result is always shown for checking before saving. Only bibliographic clues (DOI, ISBN, title) are sent to these services, and only for Bibliography; **Sources are never sent anywhere**. Scanned PDFs need OCR (later).
+
+### Library import (Paperpile first)
+1. Give Qipu a **BibTeX/RIS export** (clean metadata).
+2. Give Qipu the **PDFs**: pick them in Google Drive, or drag a folder from the computer.
+3. Qipu **matches references to files**, most reliable clue first: file path in the BibTeX entry (if present), DOI inside the PDF, file name ("Author Year - Title"), title on page 1.
+4. **Review screen before saving:** ✓ matched · ? unsure (choose among suggestions) · files without a reference (become items with automatic details) · references without a file (become references without PDF) · **duplicates** flagged (same DOI or identical file).
+5. Paperpile labels/folders become **tags or projects**, if the export carries them.
+
+- **To decide when building:** copy the PDFs into `Drive/Qipu/` (recommended: Qipu's folder is self-contained) or link them where they are.
+- **To check when building:** what Paperpile's BibTeX export contains (file paths, labels). Use a small real export.
+- Highlights made inside Paperpile are not in the Drive PDFs; they can only come in later through "import annotations from annotated PDFs".
+
+---
+
+## 6. Reader
 
 ### Right panel
 Tabs: **Info · Annotations · Search**.
@@ -149,7 +168,7 @@ Tabs: **Info · Annotations · Search**.
 - **Search:** search within this text; clicking a hit jumps to it and selects it, so 1–5 highlights it.
 
 ### Annotation (Paperpile-style, one highlighting mode)
-- **5 colors**, mapped to keys **1–5**. Each color is customizable and has an **optional name** (e.g. 1 = "Key argument", 3 = "Disagree"), which works as light thematic coding. Default colors must be distinguishable for colorblind users.
+- **5 colors**, mapped to keys **1–5**. Each color is customizable and has an **optional name** (e.g. 1 = "Key argument", 3 = "Disagree"), which works as light thematic coding. Default colors are distinguishable for colorblind users (Okabe–Ito).
 - **Highlight:** select text, then press 1–5, or click a color dot next to the selection. **The dots are the main path on touch screens** (tablet later).
 - With nothing selected, 1–5 sets the active color for shapes and pen.
 - **Toolbar:** Select · Square · Circle · Star · Pen · Eraser · 5 colors · edit colors. Esc returns to Select. Pen must work with a stylus later (pointer events).
@@ -157,7 +176,8 @@ Tabs: **Info · Annotations · Search**.
 - **Clicking an annotation:** change color · tags · add note · copy (with citation) · delete.
 - Cmd+Z undoes. Every delete shows an Undo message.
 - **Every highlight is a quote:** text, automatic locator (page, or paragraph for pasted text; editable) and tags.
-- **Notes from reading** are full, independent notes (Notes tab, `[[links]]`, `#tags`). They open in the right panel next to the text, with "Open in Notes →". A note can be attached to the whole text or to one or more highlights, and jumps back to them.
+- **Highlights inherit their item's tags** (central, decided 2026-11-26): a highlight in an interview tagged `feria` counts as tagged `feria` without tagging it. Its own tags add to the inherited ones. Inherited tags look slightly different (lighter) from the highlight's own tags.
+- **Notes from reading** are full, independent notes (`[[links]]`, `#tags`). They open in the right panel next to the text, with "Open as note →". A note can be attached to the whole text or to one or more highlights, and jumps back to them.
 - Changing a palette color recolors all annotations that use it (they store the color slot, not the hex value).
 
 ### Download
@@ -177,20 +197,48 @@ Tabs: **Info · Annotations · Search**.
 
 ---
 
-## 6. Notes tab
+## 7. Analysis: annotations across the library (decided 2026-11-26)
 
-- With no note open: **list of notes** with its own search (title and text), newest edited first, and **+ New note**.
-- Clicking the Notes tab while a note is open goes back to the list.
-- Editor:
-  - Obsidian-style free text, Edit / Read modes.
-  - **Tags exist only in the text** as `#tag` (nested: `#andes/ayni`). Plain while editing; clickable badges in Read mode.
-  - Typing `#` suggests tags; typing `[[` suggests items and notes. Clicking a link to a missing note creates it.
-  - **Autosave**, with grey "Saved 2 minutes ago" under the title.
-  - Right panel: links, backlinks, tags, projects, what the note is attached to.
+For academic writing: everything about a theme in one place.
+
+**A. Annotations mode in the Library.** The **Items | Annotations** toggle switches the list to one row per highlight: quote, color (and name), tags (own + inherited), source, page.
+- Same search and filters as items. Filtering by tag `ayni` shows every quote about ayni, from the literature and the interviews, thanks to tag inheritance.
+- Group by source or by color; filter Bibliography vs Sources; filter by color.
+- Clicking a quote opens the reader at that passage. **Copy** gives the selected quotes with citations (`malinowski1922, p. 81`).
+
+**B. Collect into a note.** Select quotes in Annotations mode → **Add to note** (new or existing). Each quote goes in as a block quote with its citation and a link back to the passage. The note becomes the working document for that theme or section.
+
+Matrix and board views were discussed and **not adopted**.
 
 ---
 
-## 7. Foundations (agreed in the review of 2026-11-25)
+## 8. Notes editor
+
+- Notes are listed in the Library (switch **Notes**, or **All**); **+ New note** creates one.
+- Obsidian-style free text, Edit / Read modes.
+- **Tags exist only in the text** as `#tag` (nested: `#andes/ayni`). Plain while editing; clickable badges in Read mode.
+- Typing `#` suggests tags; typing `[[` suggests items and notes. Clicking a link to a missing note creates it.
+- **Autosave**, with grey "Saved 2 minutes ago" under the title.
+- Right panel: links, backlinks, tags, projects, what the note is attached to.
+
+---
+
+## 9. Build plan (agreed 2026-11-26)
+
+1. Apply migration 002 to Supabase; generate the TypeScript database types.
+2. Data layer (the only code that talks to Supabase / Drive).
+3. Library with real data (list, search, filters, sidebar).
+4. Upload with automatic details (Drive).
+5. Library import (Paperpile).
+6. Reader with highlights (then shapes, pen, export).
+7. Notes.
+8. Annotations mode (A), then Collect into a note (B).
+
+Each step is tried on staging before the next.
+
+---
+
+## 10. Foundations (agreed in the review of 2026-11-25)
 
 ### Tooling and process
 - Next.js 16 (not 14 as the old handoff said). Upgrade to the versions Next 16 expects (React 19, ESLint 9 flat config). Remove `legacy-peer-deps`. Rename `middleware.ts` → `proxy.ts`.
@@ -216,6 +264,7 @@ Tabs: **Info · Annotations · Search**.
 - **Annotations** replace quotes: type (highlight / square / circle / star / ink), color slot (1–5), tags, locator, and two anchors:
   - position: page + rectangles or path in **PDF coordinates** (not screen pixels)
   - text quote: exact text + a few words before and after (W3C Web Annotation style)
+- **Tag inheritance** in the database: view `annotation_tags_effective` = a highlight's own tags plus its item's tags (marked `inherited`).
 - Note ↔ annotation link table (a note can attach to several highlights); `anchor_item_id` for whole-text notes.
 - **PDF text stored per page** in its own table (avoids the Postgres search-index size limit for long books; search can report the page). Text is extracted in the browser at upload.
 - Per-user palette (5 slots: hex + name) and custom source types.
@@ -231,7 +280,7 @@ Tabs: **Info · Annotations · Search**.
 
 ---
 
-## 8. Future directions (not built now, but designed for)
+## 11. Future directions (not built now, but designed for)
 
 ### Desktop app, offline, with local files
 Not a separate project, as long as the code follows four rules from the start:

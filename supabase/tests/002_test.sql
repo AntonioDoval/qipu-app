@@ -130,6 +130,21 @@ do $$ declare refused integer := 0; aid uuid; begin
   if refused <> 3 then raise exception 'invalid annotations accepted (% of 3 refused)', refused; end if;
 end $$;
 
+-- Tag inheritance: a highlight carries its item's tags, plus its own.
+insert into public.tags (path) values ('feria'), ('method');
+insert into public.item_tags select i.id, t.id from public.items i, public.tags t
+  where i.title = 'Argonauts PDF copy' and t.path in ('feria', 'method');
+insert into public.annotation_tags select a.id, t.id from public.annotations a, public.tags t
+  where t.path in ('andes/ayni', 'method');
+do $$ begin
+  if (select string_agg(t.path || ':' || e.inherited, ',' order by t.path)
+      from public.annotation_tags_effective e join public.tags t on t.id = e.tag_id)
+     is distinct from 'andes/ayni:false,feria:true,method:false' then
+    raise exception 'tag inheritance wrong: %', (select string_agg(t.path || ':' || e.inherited, ',' order by t.path)
+      from public.annotation_tags_effective e join public.tags t on t.id = e.tag_id);
+  end if;
+end $$;
+
 -- Projects: 20 levels allowed, 21 refused, cycles refused.
 do $$ declare pid uuid := null; nid uuid; refused integer := 0; begin
   for i in 0..20 loop
@@ -167,6 +182,7 @@ begin
   if (select count(*) from public.items) <> 1 then raise exception 'B can see A''s items'; end if;
   if (select count(*) from public.annotations) <> 0 then raise exception 'B can see A''s annotations'; end if;
   if (select count(*) from public.note_versions) <> 0 then raise exception 'B can see A''s note history'; end if;
+  if (select count(*) from public.annotation_tags_effective) <> 0 then raise exception 'B can see A''s annotation tags'; end if;
   if (select count(*) from public.search_library('malinowski')) <> 0 then raise exception 'B''s search finds A''s items'; end if;
 
   begin insert into public.item_tags values (a_item, b_tag);         exception when insufficient_privilege then refused := refused + 1; end;

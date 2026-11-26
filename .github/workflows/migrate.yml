@@ -1,0 +1,103 @@
+name: Apply database migrations
+
+# Started by hand: GitHub → Actions → "Apply database migrations" → Run workflow.
+# "Preview" connects to Supabase and shows what would change, without changing anything.
+# "Apply" applies the pending migrations and regenerates src/types/database.ts.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: What to do
+        type: choice
+        options:
+          - Preview (changes nothing)
+          - Apply migrations
+        default: Preview (changes nothing)
+
+permissions:
+  contents: write   # to commit the regenerated database types
+
+concurrency:
+  group: supabase-migrations
+  cancel-in-progress: false
+
+env:
+  PROJECT_REF: otbpolbikpylzjbosjgc   # the one Qipu Supabase project (see CLAUDE.md)
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+jobs:
+  test:
+    name: Test migrations on a fresh database
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: scripts/test-migrations.sh
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+
+  migrate:
+    name: ${{ inputs.mode }}
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.1
+
+      - name: Check the two secrets are set
+        run: |
+          [ -n "$SUPABASE_ACCESS_TOKEN" ] || { echo "::error::Missing secret SUPABASE_ACCESS_TOKEN (see docs/setup-migrations.md)"; exit 1; }
+          [ -n "$SUPABASE_DB_PASSWORD" ]  || { echo "::error::Missing secret SUPABASE_DB_PASSWORD (see docs/setup-migrations.md)"; exit 1; }
+
+      - name: Connect to the Qipu Supabase project
+        run: supabase link --project-ref "$PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Migrations in the repo vs. in the database
+        run: |
+          supabase migration list --password "$SUPABASE_DB_PASSWORD"
+          echo
+          echo "Note: migration 001 was applied by hand (SQL editor) before this workflow existed."
+          echo "Apply mode records it as applied first, so it is never run twice."
+
+      - name: Preview what would be applied
+        if: ${{ inputs.mode != 'Apply migrations' }}
+        run: supabase db push --dry-run --password "$SUPABASE_DB_PASSWORD"
+
+      # Idempotent: records 001 as applied (it already is in the database); never runs its SQL.
+      - name: Record migration 001 as already applied
+        if: ${{ inputs.mode == 'Apply migrations' }}
+        run: supabase migration repair --status applied 001 --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Apply pending migrations
+        if: ${{ inputs.mode == 'Apply migrations' }}
+        run: supabase db push --password "$SUPABASE_DB_PASSWORD" --yes
+
+      - name: Result
+        if: ${{ inputs.mode == 'Apply migrations' }}
+        run: supabase migration list --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Generate TypeScript types from the database
+        if: ${{ inputs.mode == 'Apply migrations' }}
+        run: supabase gen types typescript --linked --schema public > src/types/database.ts
+
+      - name: Save the types to the branch
+        if: ${{ inputs.mode == 'Apply migrations' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/types/database.ts
+          if git diff --cached --quiet; then echo "Types unchanged."; exit 0; fi
+          git commit -m "chore(types): regenerate database types after migrations"
+          git push
