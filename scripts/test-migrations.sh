@@ -4,7 +4,7 @@
 set -euo pipefail
 : "${DATABASE_URL:?Set DATABASE_URL to an EMPTY throwaway database}"
 cd "$(dirname "$0")/.."
-psql() { command psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q "$@"; }
+psql() { command psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -q -o /dev/null "$@"; }
 
 echo "→ Supabase stand-in (auth schema)"
 psql -f supabase/tests/auth_stub.sql
