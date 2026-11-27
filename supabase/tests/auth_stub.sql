@@ -9,11 +9,11 @@ do $$ begin
   if not exists (select 1 from pg_roles where rolname = 'service_role') then create role service_role nologin bypassrls; end if;
 end $$;
 
--- Supabase gives these roles access to the public schema by default (RLS then restricts rows).
+-- Like current Supabase projects: the roles may use the public schema, but NEW tables and
+-- functions are NOT granted to them automatically. Every migration must grant what the app
+-- needs, explicitly (see 003_grants.sql). Functions are not executable by everyone by default.
 grant usage on schema public to anon, authenticated, service_role;
-alter default privileges in schema public grant all on tables    to anon, authenticated, service_role;
-alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
-alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
+alter default privileges in schema public revoke execute on functions from public;
 
 create schema if not exists auth;
 create schema if not exists extensions;

@@ -205,6 +205,18 @@ begin
   delete from public.items where id = a_item;
 end $$;
 
+-- Visitors who are not signed in (anon) cannot read anything.
+reset role;
+set role anon;
+do $$ declare refused integer := 0; begin
+  begin perform 1 from public.items; exception when insufficient_privilege then refused := refused + 1; end;
+  begin perform 1 from public.annotations; exception when insufficient_privilege then refused := refused + 1; end;
+  begin perform 1 from public.search_library('x'); exception when insufficient_privilege then refused := refused + 1; end;
+  if refused <> 3 then raise exception 'anon can reach Qipu data (% of 3 refused)', refused; end if;
+end $$;
+reset role;
+set role authenticated;
+
 -- Browser roles cannot reach server-only things.
 do $$ declare refused integer := 0; begin
   begin perform public.purge_trash(); exception when insufficient_privilege then refused := refused + 1; end;
