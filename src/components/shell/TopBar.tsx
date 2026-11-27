@@ -9,19 +9,21 @@ import { useTranslations } from 'next-intl';
 import { ArrowLeft, PanelLeft, PanelRight } from 'lucide-react';
 import { useLibrary } from '@/components/library/LibraryProvider';
 import { shortLabel } from '@/lib/format';
+import { useShortcutLabels } from '@/lib/shortcuts';
 import { useShell } from './ShellProvider';
 
 export function TopBar() {
   const t = useTranslations('shell');
   const { sidebarOpen, panelOpen, toggleSidebar, togglePanel } = useShell();
   const { itemById } = useLibrary();
+  const keys = useShortcutLabels();
   const pathname = usePathname();
   const openId = pathname.startsWith('/item/') ? pathname.split('/')[2] : null;
   const openItem = openId ? itemById(openId) : undefined;
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-1.5 border-b border-dust bg-cream px-3 md:px-4">
-      <ToggleButton label={t('toggleSidebar')} pressed={sidebarOpen} onClick={toggleSidebar}>
+      <ToggleButton label={t('toggleSidebar', { keys: keys.toggleSidebar })} pressed={sidebarOpen} onClick={toggleSidebar}>
         <PanelLeft size={18} strokeWidth={1.7} />
       </ToggleButton>
 
@@ -52,7 +54,7 @@ export function TopBar() {
 
       <span className="flex-1" />
 
-      <ToggleButton label={t('togglePanel')} pressed={panelOpen} onClick={togglePanel}>
+      <ToggleButton label={t('togglePanel', { keys: keys.togglePanel })} pressed={panelOpen} onClick={togglePanel}>
         <PanelRight size={18} strokeWidth={1.7} />
       </ToggleButton>
     </header>

@@ -13,8 +13,8 @@
     "search": "Search"
   },
   "shell": {
-    "toggleSidebar": "Show or hide the sidebar (⌘\\)",
-    "togglePanel": "Show or hide the right panel (⌘.)",
+    "toggleSidebar": "Show or hide the sidebar ({keys})",
+    "togglePanel": "Show or hide the right panel ({keys})",
     "home": "Library home",
     "backToLibrary": "Library"
   },
@@ -35,7 +35,8 @@
     "signOut": "Sign out",
     "shortcuts": "Keyboard shortcuts",
     "shortcutSidebar": "Sidebar",
-    "shortcutPanel": "Right panel"
+    "shortcutPanel": "Right panel",
+    "languageChanged": "Now in English"
   },
   "kinds": {
     "bibliography": "Bibliography",

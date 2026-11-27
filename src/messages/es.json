@@ -13,8 +13,8 @@
     "search": "Buscar"
   },
   "shell": {
-    "toggleSidebar": "Mostrar u ocultar la barra lateral (⌘\\)",
-    "togglePanel": "Mostrar u ocultar el panel derecho (⌘.)",
+    "toggleSidebar": "Mostrar u ocultar la barra lateral ({keys})",
+    "togglePanel": "Mostrar u ocultar el panel derecho ({keys})",
     "home": "Inicio de la biblioteca",
     "backToLibrary": "Biblioteca"
   },
@@ -35,7 +35,8 @@
     "signOut": "Cerrar sesión",
     "shortcuts": "Atajos de teclado",
     "shortcutSidebar": "Barra lateral",
-    "shortcutPanel": "Panel derecho"
+    "shortcutPanel": "Panel derecho",
+    "languageChanged": "Ahora en español"
   },
   "kinds": {
     "bibliography": "Bibliografía",

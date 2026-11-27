@@ -12,6 +12,13 @@ const config: Config = {
       colors: Object.fromEntries(
         tokens.map((t) => [cssVar(t).slice(2), `var(${cssVar(t)})`]),
       ),
+      keyframes: {
+        'toast-in': {
+          from: { opacity: '0', transform: 'translateY(8px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: { 'toast-in': 'toast-in 180ms ease-out' },
       fontFamily: {
         display: ['var(--font-display)', 'Georgia', 'serif'],
         body: ['var(--font-body)', 'Georgia', 'serif'],

@@ -41,13 +41,14 @@ Item open:        [◧]  Qipu   ← Library   Malinowski, 1922 · Argonauts of t
 ```
 
 From left to right:
-1. **Left sidebar toggle** (Cmd+\). Fixed position whether the sidebar is open or closed.
+1. **Left sidebar toggle** (⌃⌘S; Ctrl+Alt+S on Windows). Fixed position whether the sidebar is open or closed.
 2. **Qipu logo/name.** Goes to the Library home: no filters, no search.
 3. Only while something is open: **← Library**, then the item's short name.
    - Bibliography / Sources: `author, year`. The author is cut at 15 characters, with "…" **only if it was cut** (e.g. "Malinowski, 1922", "Municipalidad P…, 2019"). If there is no author, the title is used.
    - Notes: the note's title, cut at 15 characters with "…" only if cut.
-4. Far right: **right panel toggle** (Cmd+.). Fixed position whether the panel is open or closed.
+4. Far right: **right panel toggle** (⌃⌘I; Ctrl+Alt+I on Windows). Fixed position whether the panel is open or closed.
 
+- Panel shortcuts use letters (matched by physical key) so they work on any keyboard layout; ⌘\ and ⌘. were dropped because they are hard to type on a Latin American layout (decided 2026-11-27).
 - There are no tabs, and no Finder or Shortcuts buttons. **Cmd+K** is a keyboard shortcut only. The shortcut list lives in Settings.
 
 ---

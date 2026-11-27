@@ -4,18 +4,22 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { LogOut, Settings } from 'lucide-react';
 import { locales, type Locale } from '@/i18n/locales';
 import { signOut } from '@/lib/auth';
-import { setLocaleCookie } from '@/lib/locale';
+import { MESSAGES, useLocaleSwitch } from '@/components/i18n/LocaleProvider';
+import { useToast } from '@/components/ui/Toaster';
+import { useShortcutLabels } from '@/lib/shortcuts';
 
 const LANGUAGE_NAMES: Record<Locale, string> = { es: 'Español', en: 'English' };
 
 export function SettingsMenu() {
   const t = useTranslations('settings');
   const tSide = useTranslations('sidebar');
-  const locale = useLocale() as Locale;
+  const { locale, setLocale } = useLocaleSwitch();
+  const { toast } = useToast();
+  const keys = useShortcutLabels();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const box = useRef<HTMLDivElement>(null);
@@ -36,8 +40,10 @@ export function SettingsMenu() {
   }, [open]);
 
   const changeLanguage = (next: Locale) => {
-    setLocaleCookie(next);
-    router.refresh();
+    if (next === locale) return;
+    setLocale(next);
+    // Confirm in the new language.
+    toast(MESSAGES[next].settings.languageChanged);
   };
 
   const doSignOut = async () => {
@@ -81,9 +87,9 @@ export function SettingsMenu() {
 
           <p className="mb-1.5 font-mono text-[10.5px] uppercase tracking-wider text-sage">{t('shortcuts')}</p>
           <dl className="mb-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[13px]">
-            <dt><Kbd>⌘\</Kbd></dt>
+            <dt><Kbd>{keys.toggleSidebar}</Kbd></dt>
             <dd>{t('shortcutSidebar')}</dd>
-            <dt><Kbd>⌘.</Kbd></dt>
+            <dt><Kbd>{keys.togglePanel}</Kbd></dt>
             <dd>{t('shortcutPanel')}</dd>
           </dl>
 

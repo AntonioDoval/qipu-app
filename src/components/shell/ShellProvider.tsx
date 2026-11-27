@@ -1,9 +1,10 @@
 'use client';
 
 // Which side panels are open, shared by every screen. Remembered in this browser,
-// toggled with ⌘\ (sidebar) and ⌘. (right panel).
+// toggled with ⌃⌘S (sidebar) and ⌃⌘I (right panel); see lib/shortcuts.ts.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { shortcutFor } from '@/lib/shortcuts';
 import { useMediaQuery, useStored } from '@/lib/useStored';
 
 interface ShellState {
@@ -37,17 +38,14 @@ export function ShellProvider({ children }: { children: React.ReactNode }) {
     if (narrow) setPhoneSidebarOpen(false);
   }, [narrow]);
 
-  // ⌘\ / Ctrl+\ and ⌘. / Ctrl+.
+  // ⌃⌘S / ⌃⌘I (Ctrl+Alt+S / Ctrl+Alt+I): letters, so they work on any keyboard layout.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (!(e.metaKey || e.ctrlKey)) return;
-      if (e.key === '\\') {
-        e.preventDefault();
-        toggleSidebar();
-      } else if (e.key === '.') {
-        e.preventDefault();
-        togglePanel();
-      }
+      const action = shortcutFor(e);
+      if (!action) return;
+      e.preventDefault();
+      if (action === 'toggleSidebar') toggleSidebar();
+      else togglePanel();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
