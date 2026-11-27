@@ -53,9 +53,21 @@ export function fullDate(value: string | Date, locale: string): string {
   return d.toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
 }
 
-/** Lower case, without accents: for comparing titles the way the database search does. */
+// Letters that are not "letter + accent" in Unicode, so removing accents alone misses them.
+// Same as Postgres unaccent: ł→l, ø→o, æ→ae, ß→ss…
+const SPECIAL_LETTERS: Record<string, string> = {
+  ł: 'l', Ł: 'l', ø: 'o', Ø: 'o', đ: 'd', Đ: 'd', ð: 'd', Ð: 'd', ħ: 'h', ı: 'i',
+  æ: 'ae', Æ: 'ae', œ: 'oe', Œ: 'oe', ß: 'ss', þ: 'th', Þ: 'th',
+};
+
+/** Lower case, without accents: for comparing text the way the database search does. */
 export function foldText(text: string): string {
-  return text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+  return text
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[łŁøØđĐðÐħıæÆœŒßþÞ]/g, (c) => SPECIAL_LETTERS[c])
+    .toLowerCase()
+    .trim();
 }
 
 export interface SnippetPart {

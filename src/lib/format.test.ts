@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { authorsShort, shortLabel, smartDate, splitSnippet, trimLabel } from './format';
+import { authorsShort, foldText, shortLabel, smartDate, splitSnippet, trimLabel } from './format';
 
 describe('authorsShort', () => {
   it('follows the spec: one, two, three or more authors', () => {
@@ -57,5 +57,14 @@ describe('splitSnippet', () => {
       { text: '<b>x</b> ', match: false },
       { text: 'y', match: true },
     ]);
+  });
+});
+
+describe('foldText', () => {
+  it('removes accents like the database does, including letters such as ł, ø, æ, ß', () => {
+    expect(foldText('Bronisław')).toBe('bronislaw');
+    expect(foldText('Reciprocidád Andina')).toBe('reciprocidad andina');
+    expect(foldText('Søren Kierkegaard')).toBe('soren kierkegaard');
+    expect(foldText('Straße, Æsir, cœur')).toBe('strasse, aesir, coeur');
   });
 });
