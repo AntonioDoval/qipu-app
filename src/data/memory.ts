@@ -364,12 +364,13 @@ export function createMemoryData(options: { sample?: boolean } = { sample: true 
       if (!q) return [];
       const words = q.split(/\s+/).filter(Boolean);
       const hit = (text: string) => words.every((w) => foldText(text).includes(w));
+      // Mark every word whose accent-free form contains a searched word (like the database's ⟦ ⟧).
       const snippet = (text: string) => {
-        const t = text.replace(/\s+/g, ' ');
-        const at = foldText(t).indexOf(words[0]);
-        const start = Math.max(0, at - 40);
-        const piece = t.slice(start, at + 80);
-        return (start ? '…' : '') + piece.replace(new RegExp(`(${words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi'), '⟦$1⟧');
+        const tokens = text.replace(/\s+/g, ' ').split(/(\s+)/);
+        const first = tokens.findIndex((tok) => words.some((w) => foldText(tok).includes(w)));
+        const from = Math.max(0, first - 12);
+        const piece = tokens.slice(from, from + 40).map((tok) => (words.some((w) => foldText(tok).includes(w)) ? `⟦${tok}⟧` : tok));
+        return (from ? '…' : '') + piece.join('');
       };
       const results = items
         .filter((i) => !i.deletedAt && hit(`${i.title} ${i.creatorsText} ${i.citekey ?? ''} ${i.body ?? ''}`))

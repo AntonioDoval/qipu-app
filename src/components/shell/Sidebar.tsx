@@ -4,11 +4,11 @@
 //   search everything · All items (A–Z) · Projects (tree with their items) · Tags (tree) · Trash · Settings
 
 import { useMemo, useState } from 'react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { ChevronRight, Folder, Hash, Search, Trash2 } from 'lucide-react';
 import { useLibrary } from '@/components/library/LibraryProvider';
+import { useLibraryUI } from '@/components/library/LibraryUIProvider';
 import type { Item, Project } from '@/data';
 import { authorsShort, foldText } from '@/lib/format';
 import { tagAndParents } from '@/lib/tags';
@@ -36,6 +36,7 @@ export function Sidebar() {
   const t = useTranslations('sidebar');
   const { items, projects, tags, itemProjects, itemTags } = useLibrary();
   const { closeSidebarIfNarrow } = useShell();
+  const ui = useLibraryUI();
   const { open, openProjects, toggleSection, toggleProject } = useOpenSections();
   const [query, setQuery] = useState('');
   const router = useRouter();
@@ -89,14 +90,27 @@ export function Sidebar() {
     router.push(href);
     closeSidebarIfNarrow();
   };
+  const showProject = (id: string) => {
+    ui.setProject(id);
+    go('/library');
+  };
+  const showTag = (path: string) => {
+    ui.setTag(path);
+    go('/library');
+  };
+  const showTrash = () => {
+    void ui.showTrash();
+    go('/library');
+  };
+  const inLibrary = pathname === '/library';
 
   const onSearchKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') setQuery('');
     if (e.key !== 'Enter' || !results) return;
     const first = results.items[0];
     if (first) go(`/item/${first.id}`);
-    else if (results.projects[0]) go(`/library?project=${results.projects[0].id}`);
-    else if (results.tags[0]) go(`/library?tag=${encodeURIComponent(results.tags[0].path)}`);
+    else if (results.projects[0]) showProject(results.projects[0].id);
+    else if (results.tags[0]) showTag(results.tags[0].path);
   };
 
   return (
@@ -122,13 +136,13 @@ export function Sidebar() {
               <ItemRow key={i.id} item={i} current={i.id === currentId} onOpen={go} indent={8} />
             ))}
             {results.projects.map((p) => (
-              <button key={p.id} type="button" onClick={() => go(`/library?project=${p.id}`)} className={rowClass}>
+              <button key={p.id} type="button" onClick={() => showProject(p.id)} className={rowClass}>
                 <Folder size={14} strokeWidth={1.7} className="text-sage" />
                 <span className="truncate">{p.name}</span>
               </button>
             ))}
             {results.tags.map((tg) => (
-              <button key={tg.path} type="button" onClick={() => go(`/library?tag=${encodeURIComponent(tg.path)}`)} className={rowClass}>
+              <button key={tg.path} type="button" onClick={() => showTag(tg.path)} className={rowClass}>
                 <Hash size={14} strokeWidth={1.7} className="text-sage" />
                 <span className="truncate">{tg.path}</span>
               </button>
@@ -160,6 +174,8 @@ export function Sidebar() {
                     openProjects={openProjects}
                     onToggle={toggleProject}
                     onGo={go}
+                    onShowProject={showProject}
+                    currentProjectId={inLibrary && !ui.trash ? ui.query.projectId : null}
                     currentId={currentId}
                   />
                 ) : (
@@ -175,8 +191,9 @@ export function Sidebar() {
                     <button
                       key={tg.path}
                       type="button"
-                      onClick={() => go(`/library?tag=${encodeURIComponent(tg.path)}`)}
-                      className={rowClass}
+                      onClick={() => showTag(tg.path)}
+                      aria-current={(inLibrary && !ui.trash && ui.query.tag === tg.path) || undefined}
+                      className={`${rowClass} aria-[current]:bg-soft aria-[current]:text-accent`}
                       style={{ paddingLeft: 8 + tg.depth * 14 }}
                     >
                       <span className="truncate">{tg.path.split('/').pop()}</span>
@@ -192,13 +209,15 @@ export function Sidebar() {
       </div>
 
       <div className="flex gap-1 border-t border-dust p-2">
-        <Link
-          href="/library?trash=1"
-          className="flex flex-1 items-center gap-2 rounded-md px-2 py-1 text-[13px] text-ink hover:bg-sand"
+        <button
+          type="button"
+          onClick={showTrash}
+          aria-current={(inLibrary && ui.trash) || undefined}
+          className="flex flex-1 items-center gap-2 rounded-md px-2 py-1 text-[13px] text-ink hover:bg-sand aria-[current]:bg-soft aria-[current]:text-accent"
         >
           <Trash2 size={15} strokeWidth={1.7} className="text-sage" />
           {t('trash')}
-        </Link>
+        </button>
         <div className="flex-1">
           <SettingsMenu />
         </div>
@@ -251,6 +270,8 @@ function ProjectTree(props: {
   openProjects: Record<string, boolean>;
   onToggle: (id: string) => void;
   onGo: (href: string) => void;
+  onShowProject: (id: string) => void;
+  currentProjectId: string | null;
   currentId: string | null;
 }) {
   const children = props.projects.filter((p) => p.parentId === props.parentId);
@@ -273,7 +294,12 @@ function ProjectTree(props: {
               >
                 <ChevronRight size={12} strokeWidth={2} className="transition-transform group-aria-expanded:rotate-90" />
               </button>
-              <button type="button" onClick={() => props.onGo(`/library?project=${p.id}`)} className={rowClass}>
+              <button
+                type="button"
+                onClick={() => props.onShowProject(p.id)}
+                aria-current={props.currentProjectId === p.id || undefined}
+                className={`${rowClass} aria-[current]:bg-soft aria-[current]:text-accent`}
+              >
                 <span
                   className="h-2 w-2 shrink-0 rounded-full"
                   style={{ background: p.color, opacity: props.depth ? 0.55 : 1 }}

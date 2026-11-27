@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { ArrowLeft, PanelLeft, PanelRight } from 'lucide-react';
 import { useLibrary } from '@/components/library/LibraryProvider';
+import { useLibraryUI } from '@/components/library/LibraryUIProvider';
 import { shortLabel } from '@/lib/format';
 import { useShortcutLabels } from '@/lib/shortcuts';
 import { useShell } from './ShellProvider';
@@ -17,6 +18,7 @@ export function TopBar() {
   const { sidebarOpen, panelOpen, toggleSidebar, togglePanel } = useShell();
   const { itemById } = useLibrary();
   const keys = useShortcutLabels();
+  const { resetAll } = useLibraryUI();
   const pathname = usePathname();
   const openId = pathname.startsWith('/item/') ? pathname.split('/')[2] : null;
   const openItem = openId ? itemById(openId) : undefined;
@@ -29,6 +31,7 @@ export function TopBar() {
 
       <Link
         href="/library"
+        onClick={resetAll}
         title={t('home')}
         className="rounded px-1.5 font-display text-[21px] font-semibold tracking-tight text-ink hover:text-accent"
       >

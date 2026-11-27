@@ -5,7 +5,8 @@
 // moving between the library and an open item.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { getData, type Item, type ItemProject, type ItemTag, type Project, type Tag } from '@/data';
+import { getData, type Annotation, type Item, type ItemProject, type ItemTag, type Project, type Tag } from '@/data';
+import type { LibraryFacts } from '@/lib/libraryQuery';
 
 type Status = 'loading' | 'ready' | 'error';
 
@@ -17,11 +18,20 @@ interface LibraryState {
   tags: Tag[];
   itemTags: ItemTag[];
   itemProjects: ItemProject[];
+  annotations: Annotation[];
   itemById: (id: string) => Item | undefined;
+  /** Lookups the library list needs (tags, projects, counts per item). */
+  facts: Omit<LibraryFacts, 'fullTextHits'>;
   reload: () => Promise<void>;
 }
 
 const LibraryContext = createContext<LibraryState | null>(null);
+
+function group<K, V>(pairs: [K, V][]): Map<K, V[]> {
+  const map = new Map<K, V[]>();
+  for (const [k, v] of pairs) map.set(k, [...(map.get(k) ?? []), v]);
+  return map;
+}
 
 export function LibraryProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<Status>('loading');
@@ -31,22 +41,25 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
   const [tags, setTags] = useState<Tag[]>([]);
   const [itemTags, setItemTags] = useState<ItemTag[]>([]);
   const [itemProjects, setItemProjects] = useState<ItemProject[]>([]);
+  const [annotations, setAnnotations] = useState<Annotation[]>([]);
 
   const reload = useCallback(async () => {
     const data = getData();
     try {
-      const [i, p, t, it, ip] = await Promise.all([
+      const [i, p, t, it, ip, an] = await Promise.all([
         data.listItems(),
         data.listProjects(),
         data.listTags(),
         data.listItemTags(),
         data.listItemProjects(),
+        data.listAnnotations(),
       ]);
       setItems(i);
       setProjects(p);
       setTags(t);
       setItemTags(it);
       setItemProjects(ip);
+      setAnnotations(an);
       setError(null);
       setStatus('ready');
     } catch (e) {
@@ -64,6 +77,20 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<LibraryState>(() => {
     const byId = new Map(items.map((i) => [i.id, i]));
+    const pathById = new Map(tags.map((t) => [t.id, t.path]));
+    const annotationCount = new Map<string, number>();
+    for (const a of annotations) annotationCount.set(a.itemId, (annotationCount.get(a.itemId) ?? 0) + 1);
+    const noteCount = new Map<string, number>();
+    for (const n of items) if (n.anchorItemId) noteCount.set(n.anchorItemId, (noteCount.get(n.anchorItemId) ?? 0) + 1);
+    const facts: LibraryState['facts'] = {
+      tagPathsByItem: group(itemTags.map((r) => [r.itemId, pathById.get(r.tagId) ?? ''] as [string, string])),
+      projectIdsByItem: new Map(
+        [...group(itemProjects.map((r) => [r.itemId, r.projectId] as [string, string]))].map(([k, v]) => [k, new Set(v)]),
+      ),
+      projects,
+      annotationCount,
+      noteCount,
+    };
     return {
       status,
       error,
@@ -72,10 +99,12 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       tags,
       itemTags,
       itemProjects,
+      annotations,
       itemById: (id) => byId.get(id),
+      facts,
       reload,
     };
-  }, [status, error, items, projects, tags, itemTags, itemProjects, reload]);
+  }, [status, error, items, projects, tags, itemTags, itemProjects, annotations, reload]);
 
   return <LibraryContext.Provider value={value}>{children}</LibraryContext.Provider>;
 }

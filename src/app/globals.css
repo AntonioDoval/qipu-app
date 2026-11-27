@@ -71,3 +71,11 @@ code, kbd, samp, pre {
 @layer utilities {
   .text-balance { text-wrap: balance; }
 }
+
+/* ─── Library list: hide the least essential columns when the list is narrow ─
+   (e.g. both side panels open on a small laptop). They return when there is room. */
+.qipu-list { container-type: inline-size; }
+@container (max-width: 820px) { .qipu-col-has { display: none !important; } }
+@container (max-width: 760px) { .qipu-col-modified { display: none !important; } }
+@container (max-width: 690px) { .qipu-col-year { display: none !important; } }
+@container (max-width: 600px) { .qipu-col-tags { display: none !important; } }
