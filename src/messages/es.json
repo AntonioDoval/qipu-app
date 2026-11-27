@@ -40,7 +40,13 @@
     "shortcuts": "Atajos de teclado",
     "shortcutSidebar": "Barra lateral",
     "shortcutPanel": "Panel derecho",
-    "languageChanged": "Ahora en español"
+    "languageChanged": "Ahora en español",
+    "drive": "Google Drive",
+    "driveConnected": "Conectado",
+    "driveNotConnected": "No conectado",
+    "driveChecking": "Comprobando…",
+    "driveConnect": "Conectar",
+    "driveError": "No se pudo comprobar"
   },
   "kinds": {
     "bibliography": "Bibliografía",
@@ -94,10 +100,11 @@
     "signIn": "Iniciar sesión",
     "signOut": "Cerrar sesión",
     "signInWithGoogle": "Continuar con Google",
-    "email": "Email",
-    "password": "Contraseña",
     "driveReconnect": "Volvé a conectar tu Google Drive",
-    "driveReconnectDesc": "Se revocó el acceso a Google Drive. Volvé a conectarlo para seguir viendo y subiendo archivos."
+    "driveReconnectDesc": "Se revocó el acceso a Google Drive. Volvé a conectarlo para seguir viendo y subiendo archivos.",
+    "tagline": "Espacio de trabajo para la investigación",
+    "authError": "No se pudo iniciar sesión. Probá de nuevo.",
+    "driveNote": "Qipu guarda tus PDFs en una carpeta «Qipu» de tu Google Drive. Solo puede ver los archivos que crea o que vos le das, nunca el resto de tu Drive."
   },
   "item": {
     "details": "Detalles",

@@ -3,14 +3,15 @@
 // Settings, opened from the bottom of the sidebar: language, keyboard shortcuts, sign out.
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { LogOut, Settings } from 'lucide-react';
+import { HardDrive, LogOut, Settings } from 'lucide-react';
 import { locales, type Locale } from '@/i18n/locales';
 import { signOut } from '@/lib/auth';
 import { MESSAGES, useLocaleSwitch } from '@/components/i18n/LocaleProvider';
 import { useToast } from '@/components/ui/Toaster';
 import { useShortcutLabels } from '@/lib/shortcuts';
+import { connectDrive, isDriveConnected } from '@/lib/google/driveAuth';
 
 const LANGUAGE_NAMES: Record<Locale, string> = { es: 'Español', en: 'English' };
 
@@ -22,6 +23,8 @@ export function SettingsMenu() {
   const keys = useShortcutLabels();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [drive, setDrive] = useState<'checking' | 'connected' | 'not_connected' | 'error'>('checking');
+  const pathname = usePathname();
   const box = useRef<HTMLDivElement>(null);
 
   // Close when clicking outside or pressing Escape.
@@ -56,7 +59,16 @@ export function SettingsMenu() {
     <div ref={box} className="relative">
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          if (!open) {
+            // Check Drive each time Settings opens.
+            setDrive('checking');
+            isDriveConnected()
+              .then((ok) => setDrive(ok ? 'connected' : 'not_connected'))
+              .catch(() => setDrive('error'));
+          }
+          setOpen((o) => !o);
+        }}
         aria-expanded={open}
         className="flex w-full items-center gap-2 rounded-md px-2 py-1 text-[13px] text-ink hover:bg-sand"
       >
@@ -83,6 +95,23 @@ export function SettingsMenu() {
                 {LANGUAGE_NAMES[l]}
               </button>
             ))}
+          </div>
+
+          <p className="mb-1.5 font-mono text-[10.5px] uppercase tracking-wider text-sage">{t('drive')}</p>
+          <div className="mb-3 flex items-center gap-2 text-[13px]">
+            <HardDrive size={15} strokeWidth={1.7} className="text-sage" />
+            <span className={drive === 'connected' ? 'text-ink' : drive === 'checking' ? 'text-stone' : 'text-danger'}>
+              {t(drive === 'connected' ? 'driveConnected' : drive === 'checking' ? 'driveChecking' : drive === 'error' ? 'driveError' : 'driveNotConnected')}
+            </span>
+            {(drive === 'not_connected' || drive === 'error') && (
+              <button
+                type="button"
+                onClick={() => void connectDrive(pathname)}
+                className="ml-auto rounded-md bg-accent px-2.5 py-0.5 text-[12.5px] text-paper hover:opacity-90"
+              >
+                {t('driveConnect')}
+              </button>
+            )}
           </div>
 
           <p className="mb-1.5 font-mono text-[10.5px] uppercase tracking-wider text-sage">{t('shortcuts')}</p>

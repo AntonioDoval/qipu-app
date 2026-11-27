@@ -1,13 +1,16 @@
-import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import LoginPage from '@/components/auth/LoginPage';
+import { createClient } from '@/lib/supabase/server';
 
-export default async function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // Already logged in → go to library
+  // Already signed in → library
   if (user) redirect('/library');
 
-  return <LoginPage />;
+  const { error } = await searchParams;
+  return <LoginPage failed={error === 'auth'} />;
 }

@@ -40,7 +40,13 @@
     "shortcuts": "Keyboard shortcuts",
     "shortcutSidebar": "Sidebar",
     "shortcutPanel": "Right panel",
-    "languageChanged": "Now in English"
+    "languageChanged": "Now in English",
+    "drive": "Google Drive",
+    "driveConnected": "Connected",
+    "driveNotConnected": "Not connected",
+    "driveChecking": "Checking…",
+    "driveConnect": "Connect",
+    "driveError": "Could not check"
   },
   "kinds": {
     "bibliography": "Bibliography",
@@ -94,10 +100,11 @@
     "signIn": "Sign in",
     "signOut": "Sign out",
     "signInWithGoogle": "Continue with Google",
-    "email": "Email",
-    "password": "Password",
     "driveReconnect": "Reconnect your Google Drive",
-    "driveReconnectDesc": "Access to Google Drive was revoked. Reconnect to keep viewing and uploading files."
+    "driveReconnectDesc": "Access to Google Drive was revoked. Reconnect to keep viewing and uploading files.",
+    "tagline": "A workspace for research",
+    "authError": "Sign-in failed. Please try again.",
+    "driveNote": "Qipu keeps your PDFs in a “Qipu” folder in your Google Drive. It can only see files it creates or that you give it, never the rest of your Drive."
   },
   "item": {
     "details": "Details",

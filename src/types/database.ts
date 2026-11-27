@@ -533,6 +533,15 @@ export type Database = {
       }
     }
     Functions: {
+      forget_google_credentials: { Args: never; Returns: undefined }
+      my_google_credentials: {
+        Args: never
+        Returns: {
+          refresh_token_encrypted: string
+          scopes: string
+          updated_at: string
+        }[]
+      }
       next_citekey: { Args: { base: string }; Returns: string }
       owns_annotation: { Args: { target: string }; Returns: boolean }
       owns_item: { Args: { target: string }; Returns: boolean }
@@ -540,6 +549,10 @@ export type Database = {
       owns_tag: { Args: { target: string }; Returns: boolean }
       purge_trash: { Args: never; Returns: number }
       qipu_fold: { Args: { t: string }; Returns: string }
+      save_google_credentials: {
+        Args: { p_refresh_token_encrypted: string; p_scopes: string }
+        Returns: undefined
+      }
       search_library: {
         Args: { q: string }
         Returns: {
