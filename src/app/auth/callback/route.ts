@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { encryptToken, serverTokenKey } from '@/lib/server/tokenCrypto';
@@ -15,7 +16,11 @@ function safeNext(value: string | null): string {
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const next = safeNext(searchParams.get('next'));
+  // Where to go afterwards: set by the browser in a short-lived cookie (see lib/google/driveAuth.ts).
+  const cookieStore = await cookies();
+  const returnTo = cookieStore.get('qipu-return-to')?.value;
+  const next = safeNext(searchParams.get('next') ?? (returnTo ? decodeURIComponent(returnTo) : null));
+  cookieStore.delete('qipu-return-to');
 
   if (code) {
     const supabase = await createClient();

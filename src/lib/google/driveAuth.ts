@@ -38,8 +38,14 @@ export async function isDriveConnected(): Promise<boolean> {
   }
 }
 
+// Supabase only returns to addresses on its approved list (Authentication → URL Configuration),
+// matched exactly, so the callback address never carries extra parameters. Where to go
+// afterwards travels in a short-lived cookie instead (read by /auth/callback).
+export const RETURN_COOKIE = 'qipu-return-to';
+
 function redirectTo(returnTo: string) {
-  return `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnTo)}`;
+  document.cookie = `${RETURN_COOKIE}=${encodeURIComponent(returnTo)}; path=/; max-age=600; samesite=lax`;
+  return `${window.location.origin}/auth/callback`;
 }
 
 /** Sign in with Google, asking for offline Drive access (Google then sends the long-lived key). */
