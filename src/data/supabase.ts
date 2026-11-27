@@ -165,8 +165,9 @@ const HEX = /^#[0-9a-fA-F]{6}$/;
 
 // ─── the implementation ───────────────────────────────────────────────────────
 
-export function createSupabaseData(client: QipuSupabaseClient): QipuData {
-  let userId: string | null = null;
+export function createSupabaseData(client: QipuSupabaseClient, options: { userId?: string } = {}): QipuData {
+  // `userId` is only passed by tests (their database has no sign-in service); the app asks Supabase.
+  let userId: string | null = options.userId ?? null;
 
   async function uid(): Promise<string> {
     if (userId) return userId;

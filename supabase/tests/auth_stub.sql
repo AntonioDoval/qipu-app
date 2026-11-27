@@ -26,8 +26,11 @@ create table if not exists auth.users (
 );
 
 -- Supabase's auth.uid(): the signed-in user's id, taken from the request's JWT.
--- Tests set it with: select set_config('request.jwt.claim.sub', '<uuid>', false);
+-- PostgREST puts the JWT claims in request.jwt.claims; SQL tests set request.jwt.claim.sub directly.
 create or replace function auth.uid() returns uuid language sql stable as $$
-  select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
+  select coalesce(
+    nullif(current_setting('request.jwt.claim.sub', true), ''),
+    nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'
+  )::uuid
 $$;
 grant execute on function auth.uid() to anon, authenticated, service_role;
