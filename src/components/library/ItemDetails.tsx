@@ -4,7 +4,8 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { RotateCcw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { RotateCcw, Trash2 } from 'lucide-react';
 import { getData, type CslName, type Item } from '@/data';
 import { KindIcon } from '@/components/shell/KindIcon';
 import { useToast } from '@/components/ui/Toaster';
@@ -20,7 +21,7 @@ function cslDate(item: Item): string | null {
   return parts.map((p, i) => (i === 0 ? String(p) : String(p).padStart(2, '0'))).join('-');
 }
 
-export function ItemDetails({ item, inTrash }: { item: Item; inTrash: boolean }) {
+export function ItemDetails({ item, inTrash, showOpen = true }: { item: Item; inTrash: boolean; showOpen?: boolean }) {
   const t = useTranslations('details');
   const tLib = useTranslations('library');
   const typeLabel = useTypeLabel();
@@ -28,6 +29,8 @@ export function ItemDetails({ item, inTrash }: { item: Item; inTrash: boolean })
   const { items, facts, projects, reload } = useLibrary();
   const ui = useLibraryUI();
   const { toast } = useToast();
+  const tCommon = useTranslations('common');
+  const router = useRouter();
 
   const tagPaths = facts.tagPathsByItem.get(item.id) ?? [];
   const itemProjects = projects.filter((p) => facts.projectIdsByItem.get(item.id)?.has(p.id));
@@ -62,6 +65,17 @@ export function ItemDetails({ item, inTrash }: { item: Item; inTrash: boolean })
           ],
         ];
 
+  const moveToTrash = async () => {
+    await getData().trashItems([item.id]);
+    ui.select(null);
+    await reload();
+    router.push('/library');
+    toast(tLib('movedToTrash', { title: item.title }), {
+      label: tCommon('undo'),
+      onClick: () => void getData().restoreItems([item.id]).then(reload),
+    });
+  };
+
   const restore = async () => {
     await getData().restoreItems([item.id]);
     await Promise.all([reload(), ui.showTrash()]);
@@ -85,9 +99,11 @@ export function ItemDetails({ item, inTrash }: { item: Item; inTrash: boolean })
             <RotateCcw size={14} strokeWidth={1.7} /> {tLib('restore')}
           </button>
         ) : (
-          <Link href={`/item/${item.id}`} className="self-start rounded-md bg-accent px-3 py-1 text-[13px] text-paper hover:opacity-90">
-            {tLib('open')}
-          </Link>
+          showOpen && (
+            <Link href={`/item/${item.id}`} className="self-start rounded-md bg-accent px-3 py-1 text-[13px] text-paper hover:opacity-90">
+              {tLib('open')}
+            </Link>
+          )
         )}
       </section>
 
@@ -169,6 +185,16 @@ export function ItemDetails({ item, inTrash }: { item: Item; inTrash: boolean })
           </>
         )}
       </dl>
+
+      {!inTrash && (
+        <button
+          type="button"
+          onClick={() => void moveToTrash()}
+          className="flex items-center gap-1.5 self-start rounded-md px-2 py-1 text-[13px] text-danger hover:bg-softer"
+        >
+          <Trash2 size={14} strokeWidth={1.7} /> {tLib('moveToTrash')}
+        </button>
+      )}
     </div>
   );
 }

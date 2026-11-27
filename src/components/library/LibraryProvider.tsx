@@ -23,6 +23,10 @@ interface LibraryState {
   /** Lookups the library list needs (tags, projects, counts per item). */
   facts: Omit<LibraryFacts, 'fullTextHits'>;
   reload: () => Promise<void>;
+  /** Show a just-saved or just-created item right away, before the next full reload. */
+  upsertItem: (item: Item) => void;
+  /** Refresh only tags (e.g. after a note was saved with new #tags). */
+  reloadTags: () => Promise<void>;
 }
 
 const LibraryContext = createContext<LibraryState | null>(null);
@@ -68,6 +72,17 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const upsertItem = useCallback((item: Item) => {
+    setItems((list) => (list.some((i) => i.id === item.id) ? list.map((i) => (i.id === item.id ? item : i)) : [item, ...list]));
+  }, []);
+
+  const reloadTags = useCallback(async () => {
+    const data = getData();
+    const [t, it] = await Promise.all([data.listTags(), data.listItemTags()]);
+    setTags(t);
+    setItemTags(it);
+  }, []);
+
   useEffect(() => {
     // Load the library once, when the app opens. The state only changes after the data
     // arrives (asynchronously), which is the intended use of an effect: fetching from outside.
@@ -103,8 +118,10 @@ export function LibraryProvider({ children }: { children: React.ReactNode }) {
       itemById: (id) => byId.get(id),
       facts,
       reload,
+      upsertItem,
+      reloadTags,
     };
-  }, [status, error, items, projects, tags, itemTags, itemProjects, annotations, reload]);
+  }, [status, error, items, projects, tags, itemTags, itemProjects, annotations, reload, upsertItem, reloadTags]);
 
   return <LibraryContext.Provider value={value}>{children}</LibraryContext.Provider>;
 }

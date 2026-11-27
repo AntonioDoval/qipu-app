@@ -6,11 +6,12 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { ArrowDown, ArrowUp, Columns3, FileText, Highlighter, Inbox, Loader2, PenLine, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, Columns3, FileText, Highlighter, Inbox, Loader2, PenLine, Plus, Search, SlidersHorizontal, X } from 'lucide-react';
 import { KindIcon } from '@/components/shell/KindIcon';
 import { ViewWithPanel } from '@/components/shell/ViewWithPanel';
 import { Popover } from '@/components/ui/Popover';
-import type { Item } from '@/data';
+import { getData, type Item } from '@/data';
+import { useToast } from '@/components/ui/Toaster';
 import { authorsShort, splitSnippet } from '@/lib/format';
 import { filterItems, sortItems, type HasFilter, type KindFilter, type SortKey } from '@/lib/libraryQuery';
 import { ItemDetails } from './ItemDetails';
@@ -40,6 +41,17 @@ export function LibraryView() {
   const typeLabel = useTypeLabel();
   const dates = useDates();
   const { query } = ui;
+  const { toast } = useToast();
+
+  const newNote = async () => {
+    try {
+      const note = await getData().createItem({ kind: 'note', type: 'note', title: t('untitledNote'), body: '' });
+      lib.upsertItem(note);
+      router.push(`/item/${note.id}`);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : String(e));
+    }
+  };
 
   const visible = useMemo(() => {
     if (ui.trash) return sortItems(ui.trashItems, query.sort);
@@ -83,9 +95,18 @@ export function LibraryView() {
       <div className="flex items-baseline gap-3 border-b border-dust px-5 py-3 md:px-6">
         <h1 className="font-display text-[21px] font-medium">{heading}</h1>
         {lib.status === 'ready' && <span className="text-[13px] text-sage">{t('count', { count: visible.length })}</span>}
-        {ui.trash && (
+        {ui.trash ? (
           <button type="button" onClick={ui.resetAll} className="ml-auto text-[13px] text-accent hover:underline">
             {t('backToLibrary')}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => void newNote()}
+            disabled={lib.status !== 'ready'}
+            className="ml-auto flex items-center gap-1.5 self-center rounded-md bg-accent px-3 py-1 text-[13px] text-paper hover:opacity-90 disabled:opacity-50"
+          >
+            <Plus size={14} strokeWidth={2} /> {t('newNote')}
           </button>
         )}
       </div>

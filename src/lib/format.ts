@@ -47,6 +47,19 @@ export function smartDate(value: string | Date, locale: string, yesterday: strin
   return d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+/** "now", "2 minutes ago", "3 hours ago", "yesterday", in the interface language (for "Saved …"). */
+export function timeAgo(value: string | Date, locale: string, now: Date = new Date()): string {
+  const d = typeof value === 'string' ? new Date(value) : value;
+  const seconds = Math.round((d.getTime() - now.getTime()) / 1000);
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  if (Math.abs(seconds) < 45) return rtf.format(0, 'second');
+  const minutes = Math.round(seconds / 60);
+  if (Math.abs(minutes) < 60) return rtf.format(minutes, 'minute');
+  const hours = Math.round(minutes / 60);
+  if (Math.abs(hours) < 24) return rtf.format(hours, 'hour');
+  return rtf.format(Math.round(hours / 24), 'day');
+}
+
 /** Full date and time, for tooltips. */
 export function fullDate(value: string | Date, locale: string): string {
   const d = typeof value === 'string' ? new Date(value) : value;

@@ -10,7 +10,8 @@
     "cancel": "Cancelar",
     "close": "Cerrar",
     "delete": "Eliminar",
-    "search": "Buscar"
+    "search": "Buscar",
+    "undo": "Deshacer"
   },
   "shell": {
     "toggleSidebar": "Mostrar u ocultar la barra lateral ({keys})",
@@ -27,7 +28,10 @@
     "noProjects": "Todavía no hay proyectos.",
     "noTags": "Las etiquetas aparecen cuando las agregás.",
     "trash": "Papelera",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "newSubproject": "Nuevo proyecto dentro de «{name}»",
+    "projectNamePlaceholder": "Nombre del proyecto · Enter para crear",
+    "projectCreated": "Proyecto «{name}» creado"
   },
   "settings": {
     "title": "Configuración",
@@ -80,7 +84,11 @@
     "page": "p. {page}",
     "yesterday": "Ayer",
     "annotationsCount": "{count, plural, one {# anotación} other {# anotaciones}}",
-    "notesCount": "{count, plural, one {# nota} other {# notas}}"
+    "notesCount": "{count, plural, one {# nota} other {# notas}}",
+    "newNote": "Nueva nota",
+    "untitledNote": "Nota sin título",
+    "moveToTrash": "Mover a la papelera",
+    "movedToTrash": "«{title}» se movió a la papelera"
   },
   "auth": {
     "signIn": "Iniciar sesión",
@@ -145,5 +153,19 @@
     "webpage": "Página web",
     "image": "Imagen",
     "note": "Nota"
+  },
+  "note": {
+    "details": "Detalles",
+    "titleLabel": "Título",
+    "bodyLabel": "Texto de la nota",
+    "untitled": "Nota sin título",
+    "placeholder": "Escribí acá. #etiqueta agrega una etiqueta; [[Título]] enlaza un ítem o una nota.",
+    "saving": "Guardando…",
+    "unsaved": "Cambios sin guardar",
+    "saved": "Guardado {ago}",
+    "saveError": "No se pudo guardar. Se vuelve a intentar al seguir escribiendo.",
+    "conflict": "Esta nota se cambió en otra pestaña o dispositivo. Recargá para ver la última versión (lo que escribiste acá después de eso se pierde).",
+    "reload": "Recargar",
+    "missing": "Esta nota no existe o está en la papelera."
   }
 }

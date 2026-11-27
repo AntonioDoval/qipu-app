@@ -6,9 +6,11 @@
 import { useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { ChevronRight, Folder, Hash, Search, Trash2 } from 'lucide-react';
+import { ChevronRight, Folder, Hash, Plus, Search, Trash2 } from 'lucide-react';
 import { useLibrary } from '@/components/library/LibraryProvider';
 import { useLibraryUI } from '@/components/library/LibraryUIProvider';
+import { useToast } from '@/components/ui/Toaster';
+import { getData } from '@/data';
 import type { Item, Project } from '@/data';
 import { authorsShort, foldText } from '@/lib/format';
 import { tagAndParents } from '@/lib/tags';
@@ -34,7 +36,8 @@ function useOpenSections() {
 
 export function Sidebar() {
   const t = useTranslations('sidebar');
-  const { items, projects, tags, itemProjects, itemTags } = useLibrary();
+  const { items, projects, tags, itemProjects, itemTags, reload } = useLibrary();
+  const { toast } = useToast();
   const { closeSidebarIfNarrow } = useShell();
   const ui = useLibraryUI();
   const { open, openProjects, toggleSection, toggleProject } = useOpenSections();
@@ -104,6 +107,33 @@ export function Sidebar() {
   };
   const inLibrary = pathname === '/library';
 
+  // New project: undefined = not creating; null = at the top; an id = inside that project.
+  const [creatingIn, setCreatingIn] = useState<string | null | undefined>(undefined);
+  const startProject = (parentId: string | null) => {
+    if (parentId && !openProjects[parentId]) toggleProject(parentId);
+    if (!open.projects) toggleSection('projects');
+    setCreatingIn(parentId);
+  };
+  const createProject = async (name: string) => {
+    const parentId = creatingIn ?? null;
+    setCreatingIn(undefined);
+    try {
+      await getData().createProject({ name, parentId });
+      await reload();
+      toast(t('projectCreated', { name }));
+    } catch (e) {
+      toast(e instanceof Error ? e.message : String(e));
+    }
+  };
+  const newProjectInput = (indent: number) => (
+    <NewProjectInput
+      indent={indent}
+      placeholder={t('projectNamePlaceholder')}
+      onCreate={(name) => void createProject(name)}
+      onCancel={() => setCreatingIn(undefined)}
+    />
+  );
+
   const onSearchKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') setQuery('');
     if (e.key !== 'Enter' || !results) return;
@@ -163,7 +193,13 @@ export function Sidebar() {
             )}
 
             <div>
-              <SectionHeader label={t('projects')} open={open.projects} onToggle={() => toggleSection('projects')} />
+              <SectionHeader
+                label={t('projects')}
+                open={open.projects}
+                onToggle={() => toggleSection('projects')}
+                action={{ label: t('newProject'), onClick: () => startProject(null) }}
+              />
+              {open.projects && creatingIn === null && newProjectInput(22)}
               {open.projects &&
                 (projects.length ? (
                   <ProjectTree
@@ -177,9 +213,13 @@ export function Sidebar() {
                     onShowProject={showProject}
                     currentProjectId={inLibrary && !ui.trash ? ui.query.projectId : null}
                     currentId={currentId}
+                    onAddInside={startProject}
+                    addInsideLabel={(name) => t('newSubproject', { name })}
+                    creatingIn={creatingIn}
+                    newProjectInput={newProjectInput}
                   />
                 ) : (
-                  <p className="px-2 py-1 text-[12.5px] italic text-sage">{t('noProjects')}</p>
+                  creatingIn !== null && <p className="px-2 py-1 text-[12.5px] italic text-sage">{t('noProjects')}</p>
                 ))}
             </div>
 
@@ -229,18 +269,59 @@ export function Sidebar() {
 const rowClass =
   'flex w-full min-w-0 items-center gap-2 rounded-md px-2 py-[3px] text-left text-[13px] text-ink hover:bg-sand';
 
-function SectionHeader(props: { label: string; count?: number; open: boolean; onToggle: () => void }) {
+function SectionHeader(props: {
+  label: string;
+  count?: number;
+  open: boolean;
+  onToggle: () => void;
+  action?: { label: string; onClick: () => void };
+}) {
   return (
-    <button
-      type="button"
-      onClick={props.onToggle}
-      aria-expanded={props.open}
-      className="group flex w-full items-center gap-1 px-1 py-0.5 text-left font-mono text-[10.5px] uppercase tracking-wider text-sage hover:text-ink"
-    >
-      <ChevronRight size={12} strokeWidth={2} className="transition-transform group-aria-expanded:rotate-90" />
-      {props.label}
-      {props.count !== undefined && <span className="ml-1 normal-case text-stone">{props.count}</span>}
-    </button>
+    <div className="flex items-center">
+      <button
+        type="button"
+        onClick={props.onToggle}
+        aria-expanded={props.open}
+        className="group flex flex-1 items-center gap-1 px-1 py-0.5 text-left font-mono text-[10.5px] uppercase tracking-wider text-sage hover:text-ink"
+      >
+        <ChevronRight size={12} strokeWidth={2} className="transition-transform group-aria-expanded:rotate-90" />
+        {props.label}
+        {props.count !== undefined && <span className="ml-1 normal-case text-stone">{props.count}</span>}
+      </button>
+      {props.action && (
+        <button
+          type="button"
+          onClick={props.action.onClick}
+          aria-label={props.action.label}
+          title={props.action.label}
+          className="grid h-6 w-6 place-items-center rounded text-stone hover:bg-sand hover:text-ink"
+        >
+          <Plus size={14} strokeWidth={1.8} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function NewProjectInput(props: { indent: number; placeholder: string; onCreate: (name: string) => void; onCancel: () => void }) {
+  const [name, setName] = useState('');
+  return (
+    <div className="py-0.5 pr-1" style={{ paddingLeft: props.indent }}>
+      <input
+        autoFocus
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && name.trim()) props.onCreate(name.trim());
+          if (e.key === 'Escape') props.onCancel();
+        }}
+        onBlur={() => !name.trim() && props.onCancel()}
+        placeholder={props.placeholder}
+        aria-label={props.placeholder}
+        maxLength={200}
+        className="w-full rounded-md border border-accent2 bg-surface px-2 py-1 text-[13px] outline-none placeholder:text-stone"
+      />
+    </div>
   );
 }
 
@@ -273,6 +354,10 @@ function ProjectTree(props: {
   onShowProject: (id: string) => void;
   currentProjectId: string | null;
   currentId: string | null;
+  onAddInside: (id: string) => void;
+  addInsideLabel: (name: string) => string;
+  creatingIn: string | null | undefined;
+  newProjectInput: (indent: number) => React.ReactNode;
 }) {
   const children = props.projects.filter((p) => p.parentId === props.parentId);
   return (
@@ -284,7 +369,7 @@ function ProjectTree(props: {
         const indent = 2 + props.depth * 14;
         return (
           <div key={p.id}>
-            <div className="flex items-center" style={{ paddingLeft: indent }}>
+            <div className="group/row flex items-center pr-1" style={{ paddingLeft: indent }}>
               <button
                 type="button"
                 onClick={() => props.onToggle(p.id)}
@@ -307,7 +392,19 @@ function ProjectTree(props: {
                 />
                 <span className="truncate">{p.name}</span>
               </button>
+              {props.depth < 19 && (
+                <button
+                  type="button"
+                  onClick={() => props.onAddInside(p.id)}
+                  aria-label={props.addInsideLabel(p.name)}
+                  title={props.addInsideLabel(p.name)}
+                  className="grid h-6 w-6 shrink-0 place-items-center rounded text-stone opacity-0 hover:bg-sand hover:text-ink focus:opacity-100 group-hover/row:opacity-100"
+                >
+                  <Plus size={13} strokeWidth={1.8} />
+                </button>
+              )}
             </div>
+            {props.creatingIn === p.id && props.newProjectInput(indent + 36)}
             {isOpen && (
               <>
                 <ProjectTree {...props} parentId={p.id} depth={props.depth + 1} />

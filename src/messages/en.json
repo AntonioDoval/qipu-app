@@ -10,7 +10,8 @@
     "cancel": "Cancel",
     "close": "Close",
     "delete": "Delete",
-    "search": "Search"
+    "search": "Search",
+    "undo": "Undo"
   },
   "shell": {
     "toggleSidebar": "Show or hide the sidebar ({keys})",
@@ -27,7 +28,10 @@
     "noProjects": "No projects yet.",
     "noTags": "Tags appear once you add them.",
     "trash": "Trash",
-    "settings": "Settings"
+    "settings": "Settings",
+    "newSubproject": "New project inside “{name}”",
+    "projectNamePlaceholder": "Project name · Enter to create",
+    "projectCreated": "Project “{name}” created"
   },
   "settings": {
     "title": "Settings",
@@ -80,7 +84,11 @@
     "page": "p. {page}",
     "yesterday": "Yesterday",
     "annotationsCount": "{count, plural, one {# annotation} other {# annotations}}",
-    "notesCount": "{count, plural, one {# note} other {# notes}}"
+    "notesCount": "{count, plural, one {# note} other {# notes}}",
+    "newNote": "New note",
+    "untitledNote": "Untitled note",
+    "moveToTrash": "Move to trash",
+    "movedToTrash": "“{title}” moved to the trash"
   },
   "auth": {
     "signIn": "Sign in",
@@ -145,5 +153,19 @@
     "webpage": "Webpage",
     "image": "Image",
     "note": "Note"
+  },
+  "note": {
+    "details": "Details",
+    "titleLabel": "Title",
+    "bodyLabel": "Note text",
+    "untitled": "Untitled note",
+    "placeholder": "Write here. #tag adds a tag; [[Title]] links an item or a note.",
+    "saving": "Saving…",
+    "unsaved": "Unsaved changes",
+    "saved": "Saved {ago}",
+    "saveError": "Could not save. It will try again as you keep writing.",
+    "conflict": "This note was changed in another tab or device. Reload to see the latest version (what you wrote here since then is lost).",
+    "reload": "Reload",
+    "missing": "This note does not exist or is in the trash."
   }
 }

@@ -1,5 +1,5 @@
-import { ItemPlaceholder } from '@/components/item/ItemPlaceholder';
+import { ItemView } from '@/components/item/ItemView';
 
 export default function ItemPage() {
-  return <ItemPlaceholder />;
+  return <ItemView />;
 }

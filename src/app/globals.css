@@ -56,7 +56,9 @@ code, kbd, samp, pre {
 ::-webkit-scrollbar-thumb:hover { background: var(--stone); }
 
 /* ─── Focus rings ─────────────────────────────────────────────────────── */
-:focus-visible {
+/* Keyboard focus ring for buttons, links and the like. Text fields show focus with their own
+   border instead (and the note editor's writing area shows none, like a page). */
+:focus-visible:not(input, textarea) {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 2px;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { authorsShort, foldText, shortLabel, smartDate, splitSnippet, trimLabel } from './format';
+import { authorsShort, foldText, shortLabel, smartDate, splitSnippet, timeAgo, trimLabel } from './format';
 
 describe('authorsShort', () => {
   it('follows the spec: one, two, three or more authors', () => {
@@ -66,5 +66,16 @@ describe('foldText', () => {
     expect(foldText('Reciprocidád Andina')).toBe('reciprocidad andina');
     expect(foldText('Søren Kierkegaard')).toBe('soren kierkegaard');
     expect(foldText('Straße, Æsir, cœur')).toBe('strasse, aesir, coeur');
+  });
+});
+
+describe('timeAgo', () => {
+  const now = new Date(2026, 10, 27, 15, 0, 0);
+  it('says "now", minutes, hours and days in the interface language', () => {
+    expect(timeAgo(new Date(2026, 10, 27, 14, 59, 50), 'en', now)).toBe('now');
+    expect(timeAgo(new Date(2026, 10, 27, 14, 58, 0), 'en', now)).toBe('2 minutes ago');
+    expect(timeAgo(new Date(2026, 10, 27, 14, 58, 0), 'es', now)).toBe('hace 2 minutos');
+    expect(timeAgo(new Date(2026, 10, 27, 12, 0, 0), 'es', now)).toBe('hace 3 horas');
+    expect(timeAgo(new Date(2026, 10, 26, 15, 0, 0), 'es', now)).toBe('ayer');
   });
 });
