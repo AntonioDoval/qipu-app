@@ -1,70 +1,57 @@
 {
+  "app": {
+    "description": "A research workspace: read, annotate and write."
+  },
   "common": {
-    "loading": "Loading...",
-    "error": "An error occurred",
+    "loading": "Loading…",
+    "error": "Something went wrong.",
+    "retry": "Try again",
     "save": "Save",
     "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "add": "Add",
-    "search": "Search",
     "close": "Close",
-    "open": "Open",
-    "back": "Back",
-    "confirm": "Confirm",
-    "noResults": "No results"
+    "delete": "Delete",
+    "search": "Search"
   },
-  "nav": {
-    "library": "Library",
+  "shell": {
+    "toggleSidebar": "Show or hide the sidebar (⌘\\)",
+    "togglePanel": "Show or hide the right panel (⌘.)",
+    "home": "Library home",
+    "backToLibrary": "Library"
+  },
+  "sidebar": {
+    "search": "Search everything…",
+    "allItems": "All items",
     "projects": "Projects",
     "tags": "Tags",
-    "settings": "Settings",
-    "allItems": "All items"
+    "newProject": "New project",
+    "noProjects": "No projects yet.",
+    "noTags": "Tags appear once you add them.",
+    "trash": "Trash",
+    "settings": "Settings"
   },
-  "families": {
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "signOut": "Sign out",
+    "shortcuts": "Keyboard shortcuts",
+    "shortcutSidebar": "Sidebar",
+    "shortcutPanel": "Right panel"
+  },
+  "kinds": {
     "bibliography": "Bibliography",
-    "fieldwork": "Fieldwork",
-    "notes": "Notes",
-    "multimedia": "Multimedia",
-    "data": "Data",
-    "other": "Other",
-    "quotes": "Quotes"
+    "source": "Sources",
+    "note": "Notes",
+    "bibliographyOne": "Bibliography",
+    "sourceOne": "Source",
+    "noteOne": "Note"
   },
-  "types": {
-    "book": "Book",
-    "book_chapter": "Book chapter",
-    "journal_article": "Journal article",
-    "thesis": "Thesis",
-    "working_paper": "Working paper",
-    "conference_paper": "Conference paper",
-    "interview": "Interview",
-    "fieldnote": "Field note",
-    "document": "Document",
-    "note": "Note",
-    "webpage": "Webpage",
-    "image": "Image",
-    "video": "Video",
-    "audio": "Audio",
-    "social_media_post": "Social media post",
-    "dataset": "Dataset",
-    "statistic": "Statistic",
-    "custom": "Custom"
-  },
-  "items": {
-    "addItem": "Add item",
-    "dropzone": "Drop a file here or click to browse",
-    "pasteLink": "Paste a link",
-    "createNote": "Create note",
-    "addManually": "Add manually",
-    "title": "Title",
-    "type": "Type",
-    "year": "Year",
-    "creators": "Authors / Creators",
-    "tags": "Tags",
-    "projects": "Projects",
-    "metadata": "Metadata",
-    "openViewer": "Open viewer",
-    "noItems": "No items yet"
+  "library": {
+    "title": "Library",
+    "count": "{count, plural, =0 {No items} one {# item} other {# items}}",
+    "emptyTitle": "Your library is empty",
+    "emptyBody": "This is where you will upload PDFs, import your Paperpile library and write notes. Those arrive in the next steps.",
+    "loadError": "The library could not be loaded.",
+    "selectHint": "Select an item to see its details."
   },
   "auth": {
     "signIn": "Sign in",
@@ -73,6 +60,11 @@
     "email": "Email",
     "password": "Password",
     "driveReconnect": "Reconnect your Google Drive",
-    "driveReconnectDesc": "Access to Google Drive was revoked. Reconnect to continue viewing and uploading files."
+    "driveReconnectDesc": "Access to Google Drive was revoked. Reconnect to keep viewing and uploading files."
+  },
+  "item": {
+    "details": "Details",
+    "comingSoon": "The reader and the note editor arrive in the next steps.",
+    "notFound": "This item does not exist or is in the trash."
   }
 }

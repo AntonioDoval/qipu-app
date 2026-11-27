@@ -1,78 +1,70 @@
 {
+  "app": {
+    "description": "Espacio de trabajo para la investigación: leer, anotar y escribir."
+  },
   "common": {
-    "loading": "Cargando...",
-    "error": "Ocurrió un error",
+    "loading": "Cargando…",
+    "error": "Algo salió mal.",
+    "retry": "Reintentar",
     "save": "Guardar",
     "cancel": "Cancelar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "add": "Agregar",
-    "search": "Buscar",
     "close": "Cerrar",
-    "open": "Abrir",
-    "back": "Volver",
-    "confirm": "Confirmar",
-    "noResults": "Sin resultados"
+    "delete": "Eliminar",
+    "search": "Buscar"
   },
-  "nav": {
-    "library": "Biblioteca",
+  "shell": {
+    "toggleSidebar": "Mostrar u ocultar la barra lateral (⌘\\)",
+    "togglePanel": "Mostrar u ocultar el panel derecho (⌘.)",
+    "home": "Inicio de la biblioteca",
+    "backToLibrary": "Biblioteca"
+  },
+  "sidebar": {
+    "search": "Buscar en todo…",
+    "allItems": "Todos los ítems",
     "projects": "Proyectos",
     "tags": "Etiquetas",
-    "settings": "Configuración",
-    "allItems": "Todos los ítems"
+    "newProject": "Nuevo proyecto",
+    "noProjects": "Todavía no hay proyectos.",
+    "noTags": "Las etiquetas aparecen cuando las agregás.",
+    "trash": "Papelera",
+    "settings": "Configuración"
   },
-  "families": {
+  "settings": {
+    "title": "Configuración",
+    "language": "Idioma",
+    "signOut": "Cerrar sesión",
+    "shortcuts": "Atajos de teclado",
+    "shortcutSidebar": "Barra lateral",
+    "shortcutPanel": "Panel derecho"
+  },
+  "kinds": {
     "bibliography": "Bibliografía",
-    "fieldwork": "Trabajo de campo",
-    "notes": "Notas",
-    "multimedia": "Multimedia",
-    "data": "Datos",
-    "other": "Otros",
-    "quotes": "Citas"
+    "source": "Fuentes",
+    "note": "Notas",
+    "bibliographyOne": "Bibliografía",
+    "sourceOne": "Fuente",
+    "noteOne": "Nota"
   },
-  "types": {
-    "book": "Libro",
-    "book_chapter": "Capítulo de libro",
-    "journal_article": "Artículo de revista",
-    "thesis": "Tesis",
-    "working_paper": "Documento de trabajo",
-    "conference_paper": "Ponencia",
-    "interview": "Entrevista",
-    "fieldnote": "Nota de campo",
-    "document": "Documento",
-    "note": "Nota",
-    "webpage": "Página web",
-    "image": "Imagen",
-    "video": "Video",
-    "audio": "Audio",
-    "social_media_post": "Publicación en redes",
-    "dataset": "Dataset",
-    "statistic": "Estadística",
-    "custom": "Personalizado"
-  },
-  "items": {
-    "addItem": "Agregar ítem",
-    "dropzone": "Soltá un archivo aquí o hacé clic para explorar",
-    "pasteLink": "Pegar enlace",
-    "createNote": "Crear nota",
-    "addManually": "Agregar manualmente",
-    "title": "Título",
-    "type": "Tipo",
-    "year": "Año",
-    "creators": "Autores / Creadores",
-    "tags": "Etiquetas",
-    "projects": "Proyectos",
-    "metadata": "Metadatos",
-    "openViewer": "Abrir visor",
-    "noItems": "No hay ítems todavía"
+  "library": {
+    "title": "Biblioteca",
+    "count": "{count, plural, =0 {Sin ítems} one {# ítem} other {# ítems}}",
+    "emptyTitle": "Tu biblioteca está vacía",
+    "emptyBody": "Desde acá vas a poder subir PDFs, importar tu biblioteca de Paperpile y escribir notas. Esas funciones llegan en los próximos pasos.",
+    "loadError": "No se pudo cargar la biblioteca.",
+    "selectHint": "Elegí un ítem para ver sus detalles."
   },
   "auth": {
     "signIn": "Iniciar sesión",
     "signOut": "Cerrar sesión",
     "signInWithGoogle": "Continuar con Google",
-    "email": "Correo electrónico",
+    "email": "Email",
     "password": "Contraseña",
-    "driveReconnect": "Reconectá tu Google Drive",
-    "driveReconnectDesc": "El acceso a Google Drive fue revocado. Reconectá para seguir viendo y subiendo archivos."
+    "driveReconnect": "Volvé a conectar tu Google Drive",
+    "driveReconnectDesc": "Se revocó el acceso a Google Drive. Volvé a conectarlo para seguir viendo y subiendo archivos."
+  },
+  "item": {
+    "details": "Detalles",
+    "comingSoon": "El lector y el editor de notas llegan en los próximos pasos.",
+    "notFound": "Este ítem no existe o está en la papelera."
   }
 }
