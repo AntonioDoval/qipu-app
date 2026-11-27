@@ -6,7 +6,7 @@ on:
 
 jobs:
   app:
-    name: Lint, typecheck, build
+    name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +17,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      - run: npm run test
       - run: npm run build
         env:
           # Placeholders: the build only needs the variables to exist.
