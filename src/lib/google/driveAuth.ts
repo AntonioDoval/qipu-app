@@ -3,6 +3,7 @@
 // Google sign-in and Drive access from the browser. The browser only ever holds a
 // short-lived access token (about an hour), fetched from our server when needed.
 
+import { SAMPLE_MODE } from '@/lib/sampleMode';
 import { createClient } from '@/lib/supabase/client';
 
 /** Drive access limited to files Qipu creates or the user picks (not the whole Drive). */
@@ -19,6 +20,7 @@ let cached: { token: string; expiresAt: number } | null = null;
 
 /** A valid Google access token for Drive, renewed through the server when it runs out. */
 export async function getDriveAccessToken(): Promise<string> {
+  if (SAMPLE_MODE) return 'sample-mode'; // local preview: no Google, files stay in memory
   if (cached && cached.expiresAt > Date.now()) return cached.token;
   const res = await fetch('/api/google/token', { cache: 'no-store' });
   const body = (await res.json().catch(() => ({}))) as { accessToken?: string; expiresAt?: number; error?: string; message?: string };

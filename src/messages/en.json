@@ -46,7 +46,11 @@
     "driveNotConnected": "Not connected",
     "driveChecking": "Checking…",
     "driveConnect": "Connect",
-    "driveError": "Could not check"
+    "driveError": "Could not check",
+    "driveFolder": "Folder: {name}",
+    "driveNoFolder": "No folder yet",
+    "driveChangeFolder": "Change",
+    "driveChooseFolder": "Choose"
   },
   "kinds": {
     "bibliography": "Bibliography",
@@ -91,10 +95,13 @@
     "yesterday": "Yesterday",
     "annotationsCount": "{count, plural, one {# annotation} other {# annotations}}",
     "notesCount": "{count, plural, one {# note} other {# notes}}",
-    "newNote": "New note",
     "untitledNote": "Untitled note",
     "moveToTrash": "Move to trash",
-    "movedToTrash": "“{title}” moved to the trash"
+    "movedToTrash": "“{title}” moved to the trash",
+    "addNew": "Add new",
+    "addNote": "Note",
+    "addPdf": "PDF…",
+    "addPdfHint": "Saved in your Google Drive folder"
   },
   "auth": {
     "signIn": "Sign in",
@@ -174,5 +181,28 @@
     "conflict": "This note was changed in another tab or device. Reload to see the latest version (what you wrote here since then is lost).",
     "reload": "Reload",
     "missing": "This note does not exist or is in the trash."
+  },
+  "storage": {
+    "title": "Where should Qipu keep your files?",
+    "changeTitle": "Change the Qipu folder",
+    "intro": "Qipu will create a new folder in your Google Drive for your PDFs. Choose its name and where to put it.",
+    "name": "Folder name",
+    "location": "Location",
+    "myDrive": "My Drive (top level)",
+    "chooseLocation": "Choose another location…",
+    "useMyDrive": "Use My Drive",
+    "pickerTitle": "Choose where to create the Qipu folder",
+    "create": "Create folder",
+    "newFolderNote": "Qipu always creates a new folder and never touches what you already have. If a folder with the same name exists, Drive does not replace it: you will see two.",
+    "changeNote": "New files will go to the new folder. What is already in “{name}” stays there and keeps working."
+  },
+  "upload": {
+    "title": "Uploading to Google Drive",
+    "finished": "Upload finished",
+    "close": "Close",
+    "waiting": "Waiting",
+    "notPdf": "Only PDFs for now",
+    "driveNotConnected": "Google Drive is not connected.",
+    "connect": "Connect"
   }
 }

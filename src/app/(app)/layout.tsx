@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { LibraryProvider } from '@/components/library/LibraryProvider';
 import { LibraryUIProvider } from '@/components/library/LibraryUIProvider';
+import { UploadProvider } from '@/components/upload/UploadProvider';
 import { AppShell } from '@/components/shell/AppShell';
 import { ShellProvider } from '@/components/shell/ShellProvider';
 import { SAMPLE_MODE } from '@/lib/sampleMode';
@@ -21,7 +22,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <ShellProvider>
       <LibraryProvider>
         <LibraryUIProvider>
-          <AppShell>{children}</AppShell>
+          <UploadProvider>
+            <AppShell>{children}</AppShell>
+          </UploadProvider>
         </LibraryUIProvider>
       </LibraryProvider>
     </ShellProvider>

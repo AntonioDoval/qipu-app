@@ -46,7 +46,11 @@
     "driveNotConnected": "No conectado",
     "driveChecking": "Comprobando…",
     "driveConnect": "Conectar",
-    "driveError": "No se pudo comprobar"
+    "driveError": "No se pudo comprobar",
+    "driveFolder": "Carpeta: {name}",
+    "driveNoFolder": "Todavía sin carpeta",
+    "driveChangeFolder": "Cambiar",
+    "driveChooseFolder": "Elegir"
   },
   "kinds": {
     "bibliography": "Bibliografía",
@@ -91,10 +95,13 @@
     "yesterday": "Ayer",
     "annotationsCount": "{count, plural, one {# anotación} other {# anotaciones}}",
     "notesCount": "{count, plural, one {# nota} other {# notas}}",
-    "newNote": "Nueva nota",
     "untitledNote": "Nota sin título",
     "moveToTrash": "Mover a la papelera",
-    "movedToTrash": "«{title}» se movió a la papelera"
+    "movedToTrash": "«{title}» se movió a la papelera",
+    "addNew": "Agregar nuevo",
+    "addNote": "Nota",
+    "addPdf": "PDF…",
+    "addPdfHint": "Se guarda en tu carpeta de Google Drive"
   },
   "auth": {
     "signIn": "Iniciar sesión",
@@ -174,5 +181,28 @@
     "conflict": "Esta nota se cambió en otra pestaña o dispositivo. Recargá para ver la última versión (lo que escribiste acá después de eso se pierde).",
     "reload": "Recargar",
     "missing": "Esta nota no existe o está en la papelera."
+  },
+  "storage": {
+    "title": "¿Dónde guarda Qipu tus archivos?",
+    "changeTitle": "Cambiar la carpeta de Qipu",
+    "intro": "Qipu va a crear una carpeta nueva en tu Google Drive para tus PDFs. Elegí su nombre y dónde ponerla.",
+    "name": "Nombre de la carpeta",
+    "location": "Ubicación",
+    "myDrive": "Mi unidad (arriba de todo)",
+    "chooseLocation": "Elegir otra ubicación…",
+    "useMyDrive": "Usar Mi unidad",
+    "pickerTitle": "Elegí dónde crear la carpeta de Qipu",
+    "create": "Crear carpeta",
+    "newFolderNote": "Qipu siempre crea una carpeta nueva y no toca nada de lo que ya tenés. Si ya existe una carpeta con el mismo nombre, Drive no la reemplaza: vas a ver dos.",
+    "changeNote": "Los archivos nuevos van a ir a la carpeta nueva. Lo que ya está en «{name}» se queda ahí y sigue funcionando."
+  },
+  "upload": {
+    "title": "Subiendo a Google Drive",
+    "finished": "Subida terminada",
+    "close": "Cerrar",
+    "waiting": "En espera",
+    "notPdf": "Por ahora solo PDFs",
+    "driveNotConnected": "Google Drive no está conectado.",
+    "connect": "Conectar"
   }
 }

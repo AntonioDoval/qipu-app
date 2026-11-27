@@ -14,6 +14,7 @@ import { getData, type Item } from '@/data';
 import { useToast } from '@/components/ui/Toaster';
 import { authorsShort, splitSnippet } from '@/lib/format';
 import { filterItems, sortItems, type HasFilter, type KindFilter, type SortKey } from '@/lib/libraryQuery';
+import { useUploads } from '@/components/upload/UploadProvider';
 import { ItemDetails } from './ItemDetails';
 import { useDates, useTypeLabel } from './labels';
 import { useLibrary } from './LibraryProvider';
@@ -42,6 +43,7 @@ export function LibraryView() {
   const dates = useDates();
   const { query } = ui;
   const { toast } = useToast();
+  const uploads = useUploads();
 
   const newNote = async () => {
     try {
@@ -100,14 +102,40 @@ export function LibraryView() {
             {t('backToLibrary')}
           </button>
         ) : (
-          <button
-            type="button"
-            onClick={() => void newNote()}
-            disabled={lib.status !== 'ready'}
-            className="ml-auto flex items-center gap-1.5 self-center rounded-md bg-accent px-3 py-1 text-[13px] text-paper hover:opacity-90 disabled:opacity-50"
-          >
-            <Plus size={14} strokeWidth={2} /> {t('newNote')}
-          </button>
+          <div className="ml-auto self-center">
+            <Popover
+              align="right"
+              button={() => (
+                <>
+                  <Plus size={14} strokeWidth={2} /> {t('addNew')}
+                </>
+              )}
+              buttonClassName="flex items-center gap-1.5 rounded-md bg-accent px-3 py-1 text-[13px] text-paper hover:opacity-90 disabled:opacity-50"
+              panelClassName="w-56 p-1.5"
+            >
+              {(close) => (
+                <div role="menu" className="flex flex-col">
+                  <MenuItem
+                    icon={<PenLine size={15} strokeWidth={1.7} className="text-kind-note" />}
+                    label={t('addNote')}
+                    onClick={() => {
+                      close();
+                      void newNote();
+                    }}
+                  />
+                  <MenuItem
+                    icon={<FileText size={15} strokeWidth={1.7} className="text-kind-bibliography" />}
+                    label={t('addPdf')}
+                    hint={t('addPdfHint')}
+                    onClick={() => {
+                      close();
+                      uploads.addPdfs();
+                    }}
+                  />
+                </div>
+              )}
+            </Popover>
+          </div>
         )}
       </div>
 
@@ -358,6 +386,18 @@ export function LibraryView() {
         )}
       </div>
     </ViewWithPanel>
+  );
+}
+
+function MenuItem(props: { icon: React.ReactNode; label: string; hint?: string; onClick: () => void }) {
+  return (
+    <button type="button" role="menuitem" onClick={props.onClick} className="flex items-start gap-2.5 rounded-md px-2.5 py-2 text-left text-[13.5px] hover:bg-softer">
+      <span className="mt-0.5">{props.icon}</span>
+      <span className="flex flex-col">
+        {props.label}
+        {props.hint && <span className="text-[11.5px] text-stone">{props.hint}</span>}
+      </span>
+    </button>
   );
 }
 

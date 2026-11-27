@@ -12,6 +12,7 @@ import { MESSAGES, useLocaleSwitch } from '@/components/i18n/LocaleProvider';
 import { useToast } from '@/components/ui/Toaster';
 import { useShortcutLabels } from '@/lib/shortcuts';
 import { connectDrive, isDriveConnected } from '@/lib/google/driveAuth';
+import { useUploads } from '@/components/upload/UploadProvider';
 
 const LANGUAGE_NAMES: Record<Locale, string> = { es: 'Español', en: 'English' };
 
@@ -25,6 +26,7 @@ export function SettingsMenu() {
   const [open, setOpen] = useState(false);
   const [drive, setDrive] = useState<'checking' | 'connected' | 'not_connected' | 'error'>('checking');
   const pathname = usePathname();
+  const uploads = useUploads();
   const box = useRef<HTMLDivElement>(null);
 
   // Close when clicking outside or pressing Escape.
@@ -66,6 +68,7 @@ export function SettingsMenu() {
             isDriveConnected()
               .then((ok) => setDrive(ok ? 'connected' : 'not_connected'))
               .catch(() => setDrive('error'));
+            void uploads.refreshStorage().catch(() => undefined);
           }
           setOpen((o) => !o);
         }}
@@ -113,6 +116,24 @@ export function SettingsMenu() {
               </button>
             )}
           </div>
+
+          {drive === 'connected' && (
+            <div className="-mt-1.5 mb-3 flex items-center gap-2 pl-[23px] text-[12.5px] text-sage">
+              <span className="truncate">
+                {uploads.storage ? t('driveFolder', { name: uploads.storage.folderName }) : t('driveNoFolder')}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  uploads.openStorageSetup();
+                }}
+                className="ml-auto shrink-0 text-accent hover:underline"
+              >
+                {uploads.storage ? t('driveChangeFolder') : t('driveChooseFolder')}
+              </button>
+            </div>
+          )}
 
           <p className="mb-1.5 font-mono text-[10.5px] uppercase tracking-wider text-sage">{t('shortcuts')}</p>
           <dl className="mb-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[13px]">
