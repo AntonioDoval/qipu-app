@@ -53,6 +53,11 @@ export function fullDate(value: string | Date, locale: string): string {
   return d.toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
 }
 
+/** Lower case, without accents: for comparing titles the way the database search does. */
+export function foldText(text: string): string {
+  return text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+}
+
 export interface SnippetPart {
   text: string;
   match: boolean;
