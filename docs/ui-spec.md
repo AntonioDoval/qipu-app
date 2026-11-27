@@ -253,6 +253,7 @@ Each step is tried on staging before the next.
 ### Security and access
 - Login callback only redirects to same-site paths (fix the open redirect).
 - Row-level security checks **both sides** of every join table (item_tags, quote/annotation tags, item_links).
+- **Google app stays in testing mode for now (decided 2026-11-27):** the Drive key expires every 7 days and Settings offers **Connect**. Publishing the app (privacy policy page on production, branding) is a must-do before real use.
 - **Google login only.** Remove email/password. Request Drive access with offline access so Qipu keeps a refresh token (stored securely) and Drive keeps working after the first hour.
 
 ### Data model

@@ -31,6 +31,7 @@ Qipu is one place for the whole academic reading-writing process: discover liter
 - Migrations live in `supabase/migrations/`, applied with the Supabase CLI. **Never edit a migration that has been applied anywhere**; add a new one.
 - **For now there is one Supabase project** (ref `otbpolbikpylzjbosjgc`), shared by `develop` and `main`: the free plan's two-project limit is used up. It holds no real data yet. Until a separate staging database exists, every migration must pass the GitHub check and be shown to the user before it is applied.
 - **Must-do before Qipu holds real research data:** set up a separate staging database (Supabase Pro, or a local Supabase), and point `develop` at it.
+- **Also before real use: publish the Google app** (Google Cloud → Google Auth Platform → Público → Publicar app). While it stays in "Prueba" (decided 2026-11-27), Google expires the Drive key every 7 days (Settings → Conectar fixes it) and only test users can sign in. Publishing needs a privacy policy page on the production site, a home page URL and the app's branding details.
 - Row-level security on every table; join tables check ownership of **both** sides.
 - **Grant permissions explicitly** in every migration that adds tables or functions (`authenticated` for the app, `service_role` for server code, nothing for `anon`). Current Supabase projects do not grant new tables automatically; see `003_grants.sql`. The test database (`supabase/tests/auth_stub.sql`) is just as strict.
 - TypeScript database types are generated from the database, not written by hand.
