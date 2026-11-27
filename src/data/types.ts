@@ -228,6 +228,13 @@ export interface Profile {
   palette: PaletteSlot[];
   /** The user's own source types (built-in ones are not stored). */
   sourceTypes: string[];
+  /** The folder where Qipu keeps the user's files (chosen by the user), or null if not set up yet. */
+  storage: StorageLocation | null;
+}
+
+export interface StorageLocation {
+  folderId: string;
+  folderName: string;
 }
 
 export interface NoteVersion {
@@ -248,6 +255,14 @@ export class ConflictError extends Error {
   constructor(public readonly itemId: string) {
     super('This item was changed somewhere else since you opened it.');
     this.name = 'ConflictError';
+  }
+}
+
+/** Files cannot be stored until the user has chosen (and Qipu has created) its folder. */
+export class StorageNotSetUpError extends Error {
+  constructor() {
+    super('Choose where Qipu keeps your files first.');
+    this.name = 'StorageNotSetUpError';
   }
 }
 

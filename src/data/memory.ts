@@ -11,6 +11,7 @@ import { SAMPLE_ANCHORS, SAMPLE_ANNOTATIONS, SAMPLE_ITEMS, SAMPLE_PROJECTS } fro
 import {
   ConflictError,
   DataError,
+  StorageNotSetUpError,
   type Annotation,
   type AnnotationTag,
   type Item,
@@ -41,7 +42,9 @@ export function createMemoryData(options: { sample?: boolean } = { sample: true 
     locale: 'es',
     palette: ['#F0E442', '#009E73', '#CC79A7', '#56B4E9', '#E69F00'].map((color) => ({ color, name: null })),
     sourceTypes: [],
+    storage: null,
   };
+  const files = new Map<string, Blob>();
   let items: Item[] = [];
   let projects: Project[] = [];
   let tags: Tag[] = [];
@@ -181,6 +184,23 @@ export function createMemoryData(options: { sample?: boolean } = { sample: true 
     },
     async addSourceType(label) {
       if (!profile.sourceTypes.some((t) => foldText(t) === foldText(label))) profile.sourceTypes.push(label.trim());
+    },
+
+    async createStorageFolder(name) {
+      profile.storage = { folderId: newId(), folderName: name.trim() || 'Qipu' };
+      return structuredClone(profile.storage);
+    },
+    async storeFile(file, name, opts) {
+      if (!profile.storage) throw new StorageNotSetUpError();
+      const fileId = newId();
+      files.set(fileId, file);
+      opts?.onProgress?.(1);
+      return { fileId, fileName: name, fileSize: file.size, sha256: null };
+    },
+    async readFile(file) {
+      const blob = files.get(file.fileId);
+      if (!blob) throw new DataError('This file is not in the sample library.');
+      return blob;
     },
 
     listItems: (o) => later(items.filter((i) => (o?.trash ? !!i.deletedAt : !i.deletedAt))),

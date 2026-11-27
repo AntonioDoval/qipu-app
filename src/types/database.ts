@@ -422,6 +422,8 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           drive_connected: boolean
+          drive_folder_id: string | null
+          drive_folder_name: string | null
           email: string
           full_name: string | null
           id: string
@@ -433,6 +435,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           drive_connected?: boolean
+          drive_folder_id?: string | null
+          drive_folder_name?: string | null
           email: string
           full_name?: string | null
           id: string
@@ -444,6 +448,8 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           drive_connected?: boolean
+          drive_folder_id?: string | null
+          drive_folder_name?: string | null
           email?: string
           full_name?: string | null
           id?: string

@@ -4,6 +4,8 @@
 
 import type {
   Annotation,
+  DriveFile,
+  StorageLocation,
   AnnotationDraft,
   AnnotationPatch,
   AnnotationTag,
@@ -29,6 +31,17 @@ export interface QipuData {
   updatePalette(palette: PaletteSlot[]): Promise<void>;
   /** Remember a source type the user created ("Price list"). */
   addSourceType(label: string): Promise<void>;
+
+  // ── Files (Google Drive today; a local folder in a future desktop version) ──
+  /**
+   * Create a NEW folder for Qipu's files, named and placed where the user chose (parent null = top
+   * of the drive), and remember it. Never reuses or overwrites an existing folder.
+   */
+  createStorageFolder(name: string, parentId: string | null): Promise<StorageLocation>;
+  /** Upload a file into the user's Qipu folder (throws StorageNotSetUpError if there is none yet). */
+  storeFile(file: Blob, name: string, options?: { onProgress?: (fraction: number) => void }): Promise<DriveFile>;
+  /** Read a stored file back (e.g. a PDF for the reader). */
+  readFile(file: DriveFile): Promise<Blob>;
 
   // ── Items (bibliography, sources, notes) ──────────────────────────────────
   /** Everything not in the trash, or only what is in the trash. */

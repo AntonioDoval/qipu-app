@@ -8,10 +8,13 @@ import type { Database, Json } from '@/types/database';
 import { foldText } from '@/lib/format';
 import { parseNoteLinks, parseNoteTags, renameLinks, renameTagInText } from '@/lib/notes';
 import { isTagUnder, normalizeTagPath } from '@/lib/tags';
+import { sha256Hex } from '@/lib/fileHash';
+import { createFolder, downloadFile, uploadFile } from './drive';
 import type { QipuData } from './repository';
 import {
   ConflictError,
   DataError,
+  StorageNotSetUpError,
   type Annotation,
   type AnnotationDraft,
   type AnnotationKind,
@@ -165,7 +168,12 @@ const HEX = /^#[0-9a-fA-F]{6}$/;
 
 // ─── the implementation ───────────────────────────────────────────────────────
 
-export function createSupabaseData(client: QipuSupabaseClient, options: { userId?: string } = {}): QipuData {
+export function createSupabaseData(
+  client: QipuSupabaseClient,
+  options: { userId?: string; driveToken?: () => Promise<string> } = {},
+): QipuData {
+  // Drive access tokens come from our server (lib/google/driveAuth); tests can pass their own.
+  const driveToken = options.driveToken ?? (async () => (await import('@/lib/google/driveAuth')).getDriveAccessToken());
   // `userId` is only passed by tests (their database has no sign-in service); the app asks Supabase.
   let userId: string | null = options.userId ?? null;
 
@@ -303,6 +311,7 @@ export function createSupabaseData(client: QipuSupabaseClient, options: { userId
         locale: r.locale === 'en' ? 'en' : 'es',
         palette: (r.palette as unknown as PaletteSlot[]) ?? [],
         sourceTypes: r.source_types ?? [],
+        storage: r.drive_folder_id ? { folderId: r.drive_folder_id, folderName: r.drive_folder_name ?? 'Qipu' } : null,
       };
     },
 
@@ -325,6 +334,32 @@ export function createSupabaseData(client: QipuSupabaseClient, options: { userId
         .update({ source_types: [...profile.sourceTypes, name] })
         .eq('id', profile.id);
       check(res.error, 'save the source type');
+    },
+
+    // ── Files ────────────────────────────────────────────────────────────────
+    async createStorageFolder(name, parentId) {
+      const folderName = name.trim() || 'Qipu';
+      const folder = await createFolder(await driveToken(), folderName, parentId);
+      const res = await client
+        .from('profiles')
+        .update({ drive_folder_id: folder.id, drive_folder_name: folder.name })
+        .eq('id', await uid());
+      check(res.error, 'remember the Qipu folder');
+      return { folderId: folder.id, folderName: folder.name };
+    },
+
+    async storeFile(file, name, opts) {
+      const profile = await api.getProfile();
+      if (!profile.storage) throw new StorageNotSetUpError();
+      const [uploaded, sha256] = await Promise.all([
+        uploadFile(await driveToken(), profile.storage.folderId, file, name, opts?.onProgress),
+        sha256Hex(file),
+      ]);
+      return { fileId: uploaded.id, fileName: uploaded.name, fileSize: uploaded.size, sha256 };
+    },
+
+    async readFile(file) {
+      return downloadFile(await driveToken(), file.fileId);
     },
 
     // ── Items ────────────────────────────────────────────────────────────────

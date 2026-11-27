@@ -1,0 +1,5 @@
+/** SHA-256 of a file, as hex: identifies identical files (e.g. the same PDF uploaded twice). */
+export async function sha256Hex(file: Blob): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}

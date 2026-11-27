@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createMemoryData } from './memory';
-import { ConflictError } from './types';
+import { ConflictError, StorageNotSetUpError } from './types';
 
 // The in-memory data layer follows the same contract as the Supabase one.
 describe('memory data layer', () => {
@@ -44,5 +44,16 @@ describe('memory data layer', () => {
     expect((await data.listItems({ trash: true })).map((i) => i.id)).toEqual([first.id]);
     await data.restoreItems([first.id]);
     expect(await data.listItems({ trash: true })).toHaveLength(0);
+  });
+
+  it('stores files only after a folder was chosen, and reads them back', async () => {
+    const data = createMemoryData();
+    const pdf = new Blob(['%PDF-1.7'], { type: 'application/pdf' });
+    await expect(data.storeFile(pdf, 'x.pdf')).rejects.toBeInstanceOf(StorageNotSetUpError);
+    const location = await data.createStorageFolder('Qipu (tesis)', null);
+    expect(location.folderName).toBe('Qipu (tesis)');
+    expect((await data.getProfile()).storage).toEqual(location);
+    const stored = await data.storeFile(pdf, 'x.pdf');
+    expect(await (await data.readFile(stored)).text()).toBe('%PDF-1.7');
   });
 });

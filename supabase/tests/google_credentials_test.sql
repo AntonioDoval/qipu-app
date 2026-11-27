@@ -33,3 +33,17 @@ do $$ begin
     raise exception 'expected exactly user 1''s row to remain';
   end if;
 end $$;
+
+-- Migration 005: each user sets only their own Qipu folder.
+set role authenticated;
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000d1', false);
+update public.profiles set drive_folder_id = 'folder-1', drive_folder_name = 'Qipu';
+select set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-0000000000d2', false);
+update public.profiles set drive_folder_id = 'folder-2', drive_folder_name = 'Qipu (tesis)';
+reset role;
+do $$ begin
+  if (select drive_folder_id from public.profiles where id = '00000000-0000-0000-0000-0000000000d1') <> 'folder-1'
+     or (select drive_folder_id from public.profiles where id = '00000000-0000-0000-0000-0000000000d2') <> 'folder-2' then
+    raise exception 'a user changed another user''s Qipu folder';
+  end if;
+end $$;
