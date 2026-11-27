@@ -1,7 +1,11 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { SAMPLE_MODE } from '@/lib/sampleMode';
 
 export async function proxy(request: NextRequest) {
+  // Local sample mode (development only): no sign-in needed.
+  if (SAMPLE_MODE) return NextResponse.next({ request });
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

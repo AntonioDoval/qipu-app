@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "preview:sample": "NEXT_PUBLIC_QIPU_SAMPLE=1 next dev"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.4",
